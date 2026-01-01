@@ -64,6 +64,10 @@ public class SwapSkill : MonoBehaviour
         {
             if (t.gameObject == gameObject) continue;
             bool visible = HasLineOfSight(transform.position, t.transform.position);
+            // [comment]
+            // 아래 HasLineOfSight() 에서 적은대로 땅에 의한 막힘을 생각해서
+            // 일단 벽에 막혀 있어도 스왑 가능하도록 한 것.
+            visible = true; // for check
             if (!manager.CheckGauge(Vector2.SqrMagnitude(transform.position - t.transform.position)))
             {
                 visible = false;
@@ -109,6 +113,10 @@ public class SwapSkill : MonoBehaviour
     }
 
     // =============================
+    // [comment]
+    // 벽을 넘는 swap도 가능해야 하지 않나?
+    // 그리고 '땅'도 벽으로 처리되어서, 플레이어가 보기에는 뚫려 있는데 (큰 문제 없이 도달 가능한데)
+    // '땅'에 의해 일직선 거리는 막혀 있어 swap 대상으로 선택되지 못하는 경우가 있는 듯 하다.
     bool HasLineOfSight(Vector2 from, Vector2 to)
     {
         RaycastHit2D hit = Physics2D.Raycast(

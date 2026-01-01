@@ -32,7 +32,8 @@ public class CharacterManager : MonoBehaviour
     public void Update()
     {
         gauge = Math.Min(maxGauge, gauge + recoverRate * Time.deltaTime);
-        if (gauge > maxGauge / 3)
+        //if (gauge > maxGauge / 3)
+        if (gauge > 0 && !canCast)
         {
             canCast = true;
         }
