@@ -91,6 +91,7 @@ public static class StageSerializer
         EditorUtility.SetDirty(stage);
         AssetDatabase.SaveAssets();
     }
+#endif
 
     // ScriptableObject를 받아 현재 에디터에
     // grid (terrian), player, enemy 를 배치한다.
@@ -113,9 +114,17 @@ public static class StageSerializer
         groundTM.ClearAllTiles();
         wallTM.ClearAllTiles();
         if (player.childCount > 0)
+#if UNITY_EDITOR
             Undo.DestroyObjectImmediate(player.GetChild(0).gameObject);
+#else
+            Destroy(player.GetChild(0).gameObject);
+#endif
         for (i = enemy.childCount - 1; i >= 0; i--)
+#if UNITY_EDITOR
             Undo.DestroyObjectImmediate(enemy.GetChild(i).gameObject);
+#else
+            Destroy(enemy.GetChild(i).gameObject);
+#endif
 
         // 땅 타일 배치하기
         foreach (Int2 pos in stage.grounds)
@@ -128,17 +137,40 @@ public static class StageSerializer
         // 적들 스폰하기
         foreach (Int2 pos in stage.enemies)
         {
+#if UNITY_EDITOR
             entity = (GameObject)PrefabUtility.InstantiatePrefab(enemyPrefab);
-            entity.transform.position = grid.CellToLocal(new Vector3Int(pos.x, pos.y));
+#else
+            entity = Instantiate(enemyPrefab);
+#endif
+            entity.transform.position = GetEnemyPos(grid, pos);
             entity.transform.SetParent(enemy);
         }
 
         // 플레이어 스폰하기
+#if UNITY_EDITOR
         entity = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
-        entity.transform.position = grid.CellToLocal(new Vector3Int(stage.player.x, stage.player.y));
+#else   
+        entity = Instantiate(playerPrefab);
+#endif
+        entity.transform.position = GetPlayerPos(grid, stage.player);
         entity.transform.SetParent(player);
     }
 
     // TODO: 화면 clear 함수 만들기
-#endif
+
+    // tile 좌표를 받아 플레이어가 위치할 로컬 좌표를 반환한다
+    // enemy도 동일한 로직을 수행하지만 일단은 함수를 분리해뒀다
+    // 일단 조정 없이 타일 좌하단 지점에 스폰되도록 함 (이후 offset 추가할 예정)
+    private static Vector2 GetPlayerPos(Grid grid, Int2 pos)
+    {
+        Vector2 playerPos;
+        playerPos = grid.CellToLocal(new Vector3Int(pos. x, pos.y));
+        playerPos += new Vector2(grid.cellSize.x, grid.cellSize.y) * 0.5f;
+        return playerPos;
+    }
+
+    private static Vector2 GetEnemyPos(Grid grid, Int2 pos)
+    {
+        return GetPlayerPos(grid, pos);
+    }
 }

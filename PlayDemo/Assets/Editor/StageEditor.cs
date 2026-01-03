@@ -23,10 +23,14 @@ public class StageEditor : EditorWindow
         GUILayout.Label("Stage Editor", EditorStyles.boldLabel);
 
         grid = (Grid)EditorGUILayout.ObjectField("Grid", grid, typeof(Grid), true);
-        stage = (StageData)EditorGUILayout.ObjectField("StageData", stage, typeof(StageData), false);
         player = (Transform)EditorGUILayout.ObjectField("Player", player, typeof(Transform), true);
         enemy = (Transform)EditorGUILayout.ObjectField("Enemy", enemy, typeof(Transform), true);
         stagePlacer = (StagePlacer)EditorGUILayout.ObjectField("Stage Placer", stagePlacer, typeof(StagePlacer), true);
+        
+        GUILayout.Space(10);
+        GUILayout.Label("Stage", EditorStyles.boldLabel);
+
+        stage = (StageData)EditorGUILayout.ObjectField("StageData", stage, typeof(StageData), false);
 
         GUILayout.Space(10);
 
