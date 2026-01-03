@@ -14,7 +14,6 @@ public class PlayerMovement2D : MonoBehaviour
 
     Rigidbody2D rb;
     float moveInput;
-    bool isGrounded;
     
     private CharacterManager manager;
     public void Init(CharacterManager manager)
@@ -38,7 +37,7 @@ public class PlayerMovement2D : MonoBehaviour
 
     void FixedUpdate()
     {
-        CheckGround();
+        //CheckGround();
         Move();
     }
 
@@ -59,7 +58,7 @@ public class PlayerMovement2D : MonoBehaviour
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
-
+/*
     void CheckGround()
     {
         isGrounded = Physics2D.OverlapCircle(
@@ -68,6 +67,7 @@ public class PlayerMovement2D : MonoBehaviour
             groundLayer
         );
     }
+*/
 
     void OnDrawGizmosSelected()
     {
