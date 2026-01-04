@@ -75,7 +75,7 @@ public class SwapSkill : MonoBehaviour
             if (visible && !visibleTargets.Contains(t))
             {
                 visibleTargets.Add(t);
-                t.SetHighlight(true);
+                t.SetHighlight(true,transform ,t.transform ,manager.ShowGauge);
             }
             else if (!visible && visibleTargets.Contains(t))
             {
@@ -91,7 +91,6 @@ public class SwapSkill : MonoBehaviour
         Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
         Collider2D hit = Physics2D.OverlapPoint(mousePos, targetLayer);
         
-        print(hit);
         if (hit == null) return;
 
         SwapTarget target = hit.GetComponent<SwapTarget>();

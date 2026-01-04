@@ -14,11 +14,17 @@ public class CharacterManager : MonoBehaviour
 
     #region UI
     public RadialGauge radialGauge;
+    public RadialGauge finalGauge;
     #endregion
     [SerializeField] private float maxGauge = 100;
     [SerializeField] private float recoverRate = 10f;
     private float gauge = 100;
     private bool canCast = true;
+    [SerializeField] private float recoveryDelay = 1f;
+    private bool useSkill = false;
+    private float lastSkillTime = 0;
+    private float lastShowTime = 0;
+    private float showDelay = 0.1f;
     private void Awake()
     {
         mainSkill.Init(this);
@@ -27,17 +33,29 @@ public class CharacterManager : MonoBehaviour
         timeSlow.Init(this);
         movement.Init(this);
         gauge = maxGauge;
+        lastSkillTime = Time.time;
     }
 
     public void Update()
     {
-        gauge = Math.Min(maxGauge, gauge + recoverRate * Time.deltaTime);
-        //if (gauge > maxGauge / 3)
+        if (!useSkill)
+        {
+            gauge = Math.Min(maxGauge, gauge + recoverRate * Time.deltaTime);
+        }
+        else if (Time.time - lastSkillTime > recoveryDelay)
+        {
+            useSkill = false;
+        }
         if (gauge > 0 && !canCast)
         {
             canCast = true;
         }
-        radialGauge.SetValue(gauge/maxGauge);
+
+        if (Time.time - lastShowTime > showDelay)
+        {
+            radialGauge.SetValue(gauge / maxGauge);
+            finalGauge.SetValue(gauge / maxGauge);
+        }
     }
     public bool CheckGauge(float needGauge)
     {
@@ -55,6 +73,26 @@ public class CharacterManager : MonoBehaviour
         }
     }
 
+    public void ShowGauge(float needGauge)
+    {
+        if (canCast == false)
+        {
+            radialGauge.SetValue(gauge/maxGauge);
+            finalGauge.SetValue(gauge/maxGauge);
+            return;
+        }
+        if (needGauge > gauge)
+        {
+            radialGauge.SetValue(gauge/maxGauge);
+            finalGauge.SetValue(gauge/maxGauge);
+        }
+        else
+        {
+            radialGauge.SetValue(gauge/maxGauge);
+            finalGauge.SetValue((gauge-needGauge)/maxGauge);
+            lastShowTime = Time.time;
+        }
+    }
     public bool UseGauge(float needGauge)
     {
         if (canCast == false)
@@ -66,6 +104,8 @@ public class CharacterManager : MonoBehaviour
         {
             canCast = false;
         }
+        lastSkillTime = Time.time;
+        useSkill = true;
         return true;
     }
 }

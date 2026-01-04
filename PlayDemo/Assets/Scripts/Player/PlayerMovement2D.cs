@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class PlayerMovement2D : MonoBehaviour
 {
     [Header("Movement")]
@@ -8,49 +8,69 @@ public class PlayerMovement2D : MonoBehaviour
     public float jumpForce = 12f;
 
     [Header("Ground Check")]
-    public Transform groundCheck;
-    public float groundCheckRadius = 0.2f;
     public LayerMask groundLayer;
+    public float groundCheckDistance = 0.05f;
 
     Rigidbody2D rb;
+    Collider2D col;
+
     float moveInput;
-    
+    bool isGrounded;
+    bool airJumpUsed;
+
     private CharacterManager manager;
+
     public void Init(CharacterManager manager)
     {
         this.manager = manager;
     }
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        col = GetComponent<Collider2D>();
     }
 
     void Update()
     {
-        // 입력은 Update에서 (프레임 기준)
         moveInput = Input.GetAxisRaw("Horizontal");
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Jump();
+            TryJump();
         }
     }
 
     void FixedUpdate()
     {
-        //CheckGround();
+        CheckGround();
         Move();
     }
 
     void Move()
     {
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
-        if (moveInput > 0)
+
+        if (moveInput > 0) manager.attack.isRight = true;
+        else if (moveInput < 0) manager.attack.isRight = false;
+    }
+
+    public void ResetJump()
+    {
+        airJumpUsed = false;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 4f);
+    }
+    void TryJump()
+    {
+        if (isGrounded)
         {
-            manager.attack.isRight = true;
+            Jump();
+            airJumpUsed = false; // 바닥 점프는 소모 안 함
         }
-        else if(moveInput < 0)
+        else if (!airJumpUsed)
         {
-            manager.attack.isRight = false;
+            Jump();
+            airJumpUsed = true; // 공중 점프 1회 소모
         }
     }
 
@@ -58,21 +78,39 @@ public class PlayerMovement2D : MonoBehaviour
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
-/*
+
     void CheckGround()
     {
-        isGrounded = Physics2D.OverlapCircle(
-            groundCheck.position,
-            groundCheckRadius,
+        Bounds bounds = col.bounds;
+
+        RaycastHit2D hit = Physics2D.BoxCast(
+            bounds.center,
+            bounds.size,
+            0f,
+            Vector2.down,
+            groundCheckDistance,
             groundLayer
         );
-    }
-*/
 
+        // 노멀 체크 (옆면/벽 배제)
+        isGrounded = hit.collider != null && hit.normal.y > 0.7f;
+
+        if (isGrounded)
+        {
+            airJumpUsed = false;
+        }
+    }
+
+#if UNITY_EDITOR
     void OnDrawGizmosSelected()
     {
-        if (groundCheck == null) return;
+        if (col == null) return;
+
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        Gizmos.DrawWireCube(
+            col.bounds.center + Vector3.down * groundCheckDistance,
+            col.bounds.size
+        );
     }
+#endif
 }

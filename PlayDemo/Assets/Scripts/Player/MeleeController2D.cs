@@ -10,6 +10,7 @@ public class MeleeController2D : MonoBehaviour
     bool isAttacking;
     public bool isRight = true;
     public Animator anim;
+    public Transform shootPos;
     public HitBox hitBox;
     
     private CharacterManager manager;
@@ -40,18 +41,18 @@ public class MeleeController2D : MonoBehaviour
     IEnumerator Attack()
     {
         isAttacking = true;
+
+        // === 마우스 방향으로 회전 ===
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 dir = mouseWorld - shootPos.position;
+
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+        shootPos.rotation = Quaternion.Euler(0f, 0f, angle);
+
         EnableHitBox();
-        if (isRight)
-        {
-            anim.gameObject.transform.localPosition = new Vector2(1, 0);
-            anim.gameObject.transform.localScale = new Vector3(2, 2, 1);
-        }
-        else
-        {
-            anim.gameObject.transform.localPosition = new Vector2(-1, 0);
-            anim.gameObject.transform.localScale = new Vector3(-2, 2, 1);
-        }
         anim.SetTrigger("Attack");
+
         yield return new WaitForSeconds(attackCooldown);
 
         isAttacking = false;

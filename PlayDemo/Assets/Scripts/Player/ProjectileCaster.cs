@@ -62,5 +62,6 @@ public class ProjectileCaster : MonoBehaviour
     void OnProjectileReturned()
     {
         canCast = true;
+        manager.movement.ResetJump();
     }
 }
