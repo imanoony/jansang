@@ -10,7 +10,7 @@ public class EnemyBase : MonoBehaviour
     public float groundCheckDistance = 0.05f;
     
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] protected float moveSpeed = 5f;
 
     #endregion
     
@@ -25,6 +25,8 @@ public class EnemyBase : MonoBehaviour
     
     #region status
 
+    private float currentSpeedRate;
+    
     protected enum State
     {
         Idle,
@@ -34,7 +36,7 @@ public class EnemyBase : MonoBehaviour
     
     protected State currentState = State.Idle;
     
-    private bool isGrounded;
+    protected bool isGrounded;
     private int moveDirection = 0; // -1 for left, 1 for right, and 0 for idle
     
     #endregion
@@ -77,22 +79,30 @@ public class EnemyBase : MonoBehaviour
     
     private void Move()
     {
-        rb.linearVelocity = new Vector2(moveDirection * moveSpeed, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(moveDirection * moveSpeed * currentSpeedRate, rb.linearVelocity.y);
     }
 
     protected void ChangeDirection(int direction)
     {
         moveDirection = direction;
     }
-    
-    protected void TryJump(float jumpForce)
+
+    protected void ChangeMoveSpeed(float rate)
     {
-        if (jumpForce < 0) return;
+        currentSpeedRate = rate;
+    }
+    
+    protected bool TryJump(float jumpForce)
+    {
+        if (jumpForce < 0) return false;
         
         if (isGrounded)
         {
             Jump(jumpForce);
+            return true;
         }
+
+        return false;
     }
 
     private void Jump(float jumpForce)
