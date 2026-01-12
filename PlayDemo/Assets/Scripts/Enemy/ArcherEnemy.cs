@@ -109,9 +109,9 @@ public class ArcherEnemy : EnemyBase
 
             float gravity = Mathf.Abs(Physics2D.gravity.y);
             
-            float calculatedJumpPower = CalculateJumpPower(1.3f, yposDiff);
+            float calculatedJumpPower = CalculateJumpPower(1.5f, yposDiff);
             float calculatedTime = calculatedJumpPower / gravity
-                                   + Mathf.Sqrt(2 * 0.3f * yposDiff / gravity);
+                                   + Mathf.Sqrt(2 * 0.5f * yposDiff / gravity);
             float targetspeed = xposDiff / calculatedTime;
             
             while (!TryJump(calculatedJumpPower))
@@ -129,10 +129,12 @@ public class ArcherEnemy : EnemyBase
             
             // 문제구간
             yield return new WaitForSeconds(calculatedTime); // 땜빵
-            yield return new WaitUntil(() => !isGrounded);
+            yield return new WaitUntil(() => isGrounded);
             
             ChangeDirection(0);
             ChangeMoveSpeed(1);
+            
+            yield return new WaitForSeconds(2f); // 땜빵
             
             ia++;
 
