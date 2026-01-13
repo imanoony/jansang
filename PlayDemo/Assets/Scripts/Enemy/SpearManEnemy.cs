@@ -13,12 +13,13 @@ public class SpearManEnemy : EnemyBase
     [SerializeField] private float combatRadius = 1.5f;
     [SerializeField] private LayerMask sightMask;   // Player + Wall
     [SerializeField] private LayerMask playerMask;
+    [SerializeField] private LayerMask wallLayer;
 
     [Header("Movement!")] 
     [SerializeField] private float directionTimeChange = 2f;
 
-    [Header("Combat")] [SerializeField] private float thrustRadius = 1.3f;
-    
+    [Header("Combat")] 
+    [SerializeField] private float thrustRadius = 1.3f;
     
     #endregion
     
@@ -56,8 +57,6 @@ public class SpearManEnemy : EnemyBase
 
     protected override void Update()
     {
-        if (DetectCliff()) ChangeDirection(0);
-        
         if (!alerted)
         {
             if (directionTimeChangeElapsed > 0)
@@ -85,7 +84,8 @@ public class SpearManEnemy : EnemyBase
             if (rushStart)
             {
                 if (DetectCliff() ||
-                    Physics2D.OverlapCircle(transform.position, thrustRadius, playerMask) != null)
+                    Physics2D.OverlapCircle(transform.position, thrustRadius, playerMask) != null ||
+                    MoveDirection == 0)
                 {
                     rushStart = false;
                     canThrust = true;
@@ -93,6 +93,8 @@ public class SpearManEnemy : EnemyBase
             } 
             found = DetectPlayer(combatRadius); // 같은 플랫폼에 있는거로 바꾸기
         }
+        
+        if (DetectCliff()) ChangeDirection(0);
     }
 
     private void Flip(int direction)
@@ -108,10 +110,11 @@ public class SpearManEnemy : EnemyBase
     {
         if (MoveDirection == 0) return true;
         
-        Vector3 start = transform.position + Vector3.right * (MoveDirection * 0.5f);
+        Vector3 start = transform.position + Vector3.right * (MoveDirection * col.bounds.extents.x * 1.2f);
         RaycastHit2D hit = Physics2D.Raycast(start, Vector3.down, 1, groundLayer);
-
-        if (hit.collider == null)
+        RaycastHit2D hit2 = Physics2D.Raycast(transform.position, Vector3.right * MoveDirection, col.bounds.extents.x * 1.2f, wallLayer);
+        
+        if (hit.collider == null || hit2)
         {
             return true;
         }
@@ -140,19 +143,12 @@ public class SpearManEnemy : EnemyBase
             if (found == false)
             {
                 currentTarget = null;
-                //TEST
-                spriteRenderer.color = new Color(0f, 1f, 0f, 1f);
-
-                yield return StartCoroutine(AttackRoutine());
-
-                spriteRenderer.color = new Color(0f, 1f, 1f, 1f);
+                
+                yield return StartCoroutine(Wander());
             }
             else
             {
                 currentTarget = player.transform;
-                //TEST
-                spriteRenderer.color = new Color(1f, 0f, 0f, 1f);
-
                 yield return StartCoroutine(AttackRoutine());
             }
         }
@@ -182,11 +178,26 @@ public class SpearManEnemy : EnemyBase
     private bool canThrust;
 
     private bool automaticFlip = false;
+
+    private IEnumerator Wander()
+    {
+        //TEST
+        spriteRenderer.color = new Color(0f, 1f, 0f, 1f);
+        int dir = Random.Range(-1, 2);
+
+        ChangeDirection(dir);
+        yield return new WaitForSeconds(2f);
+        ChangeDirection(0);
+    }
     
     private IEnumerator AttackRoutine()
     {
         if (currentTarget == null) yield break;
-
+        
+        //TEST
+        spriteRenderer.color = new Color(1f, 0f, 0f, 1f);
+        
+        // 돌진!
         int dir;
         if (currentTarget.transform.position.x < transform.position.x) dir = -1;
         else dir = 1;
@@ -194,6 +205,7 @@ public class SpearManEnemy : EnemyBase
         automaticFlip = false;
         
         ChangeDirection(dir);
+        ChangeMoveSpeed(2);
         Flip(dir);
 
         rushStart = true;
