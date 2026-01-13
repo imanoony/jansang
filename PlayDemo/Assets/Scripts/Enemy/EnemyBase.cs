@@ -62,8 +62,12 @@ public class EnemyBase : MonoBehaviour
 
     private void CheckGround()
     {
+        if (rb.linearVelocity.y > 0) return;
+        
         Bounds bounds = col.bounds;
 
+        var start = bounds.center + bounds.extents.y * Vector3.down;
+        
         RaycastHit2D hit = Physics2D.BoxCast(
             bounds.center,
             bounds.size,
@@ -73,6 +77,12 @@ public class EnemyBase : MonoBehaviour
             groundLayer
         );
 
+        if (hit.collider != null && hit.collider.OverlapPoint(start + Vector3.up * float.Epsilon))
+        {
+            // 발이 플랫폼 안에 있다면 ㄴㄴ
+            return;
+        }
+        
         // 노멀 체크 (옆면/벽 배제)
         isGrounded = hit.collider != null && hit.normal.y > 0.7f;
     }

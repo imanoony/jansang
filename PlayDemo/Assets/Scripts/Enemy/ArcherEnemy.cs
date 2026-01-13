@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using JetBrains.Annotations;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class ArcherEnemy : EnemyBase
 {
@@ -12,7 +13,6 @@ public class ArcherEnemy : EnemyBase
     [SerializeField] private LayerMask sightMask;   // Player + Wall
     
     #endregion
-    
     
     #region components
 
@@ -26,6 +26,8 @@ public class ArcherEnemy : EnemyBase
     private bool found = false;
     private GameObject player;
     private Transform currentTarget;
+
+    private Vector3? nextPlatform;
     
     #endregion
     
@@ -81,7 +83,11 @@ public class ArcherEnemy : EnemyBase
                 //TEST
                 spriteRenderer.color = new Color(0f, 1f, 0f, 1f);
                 
+                Debug.Log("what's up");
+                
                 yield return StartCoroutine(ChangePlatform());
+                
+                spriteRenderer.color = new Color(0f, 1f, 1f, 1f);
             }
             else
             {
@@ -92,18 +98,20 @@ public class ArcherEnemy : EnemyBase
             }
         }
     }
-
-    private int ia = 0;
+    
     private IEnumerator ChangePlatform()
     {
-        Vector3 nextPos = FindNextPlatform(ia) ?? transform.position;
+        Vector3 nextPos = FindNextPlatform() ?? transform.position;
+        
+        spriteRenderer.color = new Color(0f, 0f, 1f, 1f);
 
-        if ((nextPos - transform.position).sqrMagnitude < 0.0001f) yield break;
+        if ((nextPos - transform.position).sqrMagnitude < 0.1f) yield break;
 
         if (nextPos.y > transform.position.y)
         {
             ChangeDirection(0);
 
+            // 다음 위치 -> 점프력과 속도 계산
             float xposDiff = nextPos.x - transform.position.x;
             float yposDiff = nextPos.y - transform.position.y;
 
@@ -117,6 +125,7 @@ public class ArcherEnemy : EnemyBase
             while (!TryJump(calculatedJumpPower))
             {
                 // 최대 try 횟수 제한?
+                Debug.Log("HELLO");
                 yield return null;
                 if (found) yield break;
             }
@@ -131,14 +140,18 @@ public class ArcherEnemy : EnemyBase
             yield return new WaitForSeconds(calculatedTime); // 땜빵
             yield return new WaitUntil(() => isGrounded);
             
+            spriteRenderer.color = new Color(0f, 1f, 1f, 1f);
+            
             ChangeDirection(0);
             ChangeMoveSpeed(1);
             
             yield return new WaitForSeconds(2f); // 땜빵
             
-            ia++;
-
-            if (ia >= fortest.Length) ia = fortest.Length - 1;
+            spriteRenderer.color = new Color(0f, 1f, 1f, 1f);
+        }
+        else
+        {
+            
         }
     }
 
@@ -172,18 +185,30 @@ public class ArcherEnemy : EnemyBase
         return false;
     }
 
-#if UNITY_EDITOR
-    [SerializeField] private Transform[] fortest;
-    private Vector3? nextPlatform;
-#endif
+    [SerializeField] private float platformFindingHeight = 3f;
+    [SerializeField] private int platformFindingSampleCount = 5;
     
     [CanBeNull]
-    private Vector3? FindNextPlatform(int i)
+    private Vector3? FindNextPlatform()
     {
-        var a = fortest[i].GetComponent<Collider2D>();
-        Vector2 pos = a.bounds.center + new Vector3(0, a.bounds.extents.y, 0);
-        nextPlatform = pos;
-        return pos;
+        for (int i = 1; i <= 3; i++)
+        {
+            Vector3 sampleStart = transform.position + Vector3.up * (platformFindingHeight * i);
+
+            for (int j = 0; j < platformFindingSampleCount; j++)
+            {
+                var tmp = sampleStart + Vector3.right * Random.Range(-5f, 5f);
+                RaycastHit2D hit = Physics2D.Raycast(tmp, Vector3.down, platformFindingHeight, groundLayer);
+                if (hit.collider != null && !hit.collider.OverlapPoint(tmp))
+                {
+                    if (Mathf.Abs(hit.point.y - transform.position.y) < float.Epsilon) continue;
+                    nextPlatform = hit.point;
+                    return hit.point;
+                }
+            }
+        }
+        
+        return null;
     }
 
     private void Attack()

@@ -82,6 +82,8 @@ public class PlayerMovement2D : MonoBehaviour
     void CheckGround()
     {
         Bounds bounds = col.bounds;
+        
+        var start = bounds.center + bounds.extents.y * Vector3.down;
 
         RaycastHit2D hit = Physics2D.BoxCast(
             bounds.center,
@@ -92,6 +94,12 @@ public class PlayerMovement2D : MonoBehaviour
             groundLayer
         );
 
+        if (hit.collider != null && hit.collider.OverlapPoint(start))
+        {
+            // 발이 플랫폼 안에 있다면 ㄴㄴ
+            return;
+        }
+        
         // 노멀 체크 (옆면/벽 배제)
         isGrounded = hit.collider != null && hit.normal.y > 0.7f;
 
