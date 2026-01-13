@@ -139,7 +139,6 @@ public class ArcherEnemy : EnemyBase
             while (!TryJump(calculatedJumpPower))
             {
                 // 최대 try 횟수 제한?
-                Debug.Log("HELLO");
                 yield return null;
                 if (found) yield break;
             }
@@ -176,7 +175,6 @@ public class ArcherEnemy : EnemyBase
             while (!TryJump(jumpPower))
             {
                 // 최대 try 횟수 제한?
-                Debug.Log("HELLO");
                 yield return null;
                 if (found) yield break;
             }

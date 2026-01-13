@@ -37,7 +37,7 @@ public class EnemyBase : MonoBehaviour
     
     protected bool isGrounded;
     private int moveDirection = 0; // -1 for left, 1 for right, and 0 for idle
-    
+    public int MoveDirection => moveDirection;
     #endregion
     
     
@@ -46,6 +46,8 @@ public class EnemyBase : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         col = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
+
+        currentSpeedRate = 1;
     }
 
     protected virtual void FixedUpdate()
@@ -96,7 +98,7 @@ public class EnemyBase : MonoBehaviour
         rb.linearVelocity = new Vector2(moveDirection * moveSpeed * currentSpeedRate, rb.linearVelocity.y);
     }
 
-    protected void ChangeDirection(int direction)
+    protected virtual void ChangeDirection(int direction)
     {
         moveDirection = direction;
     }
