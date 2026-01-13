@@ -75,7 +75,7 @@ public class SwapSkill : MonoBehaviour
             if (visible && !visibleTargets.Contains(t))
             {
                 visibleTargets.Add(t);
-                t.SetHighlight(true,transform ,t.transform ,manager.ShowGauge);
+                t.SetHighlight(true, transform, t.transform, manager.Try, manager.CancelTry);
             }
             else if (!visible && visibleTargets.Contains(t))
             {
