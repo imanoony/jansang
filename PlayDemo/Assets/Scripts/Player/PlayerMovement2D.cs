@@ -16,6 +16,8 @@ public class PlayerMovement2D : MonoBehaviour
 
     float moveInput;
     bool isGrounded;
+    public bool IsGrouneded => isGrounded;
+    
     bool airJumpUsed;
 
     private CharacterManager manager;

@@ -8,15 +8,24 @@ public class ArcherEnemy : EnemyBase
 {
     #region  parameters
     
+    [Header("Detection!")]
     [SerializeField] private float detectionRadius = 3f;
     [SerializeField] private float combatRadius = 1.5f;
     [SerializeField] private LayerMask sightMask;   // Player + Wall
+
+    [Header("Aiming!")]
+    [SerializeField] private float aimingTime = 2f;
+
+    [Header("Attack!")]
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private float bulletSpeed = 5f;
     
     #endregion
     
     #region components
 
     private SpriteRenderer spriteRenderer;
+    private LineRenderer lineRenderer;
     
     #endregion
     
@@ -24,7 +33,7 @@ public class ArcherEnemy : EnemyBase
 
     private bool alerted = false;
     private bool found = false;
-    private GameObject player;
+    public GameObject player;
     private Transform currentTarget;
 
     private Vector3? nextPlatform;
@@ -35,6 +44,8 @@ public class ArcherEnemy : EnemyBase
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, combatRadius);
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(nextPlatform ?? transform.position, 1);
         
@@ -46,6 +57,7 @@ public class ArcherEnemy : EnemyBase
         base.Start();
         
         spriteRenderer = GetComponent<SpriteRenderer>();
+        lineRenderer = GetComponent<LineRenderer>();
         
         player = GameObject.FindGameObjectWithTag("Player");
         StartCoroutine(WaitForAlert());
@@ -59,7 +71,7 @@ public class ArcherEnemy : EnemyBase
     protected override void Update()
     {
         if (!alerted) alerted = DetectPlayer(detectionRadius);
-        else found = false;
+        else found = DetectPlayer(combatRadius);
     }
 
     private IEnumerator WaitForAlert()
@@ -76,14 +88,14 @@ public class ArcherEnemy : EnemyBase
 
     private IEnumerator AlertedAction()
     {
+        yield return new WaitForSeconds(0.5f);
         while (true)
         {
             if (found == false)
             {
+                currentTarget = null;
                 //TEST
                 spriteRenderer.color = new Color(0f, 1f, 0f, 1f);
-                
-                Debug.Log("what's up");
                 
                 yield return StartCoroutine(ChangePlatform());
                 
@@ -91,6 +103,7 @@ public class ArcherEnemy : EnemyBase
             }
             else
             {
+                currentTarget = player.transform;
                 //TEST
                 spriteRenderer.color = new Color(1f, 0f, 0f, 1f);
                 
@@ -106,7 +119,8 @@ public class ArcherEnemy : EnemyBase
         spriteRenderer.color = new Color(0f, 0f, 1f, 1f);
 
         if ((nextPos - transform.position).sqrMagnitude < 0.1f) yield break;
-
+        
+        //TODO: 반복 줄이기 흠;;
         if (nextPos.y > transform.position.y)
         {
             ChangeDirection(0);
@@ -137,13 +151,11 @@ public class ArcherEnemy : EnemyBase
             ChangeMoveSpeed(Math.Abs(targetspeed / moveSpeed));
             
             // 문제구간
-            yield return new WaitForSeconds(calculatedTime); // 땜빵
+            yield return new WaitForSeconds(0.2f); // 땜빵
             yield return new WaitUntil(() => isGrounded);
             
             ChangeDirection(0);
             ChangeMoveSpeed(1);
-            
-            yield return new WaitForSeconds(2f); // 땜빵 - 플랫폼 도착 후...
         }
         else
         {
@@ -176,26 +188,19 @@ public class ArcherEnemy : EnemyBase
             ChangeMoveSpeed(Math.Abs(targetspeed / moveSpeed));
             
             // 문제구간
-            yield return new WaitForSeconds(calculatedTime); // 땜빵
+            yield return new WaitForSeconds(0.2f); // 땜빵
             yield return new WaitUntil(() => isGrounded);
             
             ChangeDirection(0);
             ChangeMoveSpeed(1);
         }
-        
-        yield return new WaitForSeconds(2f); // 땜빵 - 플랫폼 도착 후...
     }
 
     float CalculateJumpPower(float rate, float s)
     {
         return Mathf.Sqrt(2 * rate * Mathf.Abs(Physics2D.gravity.y) * s);
     }
-
-    private IEnumerator AttackRoutine()
-    {
-        yield break;
-    }
-
+    
     private void GetSignal()
     {
         alerted = true;
@@ -242,8 +247,49 @@ public class ArcherEnemy : EnemyBase
         return null;
     }
 
-    private void Attack()
+    private IEnumerator AttackRoutine()
     {
+        // 조준; 레이저 형태 보이기
+        float elapsed = 0f;
         
+        lineRenderer.enabled = true;
+        lineRenderer.positionCount = 2; 
+        
+        lineRenderer.startColor = Color.black;
+        lineRenderer.endColor = Color.black;
+        
+        while (elapsed < aimingTime)
+        {
+            lineRenderer.startWidth = 0.05f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
+            lineRenderer.endWidth = 0.05f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
+            
+            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(1, currentTarget?.position ?? transform.position);
+            
+            elapsed += Time.deltaTime;
+            yield return null;
+            
+        }
+
+        lineRenderer.enabled = false;
+        
+        // Fire!
+        GameObject bullet = Instantiate(
+            bulletPrefab,
+            transform.position,
+            transform.rotation
+        );
+        
+        Bullet b = bullet.GetComponent<Bullet>();
+        if (b != null)
+        {
+            b.Init(gameObject);
+        }
+        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+        
+        Vector2 dir = (currentTarget?.position ?? transform.position) - transform.position;
+        dir.Normalize();
+        
+        rb.linearVelocity = dir * bulletSpeed;
     }
 }

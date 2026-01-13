@@ -61,7 +61,11 @@ public class EnemyBase : MonoBehaviour
 
     private void CheckGround()
     {
-        if (rb.linearVelocity.y > 0) return;
+        if (rb.linearVelocity.y > 0)
+        {
+            isGrounded = false;
+            return;
+        }
         
         Bounds bounds = col.bounds;
 
@@ -79,6 +83,7 @@ public class EnemyBase : MonoBehaviour
         if (hit.collider != null && hit.collider.OverlapPoint(start + Vector3.up * float.Epsilon))
         {
             // 발이 플랫폼 안에 있다면 ㄴㄴ
+            isGrounded = false;
             return;
         }
         
