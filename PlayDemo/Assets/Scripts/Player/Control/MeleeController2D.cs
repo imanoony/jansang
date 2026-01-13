@@ -12,12 +12,7 @@ public class MeleeController2D : MonoBehaviour
     public Animator anim;
     public Transform shootPos;
     public HitBox hitBox;
-    
-    private CharacterManager manager;
-    public void Init(CharacterManager manager)
-    {
-        this.manager = manager;
-    }
+
     void Start()
     {
         anim.gameObject.SetActive(false);

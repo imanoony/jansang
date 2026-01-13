@@ -8,13 +8,10 @@ public class BulletTimeController : MonoBehaviour
     float defaultFixedDelta;
     
     private CharacterManager manager;
-    public void Init(CharacterManager manager)
-    {
-        this.manager = manager;
-    }
-    void Awake()
+    void Start()
     {
         defaultFixedDelta = Time.fixedDeltaTime;
+        manager = GameManager.Instance.Char;
     }
 
     void Update()

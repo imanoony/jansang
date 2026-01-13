@@ -12,13 +12,10 @@ public class SwapSkill : MonoBehaviour
     private Camera cam;
     private bool skillActive = false;
     private CharacterManager manager;
-    public void Init(CharacterManager manager)
-    {
-        this.manager = manager;
-    }
     void Start()
     {
         cam = Camera.main;
+        manager = GameManager.Instance.Char;
     }
 
     void Update()

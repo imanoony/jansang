@@ -13,22 +13,17 @@ public class PlayerMovement2D : MonoBehaviour
 
     Rigidbody2D rb;
     Collider2D col;
+    MeleeController2D attack;
 
     float moveInput;
     bool isGrounded;
     bool airJumpUsed;
 
-    private CharacterManager manager;
-
-    public void Init(CharacterManager manager)
-    {
-        this.manager = manager;
-    }
-
-    void Awake()
+    void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
+        attack = GetComponent<MeleeController2D>();
     }
 
     void Update()
@@ -51,8 +46,8 @@ public class PlayerMovement2D : MonoBehaviour
     {
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
 
-        if (moveInput > 0) manager.attack.isRight = true;
-        else if (moveInput < 0) manager.attack.isRight = false;
+        if (moveInput > 0) attack.isRight = true;
+        else if (moveInput < 0) attack.isRight = false;
     }
 
     public void ResetJump()
