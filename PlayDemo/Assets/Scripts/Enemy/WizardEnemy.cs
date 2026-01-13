@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class ShieldManEnemy : EnemyBase
+public class WizardEnemy : EnemyBase
 {
     #region  parameters
     
@@ -20,7 +20,9 @@ public class ShieldManEnemy : EnemyBase
     [SerializeField] private float flipTimeChange = 2f;
 
     [Header("Combat")] 
-    [SerializeField] private float thrustRadius = 1.3f;
+    [SerializeField] private GameObject magicball;
+    [SerializeField] private float attackCooldown;
+    [SerializeField] private float magicballSpeed = 2f;
     
     #endregion
     
@@ -33,9 +35,11 @@ public class ShieldManEnemy : EnemyBase
     #region status
     
     private bool found = false;
+    private bool automaticFlip = false;
     
     private float directionTimeChangeElapsed;
     private float flipTimeChangeElapsed;
+    private float attackCooldownElapsed;
     
     public GameObject player;
     private Transform currentTarget;
@@ -60,47 +64,20 @@ public class ShieldManEnemy : EnemyBase
     {
         if (!alerted)
         {
-            if (directionTimeChangeElapsed > 0)
-            {
-                directionTimeChangeElapsed -= Time.deltaTime;
-            }
-            else
-            {
-                directionTimeChangeElapsed = directionTimeChange;
-                int dir = Random.Range(-1, 2);
-                ChangeDirection(dir);
-                Flip(dir);
-            }
-            
             alerted = DetectPlayer(detectionRadius);
         }
         else
         {
             if (automaticFlip)
             {
-                flipTimeChangeElapsed -= Time.deltaTime;
-                if (flipTimeChangeElapsed <= 0)
-                {
-                    flipTimeChangeElapsed = flipTimeChange;
-                    
-                    if (player.transform.position.x > transform.position.x) Flip(1);
-                    else if (player.transform.position.x < transform.position.x) Flip(-1);
-                }
+                if (player.transform.position.x > transform.position.x) Flip(1);
+                else if (player.transform.position.x < transform.position.x) Flip(-1);
             }
-            if (rushStart)
-            {
-                if (DetectCliff() ||
-                    Physics2D.OverlapBox(transform.position, col.bounds.size, 0, playerMask) ||
-                    MoveDirection == 0)
-                {
-                    rushStart = false;
-                    canThrust = true;
-                }
-            } 
+            
             found = DetectPlayer(combatRadius); // 같은 플랫폼에 있는거로 바꾸기
         }
         
-        if (DetectCliff()) ChangeDirection(0);
+        if (attackCooldownElapsed > 0) attackCooldownElapsed -= Time.deltaTime;
     }
 
     private void Flip(int direction)
@@ -112,22 +89,6 @@ public class ShieldManEnemy : EnemyBase
         else if (direction == 1) transform.localScale = new Vector3(x, transform.localScale.y, transform.localScale.z);
     }
     
-    private bool DetectCliff()
-    {
-        if (MoveDirection == 0) return true;
-        
-        Vector3 start = transform.position + Vector3.right * (MoveDirection * col.bounds.extents.x * 1.2f);
-        RaycastHit2D hit = Physics2D.Raycast(start, Vector3.down, 1, groundLayer);
-        RaycastHit2D hit2 = Physics2D.Raycast(transform.position, Vector3.right * MoveDirection, col.bounds.extents.x * 1.2f, wallLayer);
-        
-        if (hit.collider == null || hit2)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     private IEnumerator WaitForAlert()
     {
         yield return new WaitUntil(() => alerted);
@@ -151,7 +112,7 @@ public class ShieldManEnemy : EnemyBase
             {
                 currentTarget = null;
                 
-                yield return StartCoroutine(Wander());
+                yield return StartCoroutine(AttackRoutine());
             }
             else
             {
@@ -175,91 +136,30 @@ public class ShieldManEnemy : EnemyBase
 
         return false;
     }
-
-    private bool rushStart;
-    private bool canThrust;
-
-    private bool automaticFlip = false;
-
-    private IEnumerator Wander()
-    {
-        //TEST
-        spriteRenderer.color = new Color(0f, 1f, 0f, 1f);
-        int dir = Random.Range(-1, 2);
-
-        ChangeDirection(dir);
-        yield return new WaitForSeconds(2f);
-        ChangeDirection(0);
-    }
     
     private IEnumerator AttackRoutine()
     {
+        yield return new WaitUntil(() => attackCooldownElapsed <= 0);
         if (currentTarget == null) yield break;
         
         //TEST
         spriteRenderer.color = new Color(1f, 0f, 0f, 1f);
         
-        // 돌진!
+        // flip!
         int dir;
         if (currentTarget.transform.position.x < transform.position.x) dir = -1;
         else dir = 1;
-
         automaticFlip = false;
-        
-        ChangeDirection(dir);
-        ChangeMoveSpeed(2);
         Flip(dir);
-
-        rushStart = true;
-        canThrust = false;
-        yield return new WaitUntil(() => canThrust);
         
-        ChangeDirection(0);
-        ChangeMoveSpeed(1f);
+        // 대기
+        yield return new WaitForSeconds(0.5f);
         
-        GetComponent<Rigidbody2D>().linearVelocityY = 3; 
-        
-        // 기절
-        spriteRenderer.color = new Color(0.4f, 0.4f, 0.4f, 1f);
-        
-        yield return new WaitForSeconds(2f);
+        MagicBall ball = Instantiate(magicball, transform.position, Quaternion.identity).GetComponent<MagicBall>();
+        ball.Init(player, magicballSpeed);
         
         automaticFlip = true;
-    }
 
-    public override void Hit()
-    {
-        if (player.transform.position.x < transform.position.x && transform.localScale.x > 0) 
-            StartCoroutine(HitRoutine());
-        
-        else if (player.transform.position.x > transform.position.x && transform.localScale.x < 0) 
-            StartCoroutine(HitRoutine());
-        
-        else 
-            StartCoroutine(GuardRoutine());
-    }
-    
-    IEnumerator HitRoutine()
-    {
-        var sprite = GetComponent<SpriteRenderer>();
-        var c = sprite.color;
-        
-        sprite.color = Color.red;
-        
-        yield return new WaitForSeconds(0.5f);
-
-        sprite.color = c;
-    }
-    
-    IEnumerator GuardRoutine()
-    {
-        var sprite = GetComponent<SpriteRenderer>();
-        var c = sprite.color;
-        
-        sprite.color = Color.yellow;
-        
-        yield return new WaitForSeconds(0.5f);
-
-        sprite.color = c;
+        attackCooldownElapsed = attackCooldown;
     }
 }
