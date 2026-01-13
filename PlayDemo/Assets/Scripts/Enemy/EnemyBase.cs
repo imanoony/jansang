@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class EnemyBase : MonoBehaviour
@@ -146,5 +147,22 @@ public class EnemyBase : MonoBehaviour
     protected virtual void OnDisable()
     {
         if (summoner != null) summoner.RemoveSignal(GetSignal);
+    }
+
+    public virtual void Hit()
+    {
+        StartCoroutine(HitRoutine());
+    }
+
+    IEnumerator HitRoutine()
+    {
+        var sprite = GetComponent<SpriteRenderer>();
+        var c = sprite.color;
+        
+        sprite.color = Color.red;
+        
+        yield return new WaitForSeconds(0.5f);
+
+        sprite.color = c;
     }
 }

@@ -35,5 +35,6 @@ public class HitBox : MonoBehaviour
         if (!hitTargets.Add(other)) return;
 
         other.GetComponent<EnemyTurretAI>()?.gameObject.SetActive(false);
+        other.GetComponent<EnemyBase>()?.Hit();
     }
 }
