@@ -1,10 +1,9 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CharacterManager : MonoBehaviour
 {
-    #region Player_Skill_Reference
+    #region Skill References
     public PlayerMovement2D movement;
     public SwapSkill mainSkill;
     public ProjectileCaster subSkill;
@@ -12,7 +11,106 @@ public class CharacterManager : MonoBehaviour
     public MeleeController2D attack;
     #endregion
 
-    #region UI
+    #region HP
+    public int HP { get; private set; }
+    [SerializeField] private int maxHP = 5;
+    public event Action<int> OnHPChanged; 
+    public void InitHP()
+    {
+        HP = maxHP;
+        OnHPChanged?.Invoke(HP);
+    }
+    public void AddHP(int amount)
+    {
+        HP = Math.Min(maxHP, HP + amount);
+        OnHPChanged?.Invoke(HP);
+    }
+    public void SubHP(int amount)
+    {
+        HP = Math.Max(0, HP - amount);
+        OnHPChanged?.Invoke(HP);
+    }
+    #endregion
+
+    #region Gauge
+    public float Gauge { get; private set; }
+    private float tried;
+    [SerializeField] private float maxGauge = 100f;
+    [SerializeField] private float recoveryRate = 10f;
+    [SerializeField] private float recoveryDelay = 1f;
+    [SerializeField] private float showDelay = 0.1f;
+    private float lastSkillTime = 0f;
+    private float lastShowTime = 0f;
+    private bool canRecover = true;
+    private bool canShow = true;
+    public event Action<float> OnGaugeChanged;
+    public event Action<float> OnTried;
+    public void InitGauge()
+    {
+        Gauge = maxGauge;
+        tried = 0f;
+        OnGaugeChanged?.Invoke(Gauge);
+        OnTried?.Invoke(tried);
+    }
+    public bool UseGauge(float amount)
+    {
+        if (!CheckGauge(amount))
+            return false;
+        Gauge = Math.Max(0f, Gauge - amount);
+        OnGaugeChanged?.Invoke(Gauge);
+        lastSkillTime = Time.time;
+        canRecover = false;
+        return true;
+    }
+    public bool CheckGauge(float amount) => Gauge >= amount;
+    public void Try(float amount)
+    {
+        if (Gauge < amount)
+            return;
+        tried = amount;
+        OnTried?.Invoke(tried);
+    }
+    public void CancelTry()
+    {
+        tried = 0f;
+        OnTried?.Invoke(tried);
+    }
+    #endregion
+
+    void Awake()
+    {
+        mainSkill.Init(this);
+        subSkill.Init(this);
+        attack.Init(this);
+        timeSlow.Init(this);
+        movement.Init(this);
+
+        InitHP();
+        InitGauge();
+    }
+
+    void Update()
+    {
+        // Gauge recovery logic start
+        if (!canRecover && Time.time - lastSkillTime > recoveryDelay)
+            canRecover = true;
+        if (canRecover && Gauge < maxGauge)
+        {
+            Gauge = Math.Min(maxGauge, Gauge + recoveryRate * Time.deltaTime);
+            if (!canShow && Time.time - lastShowTime > showDelay)
+                canShow = true;
+            if (canShow)
+            {
+                OnGaugeChanged?.Invoke(Gauge);
+                lastShowTime = Time.time;
+                canShow = false;
+            }
+        }
+        // Gauge recovery logic end
+        // Add more stat update logic here if needed
+    }
+
+    /*#region UI
     public RadialGauge radialGauge;
     public RadialGauge finalGauge;
     #endregion
@@ -107,5 +205,5 @@ public class CharacterManager : MonoBehaviour
         lastSkillTime = Time.time;
         useSkill = true;
         return true;
-    }
+    }*/
 }
