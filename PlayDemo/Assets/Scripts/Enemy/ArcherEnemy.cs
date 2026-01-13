@@ -140,19 +140,50 @@ public class ArcherEnemy : EnemyBase
             yield return new WaitForSeconds(calculatedTime); // 땜빵
             yield return new WaitUntil(() => isGrounded);
             
-            spriteRenderer.color = new Color(0f, 1f, 1f, 1f);
-            
             ChangeDirection(0);
             ChangeMoveSpeed(1);
             
-            yield return new WaitForSeconds(2f); // 땜빵
-            
-            spriteRenderer.color = new Color(0f, 1f, 1f, 1f);
+            yield return new WaitForSeconds(2f); // 땜빵 - 플랫폼 도착 후...
         }
         else
         {
+            // 다음 위치 -> 점프력과 속도 계산
+            float xposDiff = nextPos.x - transform.position.x;
+            float yposDiff = Mathf.Abs(nextPos.y - transform.position.y);
             
+            float jumpPower = 3f;
+            float gravity = Mathf.Abs(Physics2D.gravity.y);
+            
+            float additionalS = Mathf.Pow(jumpPower, 2) / (2 * gravity);
+
+            
+            float calculatedTime = jumpPower / gravity
+                                   + Mathf.Sqrt(2 * (yposDiff + additionalS) * yposDiff / gravity);
+            float targetspeed = xposDiff / calculatedTime;
+            
+            while (!TryJump(jumpPower))
+            {
+                // 최대 try 횟수 제한?
+                Debug.Log("HELLO");
+                yield return null;
+                if (found) yield break;
+            }
+            
+            int tmp = (int)(nextPos.x - transform.position.x);
+            if (tmp == 0) yield break;
+            
+            ChangeDirection(tmp / Math.Abs(tmp));
+            ChangeMoveSpeed(Math.Abs(targetspeed / moveSpeed));
+            
+            // 문제구간
+            yield return new WaitForSeconds(calculatedTime); // 땜빵
+            yield return new WaitUntil(() => isGrounded);
+            
+            ChangeDirection(0);
+            ChangeMoveSpeed(1);
         }
+        
+        yield return new WaitForSeconds(2f); // 땜빵 - 플랫폼 도착 후...
     }
 
     float CalculateJumpPower(float rate, float s)
@@ -198,10 +229,10 @@ public class ArcherEnemy : EnemyBase
             for (int j = 0; j < platformFindingSampleCount; j++)
             {
                 var tmp = sampleStart + Vector3.right * Random.Range(-5f, 5f);
-                RaycastHit2D hit = Physics2D.Raycast(tmp, Vector3.down, platformFindingHeight, groundLayer);
+                RaycastHit2D hit = Physics2D.Raycast(tmp, Vector3.down, platformFindingHeight * 2f, groundLayer);
                 if (hit.collider != null && !hit.collider.OverlapPoint(tmp))
                 {
-                    if (Mathf.Abs(hit.point.y - transform.position.y) < float.Epsilon) continue;
+                    if (Mathf.Abs(hit.point.y - transform.position.y + col.bounds.extents.y) < 0.1f) continue;
                     nextPlatform = hit.point;
                     return hit.point;
                 }

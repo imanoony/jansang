@@ -14,11 +14,10 @@ public class EnemyBase : MonoBehaviour
 
     #endregion
     
-    
     #region components
 
     protected Animator animator;
-    private Collider2D col;
+    protected Collider2D col;
     private Rigidbody2D rb;
     
     #endregion
