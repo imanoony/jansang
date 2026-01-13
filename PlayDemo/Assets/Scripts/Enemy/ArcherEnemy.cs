@@ -31,7 +31,7 @@ public class ArcherEnemy : EnemyBase
     
     #region status
 
-    private bool alerted = false;
+    
     private bool found = false;
     public GameObject player;
     private Transform currentTarget;
@@ -199,11 +199,6 @@ public class ArcherEnemy : EnemyBase
         return Mathf.Sqrt(2 * rate * Mathf.Abs(Physics2D.gravity.y) * s);
     }
     
-    private void GetSignal()
-    {
-        alerted = true;
-    }
-
     private bool DetectPlayer(float range)
     {
         float dist = Vector2.Distance(transform.position, player.transform.position);

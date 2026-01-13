@@ -12,6 +12,8 @@ public class EnemyBase : MonoBehaviour
     [Header("Movement")]
     [SerializeField] protected float moveSpeed = 5f;
 
+    [Header("Commander")] [SerializeField] private SummonerEnemy summoner;
+
     #endregion
     
     #region components
@@ -26,6 +28,8 @@ public class EnemyBase : MonoBehaviour
 
     private float currentSpeedRate;
     
+    protected bool alerted = false;
+    
     protected enum State
     {
         Idle,
@@ -38,6 +42,7 @@ public class EnemyBase : MonoBehaviour
     protected bool isGrounded;
     private int moveDirection = 0; // -1 for left, 1 for right, and 0 for idle
     public int MoveDirection => moveDirection;
+    
     #endregion
     
     
@@ -46,6 +51,8 @@ public class EnemyBase : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         col = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
+        
+        if (summoner != null) summoner.RegisterSignal(GetSignal);
 
         currentSpeedRate = 1;
     }
@@ -59,6 +66,11 @@ public class EnemyBase : MonoBehaviour
     protected virtual void Update()
     {
          //mola
+    }
+    
+    private void GetSignal()
+    {
+        alerted = true;
     }
 
     private void CheckGround()
@@ -124,5 +136,15 @@ public class EnemyBase : MonoBehaviour
     private void Jump(float jumpForce)
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+    }
+
+    protected virtual void OnDestroy()
+    {
+        if (summoner != null) summoner.RemoveSignal(GetSignal);
+    }
+
+    protected virtual void OnDisable()
+    {
+        if (summoner != null) summoner.RemoveSignal(GetSignal);
     }
 }

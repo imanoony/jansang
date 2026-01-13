@@ -1776,11 +1776,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4029203740549952736, guid: 1ff9688d080af5d4fa9ff1ed99790838, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.63
+      value: -3.53
       objectReference: {fileID: 0}
     - target: {fileID: 4029203740549952736, guid: 1ff9688d080af5d4fa9ff1ed99790838, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.5400009
+      value: -3.62
       objectReference: {fileID: 0}
     - target: {fileID: 4029203740549952736, guid: 1ff9688d080af5d4fa9ff1ed99790838, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1857,8 +1857,9 @@ MonoBehaviour:
     m_Bits: 4160
   groundCheckDistance: 0.05
   moveSpeed: 5
-  detectionRadius: 3
-  combatRadius: 1.5
+  summoner: {fileID: 0}
+  detectionRadius: 1
+  combatRadius: 1
   sightMask:
     serializedVersion: 2
     m_Bits: 320
@@ -2442,6 +2443,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Archer
       objectReference: {fileID: 0}
+    - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
+      propertyPath: summoner
+      value: 
+      objectReference: {fileID: 612949838}
     - target: {fileID: 8066111053319429742, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.89
@@ -2499,13 +2504,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpearMan
       objectReference: {fileID: 0}
+    - target: {fileID: 5720162815233390108, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
+      propertyPath: summoner
+      value: 
+      objectReference: {fileID: 612949838}
     - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.139
+      value: -4.52
       objectReference: {fileID: 0}
     - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -17.6
+      value: -17.59
       objectReference: {fileID: 0}
     - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
       propertyPath: m_LocalPosition.z

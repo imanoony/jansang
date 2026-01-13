@@ -30,8 +30,7 @@ public class SpearManEnemy : EnemyBase
     #endregion
     
     #region status
-
-    private bool alerted = false;
+    
     private bool found = false;
     
     private float directionTimeChangeElapsed;
@@ -152,11 +151,6 @@ public class SpearManEnemy : EnemyBase
                 yield return StartCoroutine(AttackRoutine());
             }
         }
-    }
-    
-    private void GetSignal()
-    {
-        alerted = true;
     }
     
     private bool DetectPlayer(float range)

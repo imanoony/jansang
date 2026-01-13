@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
 public class SummonerEnemy : EnemyBase
@@ -27,8 +28,7 @@ public class SummonerEnemy : EnemyBase
     #endregion
     
     #region status
-
-    private bool alerted = false;
+    
     private bool found = false;
     
     private float directionTimeChangeElapsed;
@@ -40,8 +40,11 @@ public class SummonerEnemy : EnemyBase
 
     private float sumWeights;
     private float[] summonProbabilities;
+
+    private UnityEvent onDetectPlayer = new UnityEvent();
     
     #endregion
+
     protected override void Start()
     {
         base.Start();
@@ -102,6 +105,15 @@ public class SummonerEnemy : EnemyBase
         }
     }
 
+    public void RegisterSignal(UnityAction action)
+    {
+        onDetectPlayer.AddListener(action);
+    } 
+    
+    public void RemoveSignal(UnityAction action)
+    {
+        onDetectPlayer.RemoveListener(action);
+    } 
     private void Flip(int direction)
     {
         //TODO: 좀 이상한데 급하게 하느라 이렇게 됨... 이거 수정해야함
@@ -118,6 +130,8 @@ public class SummonerEnemy : EnemyBase
         ChangeDirection(0);
         //TEST
         spriteRenderer.color = new Color(0f, 1f, 0f, 1f);
+        
+        onDetectPlayer.Invoke();
             
         currentState = State.Alert;
         currentTarget = player.transform;
