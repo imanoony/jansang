@@ -34,6 +34,7 @@ public class SwapTarget : MonoBehaviour
         else
         {
             isHover = false;
+            this.onNonTarget?.Invoke();
             this.onSwapTarget = null;
             this.onNonTarget = null;
         }
