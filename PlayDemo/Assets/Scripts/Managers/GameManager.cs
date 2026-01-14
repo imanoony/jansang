@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
         UI.Init();
 
         UI.SetActiveGauge(true);
+        UI.SetActiveHP(true);
         Char.InitHP();
         Char.InitGauge();
     }

@@ -2063,6 +2063,7 @@ GameObject:
   m_Component:
   - component: {fileID: 769881095}
   - component: {fileID: 769881096}
+  - component: {fileID: 769881097}
   m_Layer: 5
   m_Name: HP
   m_TagString: Untagged
@@ -2103,12 +2104,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
   m_IgnoreLayout: 0
   m_MinWidth: -1
-  m_MinHeight: -1
+  m_MinHeight: 60
   m_PreferredWidth: -1
-  m_PreferredHeight: -1
+  m_PreferredHeight: 60
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &769881097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769881094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &848963639
 GameObject:
   m_ObjectHideFlags: 0
@@ -2481,7 +2508,7 @@ MonoBehaviour:
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
@@ -2593,12 +2620,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edff4540276797f4aabd3ad27e12fd91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movement: {fileID: 1988878042}
-  mainSkill: {fileID: 1988878043}
-  subSkill: {fileID: 1988878041}
-  timeSlow: {fileID: 1988878040}
-  attack: {fileID: 1988878039}
-  maxHP: 5
+  initialMaxHP: 5
   initialMaxGauge: 100
   recoveryRate: 10
   recoveryDelay: 1
@@ -2627,6 +2649,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0675ae953d746f946aab90b45806e059, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  HPRoot: {fileID: 769881094}
+  HPSlotPrefab: {fileID: 3872130814063565803, guid: a2b4af66c8080fa49a75c4a782cb9c04, type: 3}
   GaugeRoot: {fileID: 2075824909}
   Background: {fileID: 647612892}
   Gauge: {fileID: 638869075}
@@ -2910,61 +2934,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7279371306044431877, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
   m_PrefabInstance: {fileID: 1988878037}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1988878039 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 548038150764793076, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-  m_PrefabInstance: {fileID: 1988878037}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c3aec5730b715d478fdc46c9b402fb9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1988878040 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3352813320103272926, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-  m_PrefabInstance: {fileID: 1988878037}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d371fcece34be4e909ce5cfe359fd9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1988878041 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2123598759482721288, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-  m_PrefabInstance: {fileID: 1988878037}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30a955312f50f15429f303326567811f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1988878042 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7937889744083868383, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-  m_PrefabInstance: {fileID: 1988878037}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51eb73a7b9b14d54798de517b919a5d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1988878043 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3034650379703273195, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-  m_PrefabInstance: {fileID: 1988878037}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 234807df2a4ca574f857b966054a2fe2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2075824909
 GameObject:
   m_ObjectHideFlags: 0
@@ -3017,9 +2986,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
   m_IgnoreLayout: 0
   m_MinWidth: -1
-  m_MinHeight: -1
+  m_MinHeight: 60
   m_PreferredWidth: -1
-  m_PreferredHeight: -1
+  m_PreferredHeight: 60
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
