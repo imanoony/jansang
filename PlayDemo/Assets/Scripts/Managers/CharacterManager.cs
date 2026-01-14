@@ -58,7 +58,12 @@ public class CharacterManager : MonoBehaviour
         canRecover = false;
         return true;
     }
-    public bool CheckGauge(float amount) => Gauge >= amount;
+    public bool CheckGauge(float amount)
+    {
+        if (amount == 0f)
+            return Gauge > 0f;
+        return Gauge >= amount;
+    }
     public void Try(float amount)
     {
         if (Gauge < amount)
