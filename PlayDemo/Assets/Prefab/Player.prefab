@@ -28,12 +28,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1356419120706315528}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.0599997, y: -0.026000142, z: 0}
+  m_LocalScale: {x: 8, y: 8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7279371306044431877}
+  m_Father: {fileID: 7218432460646019001}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1582432609981030016
 SpriteRenderer:
@@ -82,7 +82,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
-  m_Sprite: {fileID: -549503327, guid: 8accedb6bb0e3a348bea66b44a4bf430, type: 3}
+  m_Sprite: {fileID: 7868005485719084555, guid: bc80a6bd5f39b244b8e0a426b2e99fab, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -119,7 +119,7 @@ Animator:
   m_GameObject: {fileID: 1356419120706315528}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 1dc521c6cd4eed749bc30c443ba86ba7, type: 2}
+  m_Controller: {fileID: 9100000, guid: 72a7bbefe2f89cf4ea6a9248c559f53b, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -165,18 +165,50 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.04, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.28, y: 1.28}
+    oldSize: {x: 0.64, y: 0.64}
     newSize: {x: 1.28, y: 1.28}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.2, y: 1}
+  m_Size: {x: 0.35, y: 0.64}
   m_EdgeRadius: 0
+--- !u!1 &4986064587333778858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7218432460646019001}
+  m_Layer: 8
+  m_Name: AttackPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7218432460646019001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4986064587333778858}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1907984018316592887}
+  m_Father: {fileID: 7279371306044431877}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5043352431804775299
 GameObject:
   m_ObjectHideFlags: 0
@@ -215,7 +247,7 @@ Transform:
   m_LocalScale: {x: 0.4, y: 0.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1907984018316592887}
+  - {fileID: 7218432460646019001}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4437547419695001231
@@ -295,7 +327,8 @@ MonoBehaviour:
   attack: {fileID: 548038150764793076}
   radialGauge: {fileID: 1824237980197997778, guid: 27e25097df31cba41a9091fe635d2862, type: 3}
   maxGauge: 100
-  recoverRate: 4
+  recoverRate: 10
+  recoveryDelay: 1
 --- !u!114 &3034650379703273195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -328,12 +361,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  jumpForce: 5
-  groundCheck: {fileID: 0}
-  groundCheckRadius: 0.2
+  jumpForce: 7
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  groundCheckDistance: 0.05
 --- !u!114 &2123598759482721288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -362,7 +394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slowScale: 0.1
-  useRate: 100
+  useRate: 30
 --- !u!114 &548038150764793076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -379,6 +411,7 @@ MonoBehaviour:
   reloadTime: 0.25
   isRight: 1
   anim: {fileID: 7682376173339313760}
+  shootPos: {fileID: 7218432460646019001}
   hitBox: {fileID: 5798332138023723292}
 --- !u!61 &8144941878329839698
 BoxCollider2D:
@@ -441,7 +474,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 2
+  m_GravityScale: 1.5
   m_Material: {fileID: 6200000, guid: 53a3cb7ea2a2269448835029d77363c5, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
