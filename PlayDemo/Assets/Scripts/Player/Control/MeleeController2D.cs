@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+
 public class MeleeController2D : MonoBehaviour
 {
     [Header("Attack")]
