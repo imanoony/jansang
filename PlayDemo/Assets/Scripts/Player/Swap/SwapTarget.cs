@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class SwapTarget : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class SwapTarget : MonoBehaviour
 {
     public GameObject highlightUI;
     private Action<float> onSwapTarget = null;
@@ -49,7 +49,7 @@ public class SwapTarget : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         if (!isHover || A == null || B == null)
             return;
 
-        amount = Vector2.Distance(A.position, B.position);
+        amount = Vector2.SqrMagnitude(A.position - B.position);
 
         if (Mathf.Abs(prevAmount - amount) > EPS)
         {
@@ -57,13 +57,15 @@ public class SwapTarget : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             onSwapTarget?.Invoke(amount);
         }
     }
-    public void OnPointerEnter(PointerEventData eventData)
+    public void OnMouseEnter()
     {
+        Debug.Log("Pointer Enter Swap Target");
         isHover = true;
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public void OnMouseExit()
     {
+        Debug.Log("Pointer Exit Swap Target");
         isHover = false;
         prevAmount = 0;
         amount = 0;

@@ -8,14 +8,13 @@ public class ProjectileCaster : MonoBehaviour
 
     bool canCast = true;
     ReturningProjectile currentProjectile;
-    
-    private CharacterManager manager;
-    
-    public void Init(CharacterManager manager)
+    PlayerMovement2D movement;
+
+    void Start()
     {
-        this.manager = manager;
+        movement = GetComponent<PlayerMovement2D>();
     }
-    
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.E) && canCast)
@@ -62,6 +61,6 @@ public class ProjectileCaster : MonoBehaviour
     void OnProjectileReturned()
     {
         canCast = true;
-        manager.movement.ResetJump();
+        movement.ResetJump();
     }
 }

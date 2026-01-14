@@ -34,7 +34,7 @@ public class ReturningProjectile : MonoBehaviour
         set => m_State = value;
     }
 
-    void Awake()
+    void OnEnable()
     {
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;

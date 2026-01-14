@@ -6,14 +6,23 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         if (Instance != null && Instance != this)
+        {
             Destroy(gameObject);
+            return;
+        }
         Instance = this;
-        DontDestroyOnLoad(this.gameObject);
 
-        CharacterManager = gameObject.GetComponent<CharacterManager>();
-        UIManager = gameObject.GetComponent<UIManager>();
+        Char = gameObject.GetComponent<CharacterManager>();
+        UI = gameObject.GetComponent<UIManager>();
+
+        Char.Init();
+        UI.Init();
+
+        UI.SetActiveGauge(true);
+        Char.InitHP();
+        Char.InitGauge();
     }
     
-    public CharacterManager CharacterManager { get; private set; }
-    public UIManager UIManager { get; private set; }
+    public CharacterManager Char { get; private set; }
+    public UIManager UI { get; private set; }
 }
