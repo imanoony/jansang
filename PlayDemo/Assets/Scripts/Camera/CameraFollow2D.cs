@@ -6,7 +6,8 @@ public class CameraFollow2D : MonoBehaviour
     Camera cam;
 
     [Header("Target")]
-    public Transform target;
+    public Transform targetRoot;
+    private Transform target;
 
     [Header("Move")]
     public float followLerpSpeed = 10f;
@@ -23,6 +24,7 @@ public class CameraFollow2D : MonoBehaviour
     {
         cam = GetComponent<Camera>();
         cam.orthographic = true;
+        target = targetRoot.GetChild(0);
     }
 
     void LateUpdate()

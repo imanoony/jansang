@@ -219,7 +219,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7279371306044431877}
   - component: {fileID: 4437547419695001231}
-  - component: {fileID: 3548428189148757943}
   - component: {fileID: 3034650379703273195}
   - component: {fileID: 7937889744083868383}
   - component: {fileID: 2123598759482721288}
@@ -308,27 +307,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3548428189148757943
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5043352431804775299}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: edff4540276797f4aabd3ad27e12fd91, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movement: {fileID: 7937889744083868383}
-  mainSkill: {fileID: 3034650379703273195}
-  subSkill: {fileID: 2123598759482721288}
-  timeSlow: {fileID: 3352813320103272926}
-  attack: {fileID: 548038150764793076}
-  radialGauge: {fileID: 1824237980197997778, guid: 27e25097df31cba41a9091fe635d2862, type: 3}
-  maxGauge: 100
-  recoverRate: 10
-  recoveryDelay: 1
 --- !u!114 &3034650379703273195
 MonoBehaviour:
   m_ObjectHideFlags: 0
