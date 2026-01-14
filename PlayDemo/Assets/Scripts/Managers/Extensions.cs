@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public static class Vector2Extensions
+public static class Vector2Ex
 {
     public static Vector2 SetX(this Vector2 v, float x)
     {
@@ -20,7 +20,7 @@ public static class Vector2Extensions
     }
 }
 
-public static class Vector3Extensions
+public static class Vector3Ex
 {
     public static Vector3 SetX(this Vector3 v, float x)
     {
@@ -46,4 +46,10 @@ public static class Vector3Extensions
     {
         return new Vector3(v.x, v.y, v.z + z);
     }
+}
+
+public static class ColorEx
+{
+    public static Color MyGray => new(0.3522012f, 0.3522012f, 0.3522012f, 1f);
+    public static Color MyRed => new(0.7610062f, 0.30871f, 0.30871f, 1f);
 }

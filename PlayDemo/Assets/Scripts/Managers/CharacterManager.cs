@@ -6,16 +6,17 @@ public class CharacterManager : MonoBehaviour
     #region HP
     [Header("HP Stats")]
     public int HP { get; private set; }
-    [SerializeField] private int maxHP = 5;
+    public int MaxHP { get; private set; }
+    [SerializeField] private int initialMaxHP = 5;
     public event Action<int> OnHPChanged; 
     public void InitHP()
     {
-        HP = maxHP;
+        HP = MaxHP;
         OnHPChanged?.Invoke(HP);
     }
     public void AddHP(int amount)
     {
-        HP = Math.Min(maxHP, HP + amount);
+        HP = Math.Min(MaxHP, HP + amount);
         OnHPChanged?.Invoke(HP);
     }
     public void SubHP(int amount)
@@ -77,6 +78,8 @@ public class CharacterManager : MonoBehaviour
     {
         // Max Gauge가 게임 진행에 따라 변할 수 있다는 점을 고려
         MaxGauge = initialMaxGauge;
+        // Max HP가 게임 진행에 따라 변할 수 있다는 점을 고려
+        MaxHP = initialMaxHP;
         initialized = true;
     }
 

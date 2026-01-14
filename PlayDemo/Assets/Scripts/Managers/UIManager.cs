@@ -1,9 +1,67 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 // Observer Pattern (currently)
 public class UIManager : MonoBehaviour
 {
     #region HP
+    [Header("HP UI")]
+    [SerializeField] private GameObject HPRoot;
+    [SerializeField] private GameObject HPSlotPrefab;
+    private int cachedHP;
+    private bool isHPActive = false;
+    public void SetActiveHP(bool enable = true)
+    {
+        GameObject slot;
+        Image slotImage;
+
+        if (HPRoot == null || HPSlotPrefab == null)
+            return;
+        if (isHPActive == enable)
+            return;
+        if (!enable)
+        {
+            HPRoot.SetActive(false);
+            isHPActive = false;
+            return;
+        }
+        for (int i = HPRoot.transform.childCount - 1; i >= 0; i--)
+            Destroy(HPRoot.transform.GetChild(i).gameObject);
+        for (int i = 0; i < GameManager.Instance.Char.MaxHP; i++)
+        {
+            slot = Instantiate(HPSlotPrefab, HPRoot.transform);
+            slotImage = slot.GetComponent<Image>();
+            if (slotImage != null)
+                slotImage.color = ColorEx.MyRed;
+        }
+        HPRoot.SetActive(true);
+        cachedHP = GameManager.Instance.Char.HP;
+        isHPActive = true;
+    }
+    public void UpdateHP(int amount)
+    {
+        int start, end;
+        Image slotImage;
+        Color colorToApply;
+
+        if (HPRoot == null || HPSlotPrefab == null)
+            return;
+        if (cachedHP == amount)
+            return;
+
+        start = Mathf.Min(cachedHP, amount);
+        end = Mathf.Max(cachedHP, amount);
+        colorToApply = amount > cachedHP ? ColorEx.MyRed : ColorEx.MyGray;
+
+        for (int i = start; i < end; i++)
+        {
+            slotImage = HPRoot.transform.GetChild(i).GetComponent<Image>();
+            if (slotImage != null)
+                slotImage.color = colorToApply;
+        }
+
+        cachedHP = amount;
+    }
     #endregion
 
     #region Gauge
@@ -85,11 +143,13 @@ public class UIManager : MonoBehaviour
     #region Observers
     public void Init()
     {
+        GameManager.Instance.Char.OnHPChanged += UpdateHP;
         GameManager.Instance.Char.OnGaugeChanged += UpdateGauge;
         GameManager.Instance.Char.OnTried += UpdateTried;
     }
     void OnDisable()
     {
+        GameManager.Instance.Char.OnHPChanged -= UpdateHP;
         GameManager.Instance.Char.OnGaugeChanged -= UpdateGauge;
         GameManager.Instance.Char.OnTried -= UpdateTried;
     }
