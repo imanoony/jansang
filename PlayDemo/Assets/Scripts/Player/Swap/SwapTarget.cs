@@ -2,10 +2,13 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class SwapTarget : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class SwapTarget : MonoBehaviour
 {
     public GameObject highlightUI;
-    private Action<float> onTarget;
+    private Action<float> onSwapTarget = null;
+    private Action onNonTarget = null;
+    private const float EPS = 0.01f;
+    private float prevAmount = 0;
     private float amount = 0;
     private bool isHover = false;
     private Transform A = null;
@@ -15,16 +18,25 @@ public class SwapTarget : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         SetHighlight(false);
     }
 
-    public void SetHighlight(bool active,Transform A = null, Transform B = null, Action<float> onSwapTarget = null)
+    public void SetHighlight(
+        bool active,
+        Transform A = null, 
+        Transform B = null, 
+        Action<float> onSwapTarget = null,
+        Action onNonTarget = null
+    )
     {
         if (active)
         {
-            onTarget = onSwapTarget;
+            this.onSwapTarget = onSwapTarget;
+            this.onNonTarget = onNonTarget;
         }
         else
         {
             isHover = false;
-            onTarget = null;
+            this.onNonTarget?.Invoke();
+            this.onSwapTarget = null;
+            this.onNonTarget = null;
         }
 
         this.A = A;
@@ -33,28 +45,31 @@ public class SwapTarget : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             highlightUI.SetActive(active);
     }
 
-    public void Update()
+    void Update()
     {
-        if (A != null && B != null)
+        if (!isHover || A == null || B == null)
+            return;
+
+        amount = Vector2.SqrMagnitude(A.position - B.position);
+
+        if (Mathf.Abs(prevAmount - amount) > EPS)
         {
-            amount = Vector2.SqrMagnitude(A.position - B.position);
-        }
-        else
-        {
-            amount = 0;
-        }
-        if (isHover)
-        {
-            onTarget?.Invoke(amount);
+            prevAmount = amount;
+            onSwapTarget?.Invoke(amount);
         }
     }
-    public void OnPointerEnter(PointerEventData eventData)
+    public void OnMouseEnter()
     {
+        Debug.Log("Pointer Enter Swap Target");
         isHover = true;
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public void OnMouseExit()
     {
+        Debug.Log("Pointer Exit Swap Target");
         isHover = false;
+        prevAmount = 0;
+        amount = 0;
+        onNonTarget?.Invoke();
     }
 }

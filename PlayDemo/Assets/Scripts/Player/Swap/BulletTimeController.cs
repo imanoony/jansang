@@ -8,41 +8,24 @@ public class BulletTimeController : MonoBehaviour
     float defaultFixedDelta;
     
     private CharacterManager manager;
-    public void Init(CharacterManager manager)
-    {
-        this.manager = manager;
-    }
-    void Awake()
+    void Start()
     {
         defaultFixedDelta = Time.fixedDeltaTime;
+        manager = GameManager.Instance.Char;
     }
 
-    void Update()
+    public bool Use()
     {
-        if (Input.GetMouseButton(1)) // RMB
-        {
-            if (manager.UseGauge(useRate * Time.deltaTime))
-            {
-                EnterBulletTime();
-            }
-            else
-            {
-                ExitBulletTime();
-            }
-        }
-        else
-        {
-            ExitBulletTime();
-        }
+        return manager.UseGauge(useRate * Time.deltaTime);
     }
 
-    void EnterBulletTime()
+    public void EnterBulletTime()
     {
         Time.timeScale = slowScale;
         Time.fixedDeltaTime = defaultFixedDelta * slowScale;
     }
 
-    void ExitBulletTime()
+    public void ExitBulletTime()
     {
         Time.timeScale = 1f;
         Time.fixedDeltaTime = defaultFixedDelta;

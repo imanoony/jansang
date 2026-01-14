@@ -1,111 +1,109 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CharacterManager : MonoBehaviour
 {
-    #region Player_Skill_Reference
-    public PlayerMovement2D movement;
-    public SwapSkill mainSkill;
-    public ProjectileCaster subSkill;
-    public BulletTimeController timeSlow;
-    public MeleeController2D attack;
+    #region HP
+    [Header("HP Stats")]
+    public int HP { get; private set; }
+    public int MaxHP { get; private set; }
+    [SerializeField] private int initialMaxHP = 5;
+    public event Action<int> OnHPChanged; 
+    public void InitHP()
+    {
+        HP = MaxHP;
+        OnHPChanged?.Invoke(HP);
+    }
+    public void AddHP(int amount)
+    {
+        HP = Math.Min(MaxHP, HP + amount);
+        OnHPChanged?.Invoke(HP);
+    }
+    public void SubHP(int amount)
+    {
+        HP = Math.Max(0, HP - amount);
+        OnHPChanged?.Invoke(HP);
+    }
     #endregion
 
-    #region UI
-    public RadialGauge radialGauge;
-    public RadialGauge finalGauge;
-    #endregion
-    [SerializeField] private float maxGauge = 100;
-    [SerializeField] private float recoverRate = 10f;
-    private float gauge = 100;
-    private bool canCast = true;
+    #region Gauge
+    [Header("Gauge Stats")]
+    public float Gauge { get; private set; }
+    public float Tried { get; private set; }
+    public float MaxGauge { get; private set; }
+    [SerializeField] private float initialMaxGauge = 100f;
+    [SerializeField] private float recoveryRate = 10f;
     [SerializeField] private float recoveryDelay = 1f;
-    private bool useSkill = false;
-    private float lastSkillTime = 0;
-    private float lastShowTime = 0;
-    private float showDelay = 0.1f;
-    private void Awake()
+    [SerializeField] private float showDelay = 0.1f;
+    private float lastSkillTime = 0f;
+    private float lastShowTime = 0f;
+    private bool canRecover = true;
+    private bool canShow = true;
+    public event Action<float> OnGaugeChanged;
+    public event Action<float> OnTried;
+    public void InitGauge()
     {
-        mainSkill.Init(this);
-        subSkill.Init(this);
-        attack.Init(this);
-        timeSlow.Init(this);
-        movement.Init(this);
-        gauge = maxGauge;
+        Gauge = MaxGauge;
+        Tried = 0f;
+        OnGaugeChanged?.Invoke(Gauge);
+        OnTried?.Invoke(Tried);
+    }
+    public bool UseGauge(float amount)
+    {
+        if (!CheckGauge(amount))
+            return false;
+        Gauge = Math.Max(0f, Gauge - amount);
+        OnGaugeChanged?.Invoke(Gauge);
         lastSkillTime = Time.time;
-    }
-
-    public void Update()
-    {
-        if (!useSkill)
-        {
-            gauge = Math.Min(maxGauge, gauge + recoverRate * Time.deltaTime);
-        }
-        else if (Time.time - lastSkillTime > recoveryDelay)
-        {
-            useSkill = false;
-        }
-        if (gauge > 0 && !canCast)
-        {
-            canCast = true;
-        }
-
-        if (Time.time - lastShowTime > showDelay)
-        {
-            radialGauge.SetValue(gauge / maxGauge);
-            finalGauge.SetValue(gauge / maxGauge);
-        }
-    }
-    public bool CheckGauge(float needGauge)
-    {
-        if (canCast == false)
-        {
-            return false;
-        }
-        if (needGauge > gauge)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
-
-    public void ShowGauge(float needGauge)
-    {
-        if (canCast == false)
-        {
-            radialGauge.SetValue(gauge/maxGauge);
-            finalGauge.SetValue(gauge/maxGauge);
-            return;
-        }
-        if (needGauge > gauge)
-        {
-            radialGauge.SetValue(gauge/maxGauge);
-            finalGauge.SetValue(gauge/maxGauge);
-        }
-        else
-        {
-            radialGauge.SetValue(gauge/maxGauge);
-            finalGauge.SetValue((gauge-needGauge)/maxGauge);
-            lastShowTime = Time.time;
-        }
-    }
-    public bool UseGauge(float needGauge)
-    {
-        if (canCast == false)
-        {
-            return false;
-        }
-        gauge = Math.Max(0, gauge - needGauge);
-        if (gauge <= 0)
-        {
-            canCast = false;
-        }
-        lastSkillTime = Time.time;
-        useSkill = true;
+        canRecover = false;
         return true;
+    }
+    public bool CheckGauge(float amount) => Gauge >= amount;
+    public void Try(float amount)
+    {
+        if (Gauge < amount)
+            return;
+        Tried = amount;
+        OnTried?.Invoke(Tried);
+    }
+    public void CancelTry()
+    {
+        Tried = 0f;
+        OnTried?.Invoke(Tried);
+    }
+    #endregion
+
+    private bool initialized = false;
+    public void Init()
+    {
+        // Max Gauge가 게임 진행에 따라 변할 수 있다는 점을 고려
+        MaxGauge = initialMaxGauge;
+        // Max HP가 게임 진행에 따라 변할 수 있다는 점을 고려
+        MaxHP = initialMaxHP;
+        initialized = true;
+    }
+
+    void Update()
+    {
+        if (!initialized)
+            return;
+
+        // Gauge recovery logic start
+        if (!canRecover && Time.time - lastSkillTime > recoveryDelay)
+            canRecover = true;
+        if (canRecover && Gauge < MaxGauge)
+        {
+            Gauge = Math.Min(MaxGauge, Gauge + recoveryRate * Time.deltaTime);
+            if (!canShow && Time.time - lastShowTime > showDelay)
+                canShow = true;
+            if (canShow)
+            {
+                OnGaugeChanged?.Invoke(Gauge);
+                lastShowTime = Time.time;
+                canShow = false;
+            }
+        }
+        // Gauge recovery logic end
+        // Add more stat update logic here if needed
     }
 }

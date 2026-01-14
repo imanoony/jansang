@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class MeleeController2D : MonoBehaviour
 {
@@ -12,21 +13,16 @@ public class MeleeController2D : MonoBehaviour
     public Animator anim;
     public Transform shootPos;
     public HitBox hitBox;
-    
-    private CharacterManager manager;
-    public void Init(CharacterManager manager)
-    {
-        this.manager = manager;
-    }
+
     void Start()
     {
         anim.gameObject.SetActive(false);
         //hitBox.enabled = false;
     }
 
-    void Update()
+    public void OnAttack(InputAction.CallbackContext context)
     {
-        if (Input.GetMouseButton(0))
+        if (context.started)
         {
             TryAttack();
         }

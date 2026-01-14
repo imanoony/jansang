@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ProjectileCaster : MonoBehaviour
 {
@@ -8,26 +9,28 @@ public class ProjectileCaster : MonoBehaviour
 
     bool canCast = true;
     ReturningProjectile currentProjectile;
-    
-    private CharacterManager manager;
-    
-    public void Init(CharacterManager manager)
+    PlayerMovement2D movement;
+
+    void Start()
     {
-        this.manager = manager;
+        movement = GetComponent<PlayerMovement2D>();
     }
-    
-    void Update()
+    public void OnThrow(InputAction.CallbackContext context)
     {
-        if (Input.GetKeyDown(KeyCode.E) && canCast)
-        {
-            Cast();
-        }
-        else if (Input.GetKeyDown(KeyCode.E))
-        {
-            transform.position = currentProjectile.transform.position;
-            currentProjectile.Collect();
-        }
-        else if (Input.GetKeyUp(KeyCode.Q))
+        if (context.started)
+            if (canCast)
+            {
+                Cast();
+            }
+            else
+            {
+                transform.position = currentProjectile.transform.position;
+                currentProjectile.Collect();
+            }
+    }
+    public void OnReceive(InputAction.CallbackContext context)
+    {
+        if (context.started)
         {
             if (currentProjectile != null)
             {
@@ -62,6 +65,6 @@ public class ProjectileCaster : MonoBehaviour
     void OnProjectileReturned()
     {
         canCast = true;
-        manager.movement.ResetJump();
+        movement.ResetJump();
     }
 }

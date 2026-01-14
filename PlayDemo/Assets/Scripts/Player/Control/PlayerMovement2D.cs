@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class PlayerMovement2D : MonoBehaviour
@@ -13,36 +14,36 @@ public class PlayerMovement2D : MonoBehaviour
 
     Rigidbody2D rb;
     Collider2D col;
+    MeleeController2D attack;
 
     float moveInput;
     bool isGrounded;
     public bool IsGrouneded => isGrounded;
-    
     bool airJumpUsed;
 
-    private CharacterManager manager;
-
-    public void Init(CharacterManager manager)
-    {
-        this.manager = manager;
-    }
-
-    void Awake()
+    void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
+        attack = GetComponent<MeleeController2D>();
     }
 
-    void Update()
+    public void OnMove(InputAction.CallbackContext context)
     {
-        moveInput = Input.GetAxisRaw("Horizontal");
+        if (context.performed || context.canceled)
+        {
+            moveInput = context.ReadValue<Vector2>().x;
+        }
+    }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
         {
             TryJump();
         }
     }
-
+    
     void FixedUpdate()
     {
         CheckGround();
@@ -53,8 +54,8 @@ public class PlayerMovement2D : MonoBehaviour
     {
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
 
-        if (moveInput > 0) manager.attack.isRight = true;
-        else if (moveInput < 0) manager.attack.isRight = false;
+        if (moveInput > 0) attack.isRight = true;
+        else if (moveInput < 0) attack.isRight = false;
     }
 
     public void ResetJump()
@@ -84,7 +85,6 @@ public class PlayerMovement2D : MonoBehaviour
     void CheckGround()
     {
         Bounds bounds = col.bounds;
-        
         var start = bounds.center + bounds.extents.y * Vector3.down;
 
         RaycastHit2D hit = Physics2D.BoxCast(
