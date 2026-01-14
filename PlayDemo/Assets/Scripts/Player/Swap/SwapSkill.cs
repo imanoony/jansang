@@ -106,6 +106,8 @@ public class SwapSkill : MonoBehaviour
         Vector3 temp = transform.position;
         transform.position = target.position;
         target.position = temp;
+
+        GameManager.Instance.Char.CancelTry();
     }
 
     // =============================
