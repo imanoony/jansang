@@ -1,6 +1,6 @@
 using System.Collections;
 using UnityEngine;
-
+using UnityEngine.InputSystem;
 public class MeleeController2D : MonoBehaviour
 {
     [Header("Attack")]
@@ -19,9 +19,9 @@ public class MeleeController2D : MonoBehaviour
         //hitBox.enabled = false;
     }
 
-    void Update()
+    public void OnAttack(InputAction.CallbackContext context)
     {
-        if (Input.GetMouseButton(0))
+        if (context.started)
         {
             TryAttack();
         }

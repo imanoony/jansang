@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class PlayerMovement2D : MonoBehaviour
@@ -26,16 +27,21 @@ public class PlayerMovement2D : MonoBehaviour
         attack = GetComponent<MeleeController2D>();
     }
 
-    void Update()
+    public void OnMove(InputAction.CallbackContext context)
     {
-        moveInput = Input.GetAxisRaw("Horizontal");
+        if (context.performed || context.canceled)
+        {
+            moveInput = context.ReadValue<Vector2>().x;
+        }
+    }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
         {
             TryJump();
         }
     }
-
     void FixedUpdate()
     {
         CheckGround();

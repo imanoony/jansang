@@ -1,13 +1,13 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class SwapSkill : MonoBehaviour
 {
-    
-    public KeyCode skillKey = KeyCode.E;
     public LayerMask targetLayer;
     public LayerMask wallLayer;
-
+    [SerializeField] private BulletTimeController bulletTimeController;
     private List<SwapTarget> visibleTargets = new List<SwapTarget>();
     private Camera cam;
     private bool skillActive = false;
@@ -18,35 +18,47 @@ public class SwapSkill : MonoBehaviour
         manager = GameManager.Instance.Char;
     }
 
-    void Update()
+    private void Update()
     {
-        if (Input.GetMouseButtonDown(1) && manager.CheckGauge(0))
-        {
-            ActivateSkill();
-        }
-
-        if (Input.GetMouseButton(1))
+        if (skillActive)
         {
             UpdateTargets();
+            if (!bulletTimeController.Use())
+            {
+                skillActive = false;
+                DeactivateSkill();
+            }
         }
+    }
 
-        if (Input.GetMouseButtonUp(1))
+    public void OnTimeSlow(InputAction.CallbackContext ctx)
+    {
+        if (ctx.started)
+        {
+            if (manager.CheckGauge(0))
+            {
+                ActivateSkill();
+            }
+        }
+        if (ctx.canceled)
         {
             CheckClick();
             DeactivateSkill();
         }
     }
 
+
     // =============================
     void ActivateSkill()
     {
         skillActive = true;
+        bulletTimeController.EnterBulletTime();
     }
 
     void DeactivateSkill()
     {
         skillActive = false;
-
+        bulletTimeController.ExitBulletTime();
         foreach (var t in visibleTargets)
             t.SetHighlight(false);
 
@@ -85,6 +97,7 @@ public class SwapSkill : MonoBehaviour
     // =============================
     void CheckClick()
     {
+        if (skillActive == false) return;
         Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
         Collider2D hit = Physics2D.OverlapPoint(mousePos, targetLayer);
         
@@ -103,9 +116,7 @@ public class SwapSkill : MonoBehaviour
     // =============================
     void SwapPosition(Transform target)
     {
-        Vector3 temp = transform.position;
-        transform.position = target.position;
-        target.position = temp;
+        (transform.position, target.position) = (target.position, transform.position);
 
         GameManager.Instance.Char.CancelTry();
     }
