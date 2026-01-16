@@ -27,7 +27,7 @@ public class ShieldManEnemy : EnemyBase
     #region components
 
     private SpriteRenderer spriteRenderer;
-    
+    [SerializeField] private Collider2D attackArea;
     #endregion
     
     #region status
@@ -46,7 +46,7 @@ public class ShieldManEnemy : EnemyBase
         base.Start();
         
         spriteRenderer = GetComponent<SpriteRenderer>();
-        
+        attackArea.enabled = false;
         player = GameObject.FindGameObjectWithTag("Player");
         StartCoroutine(WaitForAlert());
     }
@@ -209,11 +209,11 @@ public class ShieldManEnemy : EnemyBase
         ChangeDirection(dir);
         ChangeMoveSpeed(2);
         Flip(dir);
-
+        attackArea.enabled = true;
         rushStart = true;
         canThrust = false;
         yield return new WaitUntil(() => canThrust);
-        
+        attackArea.enabled = false;
         ChangeDirection(0);
         ChangeMoveSpeed(1f);
         
@@ -241,6 +241,11 @@ public class ShieldManEnemy : EnemyBase
     
     IEnumerator HitRoutine()
     {
+        HP -= 1;
+        if (HP < 0)
+        {
+            Destroy(this.gameObject);
+        }
         var sprite = GetComponent<SpriteRenderer>();
         var c = sprite.color;
         

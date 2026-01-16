@@ -266,23 +266,16 @@ public class ArcherEnemy : EnemyBase
 
         lineRenderer.enabled = false;
         
+        Vector2 dir = (currentTarget?.position ?? transform.position) - transform.position;
+        dir.Normalize();
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         // Fire!
         GameObject bullet = Instantiate(
             bulletPrefab,
             transform.position,
-            transform.rotation
+            Quaternion.Euler(0, 0, angle)
         );
-        
-        Bullet b = bullet.GetComponent<Bullet>();
-        if (b != null)
-        {
-            b.Init(gameObject);
-        }
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        
-        Vector2 dir = (currentTarget?.position ?? transform.position) - transform.position;
-        dir.Normalize();
-        
         rb.linearVelocity = dir * bulletSpeed;
     }
 }

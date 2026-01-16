@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class EnemyBase : MonoBehaviour
 {
+    #region HP
+
+    [Header("HP Stats")]
+    public float HP { get; protected set; }
+
+    public int MaxHP;
+
+    #endregion
     #region  parameters
 
     [Header("Ground Check")]
@@ -54,7 +62,7 @@ public class EnemyBase : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         
         if (summoner != null) summoner.RegisterSignal(GetSignal);
-
+        HP = MaxHP;
         currentSpeedRate = 1;
     }
 
@@ -76,7 +84,7 @@ public class EnemyBase : MonoBehaviour
 
     private void CheckGround()
     {
-        if (rb.linearVelocity.y > 0)
+        if (rb.linearVelocity.y > 0.1f)
         {
             isGrounded = false;
             return;
@@ -114,6 +122,10 @@ public class EnemyBase : MonoBehaviour
     protected virtual void ChangeDirection(int direction)
     {
         moveDirection = direction;
+        if (direction == 0)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        }
     }
 
     protected void ChangeMoveSpeed(float rate)
@@ -151,11 +163,30 @@ public class EnemyBase : MonoBehaviour
 
     public virtual void Hit()
     {
-        StartCoroutine(HitRoutine());
+        StartCoroutine(HitRoutine(1f));
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Pitfall"))
+        {
+            StartCoroutine(HitRoutine(0.5f));
+        }
     }
 
-    IEnumerator HitRoutine()
+    private void OnTriggerStay2D(Collider2D other)
     {
+        if (other.CompareTag("Pitfall"))
+        {
+            StartCoroutine(HitRoutine(0.3f*Time.deltaTime));
+        }
+    }
+    IEnumerator HitRoutine(float damage)
+    {
+        this.HP -= damage;
+        if (HP <= 0)
+        {
+            Destroy(this.gameObject);
+        }
         var sprite = GetComponent<SpriteRenderer>();
         var c = sprite.color;
         

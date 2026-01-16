@@ -225,6 +225,7 @@ GameObject:
   - component: {fileID: 7937889744083868383}
   - component: {fileID: 2123598759482721288}
   - component: {fileID: 548038150764793076}
+  - component: {fileID: 7796931820783239575}
   - component: {fileID: 8144941878329839698}
   - component: {fileID: 5865790102697253617}
   m_Layer: 8
@@ -582,6 +583,20 @@ MonoBehaviour:
   anim: {fileID: 7682376173339313760}
   shootPos: {fileID: 7218432460646019001}
   hitBox: {fileID: 5798332138023723292}
+--- !u!114 &7796931820783239575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043352431804775299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad415671b5c0c404a8713786201daf0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHitCheck
+  spriteRenderer: {fileID: 4437547419695001231}
+  invincibleTime: 1
 --- !u!61 &8144941878329839698
 BoxCollider2D:
   m_ObjectHideFlags: 0

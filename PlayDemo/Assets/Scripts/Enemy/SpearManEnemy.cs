@@ -26,7 +26,7 @@ public class SpearManEnemy : EnemyBase
     #region components
 
     private SpriteRenderer spriteRenderer;
-    
+    [SerializeField] private Collider2D damageArea;
     #endregion
     
     #region status
@@ -42,7 +42,7 @@ public class SpearManEnemy : EnemyBase
     protected override void Start()
     {
         base.Start();
-        
+        damageArea.enabled = false;
         spriteRenderer = GetComponent<SpriteRenderer>();
         
         player = GameObject.FindGameObjectWithTag("Player");
@@ -210,11 +210,11 @@ public class SpearManEnemy : EnemyBase
         spriteRenderer.color = new Color(1f, 1f, 0f, 1f);
         
         automaticFlip = true;
-        
+        damageArea.enabled = true;
         yield return new WaitForSeconds(0.3f);
         
         spriteRenderer.color = new Color(0.5f, 0.5f, 1f, 1f);
-        
+        damageArea.enabled = false;
         ChangeDirection(-dir);
         ChangeMoveSpeed(0.2f);
         

@@ -226,11 +226,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 103e1284781624b4886c2aab8cc00dcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArcherEnemy
+  MaxHP: 2
   groundLayer:
     serializedVersion: 2
     m_Bits: 4160
   groundCheckDistance: 0.05
   moveSpeed: 5
+  summoner: {fileID: 0}
   detectionRadius: 3
   combatRadius: 8
   sightMask:

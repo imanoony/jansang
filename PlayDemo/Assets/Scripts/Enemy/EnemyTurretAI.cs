@@ -77,13 +77,14 @@ public class EnemyTurretAI : MonoBehaviour
             firePoint.position,
             firePoint.rotation
         );
-
+    /*
         // 🔥 발사자 자신과 잠깐 충돌 무시
         Bullet b = bullet.GetComponent<Bullet>();
         if (b != null)
         {
             b.Init(gameObject);
         }
+        */
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
         Vector2 dir = player.position - firePoint.position;
         dir.Normalize();
