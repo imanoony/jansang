@@ -139,7 +139,7 @@ public class SpearManEnemy : EnemyBase
         yield return new WaitForSeconds(0.5f);
         while (true)
         {
-            if (found == false)
+            if (found == false || !TilemapPlatformIndex.Instance.AreOnSamePlatformByRay(player.transform, transform))
             {
                 currentTarget = null;
                 
