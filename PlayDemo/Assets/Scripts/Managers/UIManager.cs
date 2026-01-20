@@ -8,6 +8,8 @@ public class UIManager : MonoBehaviour
     [Header("HP UI")]
     [SerializeField] private GameObject HPRoot;
     [SerializeField] private GameObject HPSlotPrefab;
+    [SerializeField] private Sprite HP;
+    [SerializeField] private Sprite HPNull;
     private int cachedHP;
     private bool isHPActive = false;
     public void SetActiveHP(bool enable = true)
@@ -31,8 +33,7 @@ public class UIManager : MonoBehaviour
         {
             slot = Instantiate(HPSlotPrefab, HPRoot.transform);
             slotImage = slot.GetComponent<Image>();
-            if (slotImage != null)
-                slotImage.color = ColorEx.MyRed;
+            slotImage.sprite = HP;
         }
         HPRoot.SetActive(true);
         cachedHP = GameManager.Instance.Char.HP;
@@ -42,7 +43,7 @@ public class UIManager : MonoBehaviour
     {
         int start, end;
         Image slotImage;
-        Color colorToApply;
+        Sprite slotSprite;
 
         if (HPRoot == null || HPSlotPrefab == null)
             return;
@@ -51,13 +52,13 @@ public class UIManager : MonoBehaviour
 
         start = Mathf.Min(cachedHP, amount);
         end = Mathf.Max(cachedHP, amount);
-        colorToApply = amount > cachedHP ? ColorEx.MyRed : ColorEx.MyGray;
+        slotSprite = amount > cachedHP ? HP : HPNull;
 
         for (int i = start; i < end; i++)
         {
             slotImage = HPRoot.transform.GetChild(i).GetComponent<Image>();
             if (slotImage != null)
-                slotImage.color = colorToApply;
+                slotImage.sprite = slotSprite;
         }
 
         cachedHP = amount;
