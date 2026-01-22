@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6330772751614425114}
   - component: {fileID: 6602807900092744083}
   - component: {fileID: 4692237532214177533}
+  - component: {fileID: 269325327732216404}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -82,3 +83,19 @@ MonoBehaviour:
   Gauge: {fileID: 0}
   Tried: {fileID: 0}
   gaugeRatio: 2
+--- !u!114 &269325327732216404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2464659344240176211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39331be5576802e41ba6255c998be61f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::talkController
+  chunk: {fileID: 11400000, guid: 2aea8e1d6f9df214ea23583d8e940665, type: 2}
+  prefab: {fileID: 7285775661596598556, guid: b6a6ce1b9614c7b469626fa670a2a57c, type: 3}
+  defaultCapacity: 10
+  maxSize: 30

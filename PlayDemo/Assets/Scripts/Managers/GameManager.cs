@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
 
         Char = gameObject.GetComponent<CharacterManager>();
         UI = gameObject.GetComponent<UIManager>();
-
+        talk = gameObject.GetComponent<talkController>();
         Char.Init();
         UI.Init();
 
@@ -26,4 +26,6 @@ public class GameManager : MonoBehaviour
     
     public CharacterManager Char { get; private set; }
     public UIManager UI { get; private set; }
+    
+    public talkController talk { get; private set; }
 }
