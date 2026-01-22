@@ -3528,17 +3528,45 @@ PrefabInstance:
       propertyPath: m_UIInputModule
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_Size.x
+      value: 1.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_Size.y
+      value: 2.77
+      objectReference: {fileID: 0}
+    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 1649148736485151496, guid: 94d7d6f9bd6950b40859eec60f22ce6a, type: 3}
+    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5043352431804775299, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 7279371306044431877, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.51
+      value: 12.505
       objectReference: {fileID: 0}
     - target: {fileID: 7279371306044431877, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -9.59
+      value: -10.012
       objectReference: {fileID: 0}
     - target: {fileID: 7279371306044431877, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3572,16 +3600,94 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_Size.x
+      value: 1.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_Size.y
+      value: 2.77
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_Offset.y
+      value: 1.385
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_SpriteTilingProperty.pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_SpriteTilingProperty.border.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_SpriteTilingProperty.border.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_SpriteTilingProperty.border.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_SpriteTilingProperty.border.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.x
+      value: 1.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.y
+      value: 2.77
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 1.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 2.77
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5043352431804775299, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 250739553}
   m_SourcePrefab: {fileID: 100100000, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
 --- !u!4 &241183230 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7279371306044431877, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
   m_PrefabInstance: {fileID: 241183229}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &250739542 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5043352431804775299, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+  m_PrefabInstance: {fileID: 241183229}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &250739553
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 250739542}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 326e19a142ff8714eb620ea6a20dcdd2, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &322525972
 PrefabInstance:
   m_ObjectHideFlags: 0
