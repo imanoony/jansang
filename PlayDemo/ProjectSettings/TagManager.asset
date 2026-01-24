@@ -8,6 +8,7 @@ TagManager:
   - EnemyProjectile
   - EnemyAttack
   - Projectile
+  - Deco
   layers:
   - Default
   - TransparentFX
@@ -23,8 +24,8 @@ TagManager:
   - Wall2
   - Ground
   - Ball
-  - 
-  - 
+  - Pitfall
+  - Deco
   - 
   - 
   - 

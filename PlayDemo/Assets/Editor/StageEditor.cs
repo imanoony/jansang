@@ -34,14 +34,19 @@ public class StageEditor : EditorWindow
 
         GUILayout.Space(10);
 
+
         if (GUILayout.Button("Save"))
         {
+            if (!CheckInstances()) return;
+
             if (grid != null && stage != null)
                 StageSerializer.Save(grid, player, enemy, stage); 
         }
 
         if (GUILayout.Button("Load"))
         {
+            if (!CheckInstances()) return;
+
             if (grid != null && stage != null)
                 StageSerializer.Load(
                     stage, grid, player, enemy,
@@ -51,4 +56,39 @@ public class StageEditor : EditorWindow
                 );
         }
     }
+
+    private bool CheckInstances()
+    {
+        if (player == null){
+            player = GameObject.Find("PlayerRoot")?.transform;
+            if (player == null)
+                Debug.LogError("PlayerRoot not found in scene.");
+                return false;
+        }
+        if (enemy == null)
+        {
+            enemy = GameObject.Find("EnemyRoot")?.transform;
+            if (enemy == null)
+                Debug.LogError("EnemyRoot not found in scene.");
+                return false;
+        }
+        if (grid == null){
+            grid = GameObject.Find("Grid")?.GetComponent<Grid>();
+            if (grid == null)
+                Debug.LogError("Grid not found in scene.");
+                return false;
+        }
+        if (stagePlacer == null){
+            stagePlacer = GameObject.Find("Grid")?.GetComponent<StagePlacer>();
+            if (stagePlacer == null)
+                Debug.LogError("StagePlacer not found in scene.");
+                return false;
+        }
+        if (stage == null){
+            Debug.LogError("StageData is not assigned.");
+            return false;
+        }
+        return true;
+    }
 }
+
