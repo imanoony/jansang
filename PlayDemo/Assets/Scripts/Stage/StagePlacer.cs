@@ -6,6 +6,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.Rendering;
+
+[System.Serializable]
+public class TileDictionary // 배열을 감싸는 클래스
+{
+    public string type;
+    public TileBase[] tiles;
+
+}
 
 public class StagePlacer : MonoBehaviour
 {
@@ -16,7 +25,8 @@ public class StagePlacer : MonoBehaviour
 
 #region Terrain
     public Grid grid;
-    public TileBase[] tiles;    // tiles, 지금은 테스트용으로 2개만 (0: ground, 1: wall)
+    
+    [SerializeField] public TileDictionary[] tiles;
 #endregion
 
 #region Test

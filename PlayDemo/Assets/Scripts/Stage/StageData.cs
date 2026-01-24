@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEditor;
+using UnityEngine.Rendering;
 
 [CreateAssetMenu(fileName = "Stage", menuName = "Scriptable Objects/Stage")]
 public class StageData : ScriptableObject
@@ -109,7 +110,7 @@ public static class StageSerializer
         Grid grid,
         Transform player,
         Transform enemy,
-        TileBase[] tiles,
+        TileDictionary[] tiles,
         GameObject playerPrefab,
         GameObject enemyPrefab
     )
@@ -120,6 +121,24 @@ public static class StageSerializer
         Tilemap wallTM = grid.transform.Find("Wall").GetComponent<Tilemap>();
         Tilemap pitfallTM = grid.transform.Find("Pitfall").GetComponent<Tilemap>();
         Tilemap decoTM = grid.transform.Find("Deco").GetComponent<Tilemap>();
+
+        TileBase[] groundTiles = null;
+        TileBase[] wallTiles = null;
+        TileBase[] pitfallTiles = null;
+        TileBase[] decoTiles = null;
+
+        foreach(TileDictionary td in tiles)
+        {
+            if (td.type == "Ground")
+                groundTiles = td.tiles;
+            else if (td.type == "Wall")
+                wallTiles = td.tiles;
+            else if (td.type == "Pitfall")
+                pitfallTiles = td.tiles;
+            else if (td.type == "Deco")
+                decoTiles = td.tiles;
+        }
+
 
         groundTM.ClearAllTiles();
         wallTM.ClearAllTiles();
@@ -141,19 +160,18 @@ public static class StageSerializer
 
         // 땅 타일 배치하기
         foreach (Int2 pos in stage.grounds)
-            groundTM.SetTile(new Vector3Int(pos.x, pos.y), tiles[0]);
+            groundTM.SetTile(new Vector3Int(pos.x, pos.y), groundTiles[0]);
 
         // 벽 타일 배치하기
         foreach (Int2 pos in stage.walls)
-            wallTM.SetTile(new Vector3Int(pos.x, pos.y), tiles[1]);
+            wallTM.SetTile(new Vector3Int(pos.x, pos.y), wallTiles[0]);
 
         // 함정 타일 배치하기
         foreach (Int2 pos in stage.pitfalls)
-            pitfallTM.SetTile(new Vector3Int(pos.x, pos.y), tiles[2]);
-
+            pitfallTM.SetTile(new Vector3Int(pos.x, pos.y), pitfallTiles[0]);
         // 장식 타일 배치하기
         foreach (Int2 pos in stage.decos)
-            decoTM.SetTile(new Vector3Int(pos.x, pos.y), tiles[3]);
+            decoTM.SetTile(new Vector3Int(pos.x, pos.y), decoTiles[0]);
 
         // 적들 스폰하기
         foreach (Int2 pos in stage.enemies)
