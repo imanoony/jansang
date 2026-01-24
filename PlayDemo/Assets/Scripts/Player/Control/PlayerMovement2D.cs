@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -5,12 +7,21 @@ using UnityEngine.InputSystem;
 public class PlayerMovement2D : MonoBehaviour
 {
     [Header("Movement")]
+    public Vector2 rawInput;
     public float moveSpeed = 8f;
     public float jumpForce = 12f;
+    
 
     [Header("Ground Check")]
     public LayerMask groundLayer;
     public float groundCheckDistance = 0.05f;
+
+    [Header("Dash")]
+    public float dashCooldown = 2f;
+    public float dashCurrentCooldown = 0f;
+    public float dashSpeed = 20f;
+    public float dashDuration = 0.3f;
+    public bool dashing = false;
 
     Rigidbody2D rb;
     Collider2D col;
@@ -30,6 +41,10 @@ public class PlayerMovement2D : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
+        rawInput = context.ReadValue<Vector2>();
+
+        if (dashing) return;
+
         if (context.performed || context.canceled)
         {
             moveInput = context.ReadValue<Vector2>().x;
@@ -38,12 +53,22 @@ public class PlayerMovement2D : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (dashing) return;
+
         if (context.performed)
         {
             TryJump();
         }
     }
     
+    public void OnDash(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            TryDash();
+        }
+    }
+
     void FixedUpdate()
     {
         CheckGround();
@@ -52,6 +77,8 @@ public class PlayerMovement2D : MonoBehaviour
 
     void Move()
     {
+        if (dashing) return;
+
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
 
         if (moveInput > 0) attack.isRight = true;
@@ -80,6 +107,59 @@ public class PlayerMovement2D : MonoBehaviour
     void Jump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+    }
+
+    void TryDash()
+    {
+        if(dashCurrentCooldown <= 0f)
+        {
+            dashCurrentCooldown = dashCooldown;
+            Dash();
+        }
+    }
+
+    void Dash()
+    {
+        Vector2 dashDir = rawInput.sqrMagnitude > 0 ? rawInput.normalized : (attack.isRight ? Vector2.right : Vector2.left);
+
+        Vector2 dashV = new Vector2(dashDir.x * dashSpeed, dashDir.y * dashSpeed);
+        rb.linearVelocity = dashV;
+        StartCoroutine(DashCooldownRoutine(dashV));
+    }
+
+    IEnumerator DashCooldownRoutine(Vector2 dV)
+    {
+        Debug.Log("Dash Start, Dash Direction: " + dV);
+        float dashTime = 0.01f;
+        dashing = true;
+        float gS = rb.gravityScale;
+        rb.gravityScale = 0f;
+
+        while (dashTime <= dashDuration)
+        {
+            dashCurrentCooldown -= Time.fixedDeltaTime;
+            dashTime += Time.fixedDeltaTime; 
+            rb.linearVelocity = dV * (float)(1 - Math.Pow(dashTime / dashDuration, 2) * 0.5);
+
+            if (isGrounded)
+            {
+                dashTime += Time.fixedDeltaTime * 4f; // 땅에 닿으면 대시 시간 빨리 소모
+            }
+
+            yield return new WaitForFixedUpdate();
+        }
+
+        Debug.Log("Dash End");
+
+        dashing = false;
+        rb.gravityScale = gS;
+
+        while (dashCurrentCooldown > 0f)
+        {
+            dashCurrentCooldown -= Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+        dashCurrentCooldown = 0f;
     }
 
     void CheckGround()
