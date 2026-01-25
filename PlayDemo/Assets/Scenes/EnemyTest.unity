@@ -1048,6 +1048,7 @@ GameObject:
   - component: {fileID: 310803280}
   - component: {fileID: 310803279}
   - component: {fileID: 310803281}
+  - component: {fileID: 310803282}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -1106,6 +1107,24 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a81d378593c6fb04f8bac4036bb1e3f4, type: 2}
   - {fileID: 11400000, guid: 47b409cc25787fa4585cf528b04529d5, type: 2}
   testData: {fileID: 11400000, guid: c90a92b6b98ce714d99fa7ec879e03ea, type: 2}
+--- !u!114 &310803282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310803278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b814f8ec1f7683e4295f82fa492b4890, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TilemapPlatformIndex
+  tilemap: {fileID: 515221867}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4096
+  rayDistance: 0.5
+  rayOffset: {x: 0, y: 0}
 --- !u!1 &426916336
 GameObject:
   m_ObjectHideFlags: 0

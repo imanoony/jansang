@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b6ab7177da4d12469c848489ea3090f, type: 3}
+  m_Name: EnemyTalk
+  m_EditorClassIdentifier: Assembly-CSharp::talkChunk
+  talkDatas:
+  - {fileID: 11400000, guid: 951a44673f1860b45b3cd21671773724, type: 2}
+  - {fileID: 11400000, guid: 46f9272c2ab2ab146bcad3c909b3fc99, type: 2}

@@ -7,10 +7,22 @@ using UnityEngine.InputSystem;
 public class PlayerMovement2D : MonoBehaviour
 {
     [Header("Movement")]
+
     public Vector2 rawInput;
     public float moveSpeed = 8f;
     public float jumpForce = 12f;
     
+
+
+    [Tooltip("1초당 이동하는 타일")]
+    public float moveTile = 2f;
+    [Tooltip("한 번의 전투에 이동하는 타일 수")]
+    public float jumpTile  = 2f;
+    [Header("Setting")] 
+    [Tooltip("하나의 타일이 차지하는 월드 좌표상의 높이")]
+    public float tileHeight=1f;
+    [Tooltip("점프를 뛰었을 때 주는 여유 공간 비율(타일 기준)")]
+    public float jumpOffset = 0.5f;
 
     [Header("Ground Check")]
     public LayerMask groundLayer;
@@ -27,6 +39,7 @@ public class PlayerMovement2D : MonoBehaviour
     Collider2D col;
     MeleeController2D attack;
 
+    private float gravity = 1;
     float moveInput;
     bool isGrounded;
     public bool IsGrouneded => isGrounded;
@@ -37,6 +50,7 @@ public class PlayerMovement2D : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         attack = GetComponent<MeleeController2D>();
+        gravity = -Physics.gravity.y * rb.gravityScale;
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -77,9 +91,10 @@ public class PlayerMovement2D : MonoBehaviour
 
     void Move()
     {
+
         if (dashing) return;
 
-        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(moveInput * moveTile*tileHeight, rb.linearVelocity.y);
 
         if (moveInput > 0) attack.isRight = true;
         else if (moveInput < 0) attack.isRight = false;
@@ -106,6 +121,10 @@ public class PlayerMovement2D : MonoBehaviour
 
     void Jump()
     {
+        float currentTileY = Mathf.Round(transform.position.y / tileHeight);
+        float targetY = (currentTileY+jumpOffset + jumpTile)* tileHeight;
+        float jumpForce = Mathf.Sqrt(2*(targetY - transform.position.y/tileHeight)*gravity);
+        Debug.Log(gravity);
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
 

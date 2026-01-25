@@ -560,9 +560,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51eb73a7b9b14d54798de517b919a5d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+
   rawInput: {x: 0, y: 0}
   moveSpeed: 5
   jumpForce: 7
+
+  moveTile: 4
+  jumpTile: 1
+  tileHeight: 1
+  jumpOffset: 0.5
+
   groundLayer:
     serializedVersion: 2
     m_Bits: 4160
