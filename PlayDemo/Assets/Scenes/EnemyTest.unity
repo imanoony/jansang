@@ -2539,21 +2539,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 914012525}
     m_Modifications:
-    - target: {fileID: 1356419120706315528, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3548428189148757943, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: finalGauge
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 5043352431804775299, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 5865790102697253617, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_GravityScale
-      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 7279371306044431877, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2596,16 +2584,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7937889744083868383, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: jumpForce
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 7937889744083868383, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: groundLayer.m_Bits
-      value: 4160
-      objectReference: {fileID: 0}
-    - target: {fileID: 7937889744083868383, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: groundCheckDistance
-      value: 0.1
+      propertyPath: dashSpeed
+      value: 14
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

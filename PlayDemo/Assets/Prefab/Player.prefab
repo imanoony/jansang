@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5798332138023723292}
   - component: {fileID: 7682376173339313760}
   - component: {fileID: 6074085315287752125}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -494,6 +494,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 30bf1d72-b340-453c-b5b4-95a134dfe557
     m_ActionName: 'Player/New action[/Keyboard/q]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7937889744083868383}
+        m_TargetAssemblyTypeName: PlayerMovement2D, Assembly-CSharp
+        m_MethodName: OnDash
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: PlayerMovement2D.OnDash
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: c9815139-aec3-4648-95bd-b6bbc5781140
+    m_ActionName: 'Player/Dash[/Keyboard/leftShift]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
@@ -544,14 +560,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51eb73a7b9b14d54798de517b919a5d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+
+  rawInput: {x: 0, y: 0}
+  moveSpeed: 5
+  jumpForce: 7
+
   moveTile: 4
   jumpTile: 1
   tileHeight: 1
   jumpOffset: 0.5
+
   groundLayer:
     serializedVersion: 2
-    m_Bits: 64
-  groundCheckDistance: 0.05
+    m_Bits: 4160
+  groundCheckDistance: 0.1
+  dashCooldown: 2
+  dashCurrentCooldown: 0
+  dashSpeed: 20
+  dashDuration: 0.3
+  dashing: 0
 --- !u!114 &2123598759482721288
 MonoBehaviour:
   m_ObjectHideFlags: 0
