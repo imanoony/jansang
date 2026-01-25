@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class EnemyBase : MonoBehaviour
 {
@@ -22,7 +23,8 @@ public class EnemyBase : MonoBehaviour
     [SerializeField] protected float moveSpeed = 5f;
 
     [Header("Commander")] [SerializeField] private SummonerEnemy summoner;
-
+    [Header("Talk")] 
+    float talkChance = 0.002f;
     #endregion
     
     #region components
@@ -51,10 +53,20 @@ public class EnemyBase : MonoBehaviour
     protected bool isGrounded;
     private int moveDirection = 0; // -1 for left, 1 for right, and 0 for idle
     public int MoveDirection => moveDirection;
-    
+
+    public float canTalkTime = 0;
     #endregion
     
-    
+
+    public void TryTalk()
+    {
+        if (canTalkTime > Time.time) return;
+        float talkchance = Random.Range(0f, 1f);
+        if (talkchance > talkChance) return;
+
+        float delta = GameManager.Instance.talk.Show(transform);
+        canTalkTime = Time.time + delta;
+    }
     protected virtual void Start()
     {
         animator = GetComponentInChildren<Animator>();
@@ -70,6 +82,7 @@ public class EnemyBase : MonoBehaviour
     {
         CheckGround();
         Move();
+        TryTalk();
     }
 
     protected virtual void Update()
