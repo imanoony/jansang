@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEditor;
+using UnityEngine.Rendering;
 
 [CreateAssetMenu(fileName = "Stage", menuName = "Scriptable Objects/Stage")]
 public class StageData : ScriptableObject
@@ -19,6 +20,8 @@ public class StageData : ScriptableObject
 #region Terrain
     public List<Int2> grounds = new();      // 땅 타일 좌표
     public List<Int2> walls = new();        // 벽 타일 좌표
+    public List<Int2> pitfalls = new();      // 함정 타일 좌표
+    public List<Int2> decos = new();         // 장식 타일 좌표
 #endregion
 
 }
@@ -64,6 +67,8 @@ public static class StageSerializer
 
         stage.grounds.Clear();
         stage.walls.Clear();
+        stage.pitfalls.Clear();
+        stage.decos.Clear();
         for (i = 0; i < grid.transform.childCount; i++)
         {
             tilemap = grid.transform.GetChild(i).GetComponent<Tilemap>();
@@ -73,8 +78,12 @@ public static class StageSerializer
                 if (tile == null) continue;
                 if (tilemap.name.ToLower().Contains("ground"))
                     stage.grounds.Add(new Int2 { x = pos.x, y = pos.y });
-                else 
+                else if (tilemap.name.ToLower().Contains("wall"))
                     stage.walls.Add(new Int2 { x = pos.x, y = pos.y });
+                else if (tilemap.name.ToLower().Contains("pitfall"))
+                    stage.pitfalls.Add(new Int2 { x = pos.x, y = pos.y });
+                else if (tilemap.name.ToLower().Contains("deco"))
+                    stage.decos.Add(new Int2 { x = pos.x, y = pos.y });
             }
         }
 
@@ -101,7 +110,7 @@ public static class StageSerializer
         Grid grid,
         Transform player,
         Transform enemy,
-        TileBase[] tiles,
+        TileDictionary[] tiles,
         GameObject playerPrefab,
         GameObject enemyPrefab
     )
@@ -110,9 +119,32 @@ public static class StageSerializer
         GameObject entity;
         Tilemap groundTM = grid.transform.Find("Ground").GetComponent<Tilemap>();
         Tilemap wallTM = grid.transform.Find("Wall").GetComponent<Tilemap>();
+        Tilemap pitfallTM = grid.transform.Find("Pitfall").GetComponent<Tilemap>();
+        Tilemap decoTM = grid.transform.Find("Deco").GetComponent<Tilemap>();
+
+        TileBase[] groundTiles = null;
+        TileBase[] wallTiles = null;
+        TileBase[] pitfallTiles = null;
+        TileBase[] decoTiles = null;
+
+        foreach(TileDictionary td in tiles)
+        {
+            if (td.type == "Ground")
+                groundTiles = td.tiles;
+            else if (td.type == "Wall")
+                wallTiles = td.tiles;
+            else if (td.type == "Pitfall")
+                pitfallTiles = td.tiles;
+            else if (td.type == "Deco")
+                decoTiles = td.tiles;
+        }
+
 
         groundTM.ClearAllTiles();
         wallTM.ClearAllTiles();
+        pitfallTM.ClearAllTiles();
+        decoTM.ClearAllTiles();
+
         if (player.childCount > 0)
 #if UNITY_EDITOR
             Undo.DestroyObjectImmediate(player.GetChild(0).gameObject);
@@ -128,11 +160,18 @@ public static class StageSerializer
 
         // 땅 타일 배치하기
         foreach (Int2 pos in stage.grounds)
-            groundTM.SetTile(new Vector3Int(pos.x, pos.y), tiles[0]);
+            groundTM.SetTile(new Vector3Int(pos.x, pos.y), groundTiles[0]);
 
         // 벽 타일 배치하기
         foreach (Int2 pos in stage.walls)
-            wallTM.SetTile(new Vector3Int(pos.x, pos.y), tiles[1]);
+            wallTM.SetTile(new Vector3Int(pos.x, pos.y), wallTiles[0]);
+
+        // 함정 타일 배치하기
+        foreach (Int2 pos in stage.pitfalls)
+            pitfallTM.SetTile(new Vector3Int(pos.x, pos.y), pitfallTiles[0]);
+        // 장식 타일 배치하기
+        foreach (Int2 pos in stage.decos)
+            decoTM.SetTile(new Vector3Int(pos.x, pos.y), decoTiles[0]);
 
         // 적들 스폰하기
         foreach (Int2 pos in stage.enemies)
