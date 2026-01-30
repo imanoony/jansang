@@ -127,6 +127,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1596391089}
     m_Modifications:
+    - target: {fileID: 2021016497362810777, guid: 1ff9688d080af5d4fa9ff1ed99790838, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2551588821228025244, guid: 1ff9688d080af5d4fa9ff1ed99790838, type: 3}
       propertyPath: m_Name
       value: Enemy
@@ -267,6 +271,10 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8562850243022647395, guid: 1ff9688d080af5d4fa9ff1ed99790838, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 3e10e233b7af32a4ebd84cc704ce3d17, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3997,8 +4005,10 @@ MonoBehaviour:
   enemyRoot: {fileID: 1596391089}
   grid: {fileID: 591800932}
   tiles:
-  - {fileID: 11400000, guid: a81d378593c6fb04f8bac4036bb1e3f4, type: 2}
-  - {fileID: 11400000, guid: 47b409cc25787fa4585cf528b04529d5, type: 2}
+  - type: 
+    tiles: []
+  - type: 
+    tiles: []
   testData: {fileID: 11400000, guid: c90a92b6b98ce714d99fa7ec879e03ea, type: 2}
 --- !u!156049354 &591800932
 Grid:
@@ -4069,7 +4079,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.41823888, g: 1, b: 0.6823686, a: 0}
+  m_BackGroundColor: {r: 0.27358487, g: 0.3333333, b: 0.30063316, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -4148,7 +4158,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -4577,6 +4587,55 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &1044629771
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1044629773}
+  - component: {fileID: 1044629772}
+  m_Layer: 0
+  m_Name: Global Volume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1044629772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1044629771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 983787b6d00f17141a4dbefe10ca0dfd, type: 2}
+--- !u!4 &1044629773
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1044629771}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.970765, y: 1.6603519, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1137175413
 GameObject:
   m_ObjectHideFlags: 0
@@ -5737,3 +5796,4 @@ SceneRoots:
   - {fileID: 1596391089}
   - {fileID: 2058861058}
   - {fileID: 322525972}
+  - {fileID: 1044629773}
