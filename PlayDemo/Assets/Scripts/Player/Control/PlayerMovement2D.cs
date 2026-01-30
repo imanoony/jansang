@@ -34,6 +34,13 @@ public class PlayerMovement2D : MonoBehaviour
     public float dashSpeed = 20f;
     public float dashDuration = 0.3f;
     public bool dashing = false;
+    [SerializeField] private bool silenced = false;
+    public void DashSilence(float time)
+    {
+        silenced = true;
+        StartCoroutine(SilenceTimer(time));
+    }
+
 
     Rigidbody2D rb;
     Collider2D col;
@@ -44,6 +51,15 @@ public class PlayerMovement2D : MonoBehaviour
     bool isGrounded;
     public bool IsGrouneded => isGrounded;
     bool airJumpUsed;
+
+
+
+    private IEnumerator SilenceTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        silenced = false;
+    }
+
 
     void Start()
     {
@@ -77,6 +93,7 @@ public class PlayerMovement2D : MonoBehaviour
     
     public void OnDash(InputAction.CallbackContext context)
     {
+        if (silenced) return;
         if (context.performed)
         {
             TryDash();

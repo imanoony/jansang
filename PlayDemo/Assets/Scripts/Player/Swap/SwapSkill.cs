@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,6 +13,25 @@ public class SwapSkill : MonoBehaviour
     private Camera cam;
     private bool skillActive = false;
     private CharacterManager manager;
+
+    [Header("Silenced")]
+    [SerializeField] private bool silenced = false;
+    public void SwapSilence(float time)
+    {
+        silenced = true;
+        if (skillActive) DeactivateSkill();
+
+        StartCoroutine(SilenceTimer(time));
+    }
+
+    private IEnumerator SilenceTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        silenced = false;
+    }
+    
+
+
     void Start()
     {
         cam = Camera.main;
@@ -20,6 +40,8 @@ public class SwapSkill : MonoBehaviour
 
     private void Update()
     {
+        if (silenced) return;
+
         if (skillActive)
         {
             UpdateTargets();
@@ -37,6 +59,7 @@ public class SwapSkill : MonoBehaviour
         {
             if (manager.CheckGauge(0))
             {
+                if(silenced) return;
                 ActivateSkill();
             }
         }
