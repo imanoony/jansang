@@ -1,165 +1,95 @@
-using System;
-using System.Collections;
-using JetBrains.Annotations;
+﻿using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
-using Random = UnityEngine.Random;
-
 public class WizardEnemy : EnemyBase
 {
     #region  parameters
-    
     [Header("Detection!")]
     [SerializeField] private float detectionRadius = 3f;
     [SerializeField] private float combatRadius = 1.5f;
-    [SerializeField] private LayerMask sightMask;   // Player + Wall
+    [SerializeField] private LayerMask sightMask;   
     [SerializeField] private LayerMask playerMask;
     [SerializeField] private LayerMask wallLayer;
-
     [Header("Movement!")] 
     [SerializeField] private float directionTimeChange = 2f;
     [SerializeField] private float flipTimeChange = 2f;
-
     [Header("Combat")] 
     [SerializeField] private GameObject magicball;
     [SerializeField] private float attackCooldown;
     [SerializeField] private float magicballSpeed = 2f;
-    
     #endregion
-    
-    #region components
-
-    private SpriteRenderer spriteRenderer;
-    
-    #endregion
-    
     #region status
-    
     private bool found = false;
     private bool automaticFlip = false;
-    
-    private float directionTimeChangeElapsed;
-    private float flipTimeChangeElapsed;
     private float attackCooldownElapsed;
-    
-    public GameObject player;
-    private Transform currentTarget;
-    
     #endregion
     protected override void Start()
     {
         base.Start();
-        
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        
-        player = GameObject.FindGameObjectWithTag("Player");
-        StartCoroutine(WaitForAlert());
     }
-
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
     }
-
     protected override void Update()
     {
         if (!alerted)
         {
-            alerted = DetectPlayer(detectionRadius);
+            alerted = DetectPlayer(detectionRadius, sightMask);
         }
         else
         {
-            if (automaticFlip)
+            if (automaticFlip && Player != null)
             {
-                if (player.transform.position.x > transform.position.x) Flip(1);
-                else if (player.transform.position.x < transform.position.x) Flip(-1);
+                if (Player.position.x > transform.position.x) FlipByDirection(1);
+                else if (Player.position.x < transform.position.x) FlipByDirection(-1);
             }
-            
-            found = DetectPlayer(combatRadius); // 같은 플랫폼에 있는거로 바꾸기
+            found = DetectPlayer(combatRadius, sightMask); 
         }
-        
         if (attackCooldownElapsed > 0) attackCooldownElapsed -= Time.deltaTime;
     }
-
-    private void Flip(int direction)
+    protected override async UniTask RunAIAsync(CancellationToken token)
     {
-        //TODO: 좀 이상한데 급하게 하느라 이렇게 됨... 이거 수정해야함
-
-        var x = Mathf.Abs(transform.localScale.x);
-        if (direction == -1) transform.localScale = new Vector3(-x, transform.localScale.y, transform.localScale.z);
-        else if (direction == 1) transform.localScale = new Vector3(x, transform.localScale.y, transform.localScale.z);
-    }
-    
-    private IEnumerator WaitForAlert()
-    {
-        yield return new WaitUntil(() => alerted);
-        
+        await UniTask.WaitUntil(() => alerted, cancellationToken: token);
         ChangeDirection(0);
-        //TEST
-        spriteRenderer.color = new Color(0f, 1f, 0f, 1f);
-            
+        SetBaseColor(new Color(0f, 1f, 0f, 1f));
         currentState = State.Alert;
         automaticFlip = true;
-
-        StartCoroutine(AlertedAction());
+        await AlertedActionAsync(token);
     }
-
-    private IEnumerator AlertedAction()
+    private async UniTask AlertedActionAsync(CancellationToken token)
     {
-        yield return new WaitForSeconds(0.5f);
-        while (true)
+        await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
+        while (!token.IsCancellationRequested)
         {
             if (found == false)
             {
-                currentTarget = null;
-                
-                yield return StartCoroutine(AttackRoutine());
+                CurrentTarget = null;
+                await AttackRoutineAsync(token);
             }
             else
             {
-                currentTarget = player.transform;
-                yield return StartCoroutine(AttackRoutine());
+                CurrentTarget = Player;
+                await AttackRoutineAsync(token);
             }
         }
     }
-    
-    private bool DetectPlayer(float range)
+    private async UniTask AttackRoutineAsync(CancellationToken token)
     {
-        float dist = Vector2.Distance(transform.position, player.transform.position);
-        if (dist > range) return false;
-        
-        Vector2 dir = (player.transform.position - transform.position).normalized;
-
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, sightMask);
-
-        if (hit.collider != null && hit.collider.CompareTag("Player"))
-            return true;
-
-        return false;
-    }
-    
-    private IEnumerator AttackRoutine()
-    {
-        yield return new WaitUntil(() => attackCooldownElapsed <= 0);
-        if (currentTarget == null) yield break;
-        
-        //TEST
-        spriteRenderer.color = new Color(1f, 0f, 0f, 1f);
-        
-        // flip!
+        await UniTask.WaitUntil(() => attackCooldownElapsed <= 0, cancellationToken: token);
+        if (CurrentTarget == null || Player == null) return;
+        SetBaseColor(new Color(1f, 0f, 0f, 1f));
         int dir;
-        if (currentTarget.transform.position.x < transform.position.x) dir = -1;
+        if (CurrentTarget.transform.position.x < transform.position.x) dir = -1;
         else dir = 1;
         automaticFlip = false;
-        Flip(dir);
-        
-        // 대기
-        yield return new WaitForSeconds(0.5f);
-        
+        FlipByDirection(dir);
+        await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
         MagicBall ball = Instantiate(magicball, transform.position, Quaternion.identity).GetComponent<MagicBall>();
-        ball.Init(player, magicballSpeed);
-        
+        ball.Init(Player.gameObject, magicballSpeed);
         automaticFlip = true;
-
         attackCooldownElapsed = attackCooldown;
     }
 }
+
