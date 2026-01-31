@@ -39,7 +39,7 @@ public class Boss1Manage : MonoBehaviour
 
     [Header("Object References")]
     public GameObject playerObject;
-    private Transform playerTransform;
+    public Transform playerTransform;
     private PlayerMovement2D playerMovement;
     private Rigidbody2D playerRigidbody;
     [SerializeField] private List<GameObject> altarObjects;
@@ -98,6 +98,7 @@ public class Boss1Manage : MonoBehaviour
         }
 
         int patternChoice = Random.Range(1, 3);
+        patternChoice = 2; // Test Code
         currentBodyPattern = (BodyPattern)patternChoice;
 
         // Body Pattern 함수 호출
@@ -141,6 +142,16 @@ public class Boss1Manage : MonoBehaviour
         currentLeftHandPattern = (LHandPattern)patternChoice;
         // L Hand Pattern 함수 호출
         // 그 함수에서 lHandPatternTimer 설정
+        switch (currentLeftHandPattern)
+        {
+            case LHandPattern.Grasp:
+                // bossLeftHand.Boss1LHandGrasp();
+                break;
+            case LHandPattern.Bind:
+                // bossLeftHand.Boss1LHandBind();
+                break;
+            
+        }
     }
 
     private void RHandPatternManage()
