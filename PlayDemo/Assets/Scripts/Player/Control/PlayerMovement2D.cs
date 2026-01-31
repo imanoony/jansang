@@ -34,12 +34,31 @@ public class PlayerMovement2D : MonoBehaviour
     public float dashSpeed = 20f;
     public float dashDuration = 0.3f;
     public bool dashing = false;
-    [SerializeField] private bool silenced = false;
+
+    [Header("Crowd Control")]
+    public bool silenced = false;
     public void DashSilence(float time)
     {
         silenced = true;
         StartCoroutine(SilenceTimer(time));
     }
+    private IEnumerator SilenceTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        silenced = false;
+    }
+    public bool stunned = false;
+    public void Stun(float time)
+    {
+        stunned = true;
+        StartCoroutine(StunTimer(time));
+    }
+    IEnumerator StunTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        stunned = false;
+    }
+    
 
 
     Rigidbody2D rb;
@@ -54,11 +73,7 @@ public class PlayerMovement2D : MonoBehaviour
 
 
 
-    private IEnumerator SilenceTimer(float time)
-    {
-        yield return new WaitForSeconds(time);
-        silenced = false;
-    }
+
 
 
     void Start()
@@ -73,7 +88,7 @@ public class PlayerMovement2D : MonoBehaviour
     {
         rawInput = context.ReadValue<Vector2>();
 
-        if (dashing) return;
+        if (dashing || stunned) return;
 
         if (context.performed || context.canceled)
         {
@@ -83,7 +98,7 @@ public class PlayerMovement2D : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (dashing) return;
+        if (dashing || stunned) return;
 
         if (context.performed)
         {
@@ -93,7 +108,7 @@ public class PlayerMovement2D : MonoBehaviour
     
     public void OnDash(InputAction.CallbackContext context)
     {
-        if (silenced) return;
+        if (silenced || stunned) return;
         if (context.performed)
         {
             TryDash();
@@ -109,7 +124,7 @@ public class PlayerMovement2D : MonoBehaviour
     void Move()
     {
 
-        if (dashing) return;
+        if (dashing || stunned) return;
 
         rb.linearVelocity = new Vector2(moveInput * moveTile*tileHeight, rb.linearVelocity.y);
 
@@ -124,6 +139,8 @@ public class PlayerMovement2D : MonoBehaviour
     }
     void TryJump()
     {
+        
+
         if (isGrounded)
         {
             Jump();

@@ -75,38 +75,15 @@ public class Boss1Body : MonoBehaviour
     private IEnumerator JudgementCoroutine(GameObject targetAltar)
     {
         Vector2 startPosition = bossManage.gameObject.transform.position;
+        yield return StartCoroutine(Boss1Manage.ObjectMoveControl(
+            bossManage.gameObject,
+            startPosition,
+            targetAltar.transform.position,
+            1f,
+            4f
+        ));
+        
         float timer = 0f;
-        while(timer < 1f)
-        {
-            timer += Time.deltaTime;
-            bossManage.gameObject.transform.position = new Vector2(
-                Mathf.Lerp(startPosition.x, targetAltar.transform.position.x, (float)Math.Pow(timer/1f, 2) / 10f),
-                Mathf.Lerp(startPosition.y, targetAltar.transform.position.y, (float)Math.Pow(timer/1f, 2) / 10f)
-            );
-            yield return null;
-        }
-        
-        timer = 0f;
-        while(timer < 4f)
-        {
-            timer += Time.deltaTime;
-            bossManage.gameObject.transform.position = new Vector2(
-                Mathf.Lerp(startPosition.x, targetAltar.transform.position.x, 0.1f + (timer/5f)),
-                Mathf.Lerp(startPosition.y, targetAltar.transform.position.y, 0.1f + (timer/5f))
-            );
-            yield return null;
-        }
-        
-        timer = 0f;
-        while(timer < 1f)
-        {
-            timer += Time.deltaTime;
-            bossManage.gameObject.transform.position = new Vector2(
-                Mathf.Lerp(startPosition.x, targetAltar.transform.position.x, 1f - (float)Math.Pow((1f-timer)/1f, 2) / 10f),
-                Mathf.Lerp(startPosition.y, targetAltar.transform.position.y, 1f - (float)Math.Pow((1f-timer)/1f, 2) / 10f)
-            );
-            yield return null;
-        }
 
         yield return new WaitForSeconds(judgementWait);
 
