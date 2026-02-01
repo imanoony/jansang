@@ -6179,6 +6179,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f14db7a9c6d3b354b8541c5dad2db240, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Boss1RightHand
+  idleSprite: {fileID: 5180589671436215883, guid: 3e40ca2019fd077428c9fae956716125, type: 3}
+  smiteSprite: {fileID: -4273901279579139304, guid: 39007ac341372a94487469d53a382917, type: 3}
+  hauntSprite: {fileID: -8081216749328935802, guid: d5bd616776799a94eb904dac63a3e0d2, type: 3}
+  playerObject: {fileID: 0}
+  spiritPrefab: {fileID: 1973558826850276187, guid: 89bc5ab76623b2243a6497e92c4eaadb, type: 3}
 --- !u!1 &1875935147
 GameObject:
   m_ObjectHideFlags: 0

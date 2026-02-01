@@ -35,7 +35,7 @@ public class Boss1Manage : MonoBehaviour
     private Boss1Body bossBody;
     private Boss1LeftHand bossLeftHand;
     private Boss1RightHand bossRightHand;
-    
+
 
     [Header("Object References")]
     public GameObject playerObject;
@@ -51,9 +51,9 @@ public class Boss1Manage : MonoBehaviour
     public LHandPattern currentLeftHandPattern = LHandPattern.Idle;
     public RHandPattern currentRightHandPattern = RHandPattern.Idle;
 
-    public float bodyPatternTimer = 0f;
-    public float lHandPatternTimer = 0f;
-    public float rHandPatternTimer = 0f;
+    public float bodyPatternTimer = 1f;
+    public float lHandPatternTimer = 3f;
+    public float rHandPatternTimer = 2f;
 
 
     private void Awake()
@@ -84,21 +84,21 @@ public class Boss1Manage : MonoBehaviour
     {
         BodyPatternManage();
         LHandPatternManage();
-        RHandPatternManage();        
+        RHandPatternManage();
     }
 
 
     private void BodyPatternManage()
     {
-        if(currentBodyPattern != BodyPattern.Idle) return;
-        if(currentBodyPattern == BodyPattern.Idle && bodyPatternTimer > 0f)
+        if (currentBodyPattern != BodyPattern.Idle) return;
+        if (currentBodyPattern == BodyPattern.Idle && bodyPatternTimer > 0f)
         {
             bodyPatternTimer -= Time.deltaTime;
             return;
         }
 
         int patternChoice = Random.Range(1, 3);
-        patternChoice = 1; // Test Code
+        patternChoice = 2; // Test Code
         currentBodyPattern = (BodyPattern)patternChoice;
 
         // Body Pattern 함수 호출
@@ -113,7 +113,7 @@ public class Boss1Manage : MonoBehaviour
             case BodyPattern.Judgement:
                 float fartestDistance = -1f;
                 GameObject targetAltar = null;
-                foreach(GameObject altar in altarObjects)
+                foreach (GameObject altar in altarObjects)
                 {
                     float distance = Vector2.Distance(transform.position, altar.transform.position);
                     if (distance > fartestDistance)
@@ -130,9 +130,9 @@ public class Boss1Manage : MonoBehaviour
 
     private void LHandPatternManage()
     {
-        if(currentLeftHandPattern != LHandPattern.Idle ||
+        if (currentLeftHandPattern != LHandPattern.Idle ||
            currentBodyPattern == BodyPattern.Judgement) return;
-        if(currentLeftHandPattern == LHandPattern.Idle && lHandPatternTimer > 0f)
+        if (currentLeftHandPattern == LHandPattern.Idle && lHandPatternTimer > 0f)
         {
             lHandPatternTimer -= Time.deltaTime;
             return;
@@ -151,29 +151,82 @@ public class Boss1Manage : MonoBehaviour
             case LHandPattern.Bind:
                 // bossLeftHand.Boss1LHandBind();
                 break;
-            
+
         }
     }
 
     private void RHandPatternManage()
     {
-        if(currentRightHandPattern != RHandPattern.Idle ||
+        if (currentRightHandPattern != RHandPattern.Idle ||
            currentBodyPattern == BodyPattern.Judgement) return;
-        if(currentRightHandPattern == RHandPattern.Idle && rHandPatternTimer > 0f)
+        if (currentRightHandPattern == RHandPattern.Idle && rHandPatternTimer > 0f)
         {
             rHandPatternTimer -= Time.deltaTime;
             return;
         }
 
         int patternChoice = Random.Range(1, 3);
+        patternChoice = 2; // Test Code
         currentRightHandPattern = (RHandPattern)patternChoice;
         // R Hand Pattern 함수 호출
         // 그 함수에서 rHandPatternTimer 설정
+        switch (currentRightHandPattern)
+        {
+            case RHandPattern.Smite:
+                // bossRightHand.Boss1Smite();
+                break;
+            case RHandPattern.Haunt:
+                bossRightHand.Boss1Haunt(3);
+                break;
+
+        }
     }
-    
+
 
 
     public static IEnumerator ObjectMoveControl(GameObject obj, Vector2 startPos, Vector2 targetPos,
+                                                float dur1, float dur2, System.Action onComplete = null)
+    {
+        float timer = 0f;
+        float endPotion = dur1 / (dur1 * 2 + dur2 * 2);
+
+        while (timer < dur1)
+        {
+            timer += Time.deltaTime;
+            obj.transform.position = new Vector2(
+                Mathf.Lerp(startPos.x, targetPos.x, (float)Mathf.Pow(timer / dur1, 2) * endPotion),
+                Mathf.Lerp(startPos.y, targetPos.y, (float)Mathf.Pow(timer / dur1, 2) * endPotion)
+            );
+            yield return null;
+        }
+
+        timer = 0f;
+        while (timer < dur2)
+        {
+            timer += Time.deltaTime;
+            obj.transform.position = new Vector2(
+                Mathf.Lerp(startPos.x, targetPos.x, endPotion + timer / (dur1 + dur2)),
+                Mathf.Lerp(startPos.y, targetPos.y, endPotion + timer / (dur1 + dur2))
+            );
+            yield return null;
+        }
+
+        timer = 0f;
+        while (timer < dur1)
+        {
+            timer += Time.deltaTime;
+            obj.transform.position = new Vector2(
+                Mathf.Lerp(startPos.x, targetPos.x, 1f - (float)Mathf.Pow((dur1 - timer) / dur1, 2) * endPotion),
+                Mathf.Lerp(startPos.y, targetPos.y, 1f - (float)Mathf.Pow((dur1 - timer) / dur1, 2) * endPotion)
+            );
+            yield return null;
+        }
+
+
+        onComplete?.Invoke();
+    }
+
+    public static IEnumerator ObjectMoveControlLocalPos(GameObject obj, Vector2 startPos, Vector2 targetPos,
                                                 float dur1, float dur2, System.Action onComplete = null)
     {
         float timer = 0f;
@@ -182,7 +235,7 @@ public class Boss1Manage : MonoBehaviour
         while(timer < dur1)
         {
             timer += Time.deltaTime;
-            obj.transform.position = new Vector2(
+            obj.transform.localPosition = new Vector2(
                 Mathf.Lerp(startPos.x, targetPos.x, (float)Mathf.Pow(timer/dur1, 2) * endPotion),
                 Mathf.Lerp(startPos.y, targetPos.y, (float)Mathf.Pow(timer/dur1, 2) * endPotion)
             );
@@ -193,7 +246,7 @@ public class Boss1Manage : MonoBehaviour
         while(timer < dur2)
         {
             timer += Time.deltaTime;
-            obj.transform.position = new Vector2(
+            obj.transform.localPosition = new Vector2(
                 Mathf.Lerp(startPos.x, targetPos.x, endPotion + timer/(dur1 + dur2)),
                 Mathf.Lerp(startPos.y, targetPos.y, endPotion + timer/(dur1 + dur2))
             );
@@ -204,13 +257,17 @@ public class Boss1Manage : MonoBehaviour
         while(timer < dur1)
         {
             timer += Time.deltaTime;
-            obj.transform.position = new Vector2(
+            obj.transform.localPosition = new Vector2(
                 Mathf.Lerp(startPos.x, targetPos.x, 1f - (float)Mathf.Pow((dur1-timer)/dur1, 2) * endPotion),
                 Mathf.Lerp(startPos.y, targetPos.y, 1f - (float)Mathf.Pow((dur1-timer)/dur1, 2) * endPotion)
             );
             yield return null;
         }
 
+        
         onComplete?.Invoke();
     }
+
+
+
 }

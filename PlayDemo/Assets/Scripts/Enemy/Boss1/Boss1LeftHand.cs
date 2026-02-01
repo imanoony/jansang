@@ -42,9 +42,9 @@ public class Boss1LeftHand : MonoBehaviour
 
     public void BackToOrigin()
     {
-        StartCoroutine(Boss1Manage.ObjectMoveControl(
+        StartCoroutine(Boss1Manage.ObjectMoveControlLocalPos(
             gameObject,
-            transform.position,
+            transform.localPosition,
             bossManage.lHandOrigin,
             0.5f,
             0.5f
