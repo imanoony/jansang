@@ -121,7 +121,7 @@ public class Boss1LeftHand : MonoBehaviour
     private void GraspDone(){
         if(!grasping){
             BackToOrigin();
-            bossManage.lHandPatternTimer = 5f;
+            bossManage.SetPatternTimer("LHand");
             bossManage.currentLeftHandPattern = LHandPattern.Idle;
             spriteRenderer.sprite = idleSprite;
             spriteRenderer.sortingOrder = 2;

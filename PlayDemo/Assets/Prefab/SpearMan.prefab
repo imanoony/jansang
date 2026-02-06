@@ -339,6 +339,7 @@ MonoBehaviour:
   groundCheckDistance: 0.1
   moveSpeed: 2
   summoner: {fileID: 0}
+  canTalkTime: 0
   detectionRadius: 3
   combatRadius: 5
   sightMask:

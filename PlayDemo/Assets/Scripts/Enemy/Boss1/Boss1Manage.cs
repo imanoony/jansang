@@ -26,6 +26,11 @@ public enum RHandPattern
 
 public class Boss1Manage : MonoBehaviour
 {
+    [Header("Movement")]
+    [SerializeField] private Rigidbody2D bossRB;
+    [SerializeField] private float moveSpeed = 2.5f;
+    [SerializeField] private float breakSpeed = 1f;
+
     [Header("Part Objects")]
     [SerializeField] private GameObject bodyObject;
     [SerializeField] private GameObject leftHandObject;
@@ -37,11 +42,14 @@ public class Boss1Manage : MonoBehaviour
     private Boss1RightHand bossRightHand;
 
 
-    [Header("Object References")]
+    [Header("Player References")]
     public GameObject playerObject;
     public Transform playerTransform;
-    private PlayerMovement2D playerMovement;
-    private Rigidbody2D playerRigidbody;
+    public PlayerHitCheck playerHitCheck;
+    public PlayerMovement2D playerMovement;
+    public Rigidbody2D playerRigidbody;
+
+    [Header("Object References")]
     [SerializeField] private List<GameObject> altarObjects;
 
 
@@ -51,13 +59,24 @@ public class Boss1Manage : MonoBehaviour
     public LHandPattern currentLeftHandPattern = LHandPattern.Idle;
     public RHandPattern currentRightHandPattern = RHandPattern.Idle;
 
+    [Header("Pattern Timers")]
     public float bodyPatternTimer = 1f;
     public float lHandPatternTimer = 3f;
     public float rHandPatternTimer = 2f;
 
+    [Header("Pattern Cooldowns")]
+    private float bodyPatternMinTime = 5f;
+    private float bodyPatternMaxTime = 7f;
+    private float lHandPatternMinTime = 4f;
+    private float lHandPatternMaxTime = 6f;
+    private float rHandPatternMinTime = 4f;
+    private float rHandPatternMaxTime = 6f;
+
 
     private void Awake()
     {
+        bossRB = GetComponent<Rigidbody2D>();
+
         bodyObject = transform.Find("Body").gameObject;
         leftHandObject = transform.Find("LeftHand").gameObject;
         rightHandObject = transform.Find("RightHand").gameObject;
@@ -70,6 +89,7 @@ public class Boss1Manage : MonoBehaviour
         playerTransform = playerObject.GetComponent<Transform>();
         playerMovement = playerObject.GetComponent<PlayerMovement2D>();
         playerRigidbody = playerObject.GetComponent<Rigidbody2D>();
+        playerHitCheck = playerObject.GetComponent<PlayerHitCheck>();
     }
 
     private void Start()
@@ -82,11 +102,56 @@ public class Boss1Manage : MonoBehaviour
 
     private void Update()
     {
+        BossMoveManage();
         BodyPatternManage();
         LHandPatternManage();
         RHandPatternManage();
     }
 
+
+    private void BossMoveManage()
+    {
+        if(currentBodyPattern != BodyPattern.Idle ||
+           currentLeftHandPattern != LHandPattern.Idle ||
+           currentRightHandPattern != RHandPattern.Idle){
+
+            if (currentBodyPattern == BodyPattern.Judgement) return;
+
+            if(bossRB.linearVelocity.magnitude > 0.1f) bossRB.AddForce(bossRB.linearVelocity * -breakSpeed);
+            else bossRB.linearVelocity = Vector2.zero;
+            return;
+        }
+
+        Vector2 playerPosNoise = playerTransform.position +
+            new Vector3(
+                Random.Range(-1f, 1f) * playerMovement.moveSpeed * 0.5f,
+                Random.Range(-1f, 1f) * playerMovement.moveSpeed * 0.5f,
+                0f
+            );
+        Vector2 direction = (playerPosNoise - (Vector2)transform.position).normalized;
+        bossRB.AddForce(direction * moveSpeed);
+        if(bossRB.linearVelocity.magnitude > moveSpeed)
+        {
+            bossRB.linearVelocity = bossRB.linearVelocity.normalized * moveSpeed;
+        }
+    }
+
+    public float SetPatternTimer(string part)
+    {
+        switch(part){
+            case "Body":
+                bodyPatternTimer = Random.Range(bodyPatternMinTime, bodyPatternMaxTime);
+                return bodyPatternTimer;
+            case "LHand":
+                lHandPatternTimer = Random.Range(lHandPatternMinTime, lHandPatternMaxTime);
+                return lHandPatternTimer;
+            case "RHand":
+                rHandPatternTimer = Random.Range(rHandPatternMinTime, rHandPatternMaxTime);
+                return rHandPatternTimer;
+            default:
+                return -1f;
+        }
+    }
 
     private void BodyPatternManage()
     {
@@ -98,7 +163,6 @@ public class Boss1Manage : MonoBehaviour
         }
 
         int patternChoice = Random.Range(1, 3);
-        patternChoice = 2; // Test Code
         currentBodyPattern = (BodyPattern)patternChoice;
 
         // Body Pattern 함수 호출

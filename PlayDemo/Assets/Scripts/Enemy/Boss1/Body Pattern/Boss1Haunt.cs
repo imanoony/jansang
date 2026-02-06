@@ -2,26 +2,19 @@ using UnityEngine;
 
 public class Boss1Haunt : MonoBehaviour
 {
-    [Header("Player References")]
-    [SerializeField] private GameObject playerObject;
-    private Transform playerTransform;
-    private PlayerHitCheck playerHithCheck;
-
     [Header("Movement Settings")]
     [SerializeField] float maxSpeed = 3f;
     [SerializeField] float acceleration = 0.05f;
 
+
     private Transform spiritTransform;
     private Rigidbody2D spiritRigidbody;
 
+    private Boss1Manage bossManage;
+
     private void Awake()
     {
-        if (playerObject == null)
-        {
-            playerObject = GameObject.FindGameObjectWithTag("Player");
-        }
-        playerTransform = playerObject.transform;
-        playerHithCheck = playerObject.GetComponent<PlayerHitCheck>();
+        bossManage = GetComponentInParent<Boss1Manage>();
 
         spiritTransform = GetComponent<Transform>();
         spiritRigidbody = GetComponent<Rigidbody2D>();
@@ -38,7 +31,7 @@ public class Boss1Haunt : MonoBehaviour
     private void Update()
     {
         vDirection = spiritRigidbody.linearVelocity;
-        playerDirection = (playerTransform.position - spiritTransform.position).normalized;
+        playerDirection = (bossManage.playerTransform.position - spiritTransform.position).normalized;
 
 
         vDirection += playerDirection * acceleration;
@@ -49,11 +42,13 @@ public class Boss1Haunt : MonoBehaviour
         spiritTransform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.CompareTag("Player"))
+        Debug.Log("Spirit Collided with: " + other.tag);
+
+        if (other.CompareTag("Player"))
         {
-            playerHithCheck.TakeDamage(1);
+            bossManage.playerHitCheck.TakeDamage(1);
             Destroy(gameObject);
         }
     }

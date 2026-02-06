@@ -63,7 +63,7 @@ public class Boss1Body : MonoBehaviour
         shockwave.SetActive(false);
 
         bossManage.currentBodyPattern = BodyPattern.Idle;
-        bossManage.bodyPatternTimer = 4.0f;
+        bossManage.SetPatternTimer("Body");
     }
 
     public void Boss1Judgement(GameObject targetAltar)
@@ -115,7 +115,7 @@ public class Boss1Body : MonoBehaviour
         judgementLazer.SetActive(false);
 
         bossManage.currentBodyPattern = BodyPattern.Idle;
-        bossManage.bodyPatternTimer = 4.0f;
+        bossManage.SetPatternTimer("Body");
         yield return null;
     }
 }

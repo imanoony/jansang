@@ -91,7 +91,7 @@ public class SwapSkill : MonoBehaviour
     // =============================
     void UpdateTargets()
     {
-        SwapTarget[] allTargets = FindObjectsOfType<SwapTarget>();
+        SwapTarget[] allTargets = FindObjectsByType<SwapTarget>(FindObjectsSortMode.None);
         foreach (var t in allTargets)
         {
             if (t.gameObject == gameObject) continue;
