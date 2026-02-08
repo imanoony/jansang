@@ -2594,8 +2594,24 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7937889744083868383, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: moveTile
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7937889744083868383, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: dashSpeed
       value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 7937889744083868383, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: moveSpeedAccel
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 7937889744083868383, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: moveSpeedDeaccel
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 7937889744083868383, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: groundLayer.m_Bits
+      value: 6208
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

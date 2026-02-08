@@ -83,10 +83,10 @@ public class MeleeController2D : MonoBehaviour
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts, token);
         
         await UniTask.WaitUntil(() => chargingTimeElapsed > chargingTime[0], cancellationToken: linkedCts.Token);
-        Debug.Log("차징 레벨 : MIDDLE!");
+        attackState = AttackState.Middle;
         
         await UniTask.WaitUntil(() => chargingTimeElapsed > chargingTime[1], cancellationToken: linkedCts.Token);
-        Debug.Log("차징 레벨 : STRONG!");
+        attackState = AttackState.Strong;
     }
 
     private void FinishCharging()

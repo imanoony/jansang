@@ -89,12 +89,39 @@ public class PlayerMovement2D : MonoBehaviour
         Move();
     }
 
+    public float moveSpeedAccel = 5;
+    public float moveSpeedDeaccel = 5;
+    public float actualSpeed;
+    
+    private Vector2 movementVector;
+    
+
     void Move()
     {
-
         if (dashing) return;
 
-        rb.linearVelocity = new Vector2(moveInput * moveTile*tileHeight, rb.linearVelocity.y);
+        if (moveInput != 0)
+        {
+            actualSpeed += moveInput * moveSpeedAccel * Time.deltaTime;
+        }
+        else
+        {
+            if (Mathf.Abs(actualSpeed) > 0.1f)
+            {
+                actualSpeed -= (Time.deltaTime * moveSpeedDeaccel) * (actualSpeed / Mathf.Abs(actualSpeed));
+            }
+            else
+            {
+                actualSpeed = 0;
+            }
+        }
+
+        actualSpeed = Mathf.Clamp(actualSpeed, -moveTile, moveTile);
+
+        movementVector.x = actualSpeed;
+        movementVector.y = rb.linearVelocityY;
+        
+        rb.linearVelocity = movementVector;
 
         if (moveInput > 0) attack.isRight = true;
         else if (moveInput < 0) attack.isRight = false;
