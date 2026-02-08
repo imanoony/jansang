@@ -1,18 +1,18 @@
 using UnityEngine;
 
-public class Boss1Judgement : MonoBehaviour
+public class Boss1_Judgement : MonoBehaviour
 {
     [SerializeField] private LayerMask playerLayer;
     [SerializeField] private bool hitPlayer = false;
     
     
-    private Boss1Manage bossManage;
+    private Boss1_Manage bossManage;
     private Collider2D myCollider;
     
     private void Awake()
     {
         myCollider = GetComponent<Collider2D>();
-        bossManage = GetComponentInParent<Boss1Manage>();
+        bossManage = GetComponentInParent<Boss1_Manage>();
     }
 
     private void OnEnable()

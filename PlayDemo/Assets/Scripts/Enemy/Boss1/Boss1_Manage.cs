@@ -30,7 +30,7 @@ public enum RHandPattern
     Haunt = 2,
 }
 
-public class Boss1Manage : MonoBehaviour
+public class Boss1_Manage : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private Rigidbody2D bossRB;
@@ -43,9 +43,9 @@ public class Boss1Manage : MonoBehaviour
     [SerializeField] private GameObject rightHandObject;
     public Vector2 lHandOrigin = new Vector2(-2.4f, 0f);
     public Vector2 rHandOrigin = new Vector2(2.4f, 0f);
-    private Boss1Body bossBody;
-    private Boss1LeftHand bossLeftHand;
-    private Boss1RightHand bossRightHand;
+    private Boss1_Body bossBody;
+    private Boss1_LeftHand bossLeftHand;
+    private Boss1_RightHand bossRightHand;
 
 
     [Header("Player References")]
@@ -93,9 +93,9 @@ public class Boss1Manage : MonoBehaviour
         leftHandObject = transform.Find("LeftHand").gameObject;
         rightHandObject = transform.Find("RightHand").gameObject;
 
-        bossBody = bodyObject.GetComponent<Boss1Body>();
-        bossLeftHand = leftHandObject.GetComponent<Boss1LeftHand>();
-        bossRightHand = rightHandObject.GetComponent<Boss1RightHand>();
+        bossBody = bodyObject.GetComponent<Boss1_Body>();
+        bossLeftHand = leftHandObject.GetComponent<Boss1_LeftHand>();
+        bossRightHand = rightHandObject.GetComponent<Boss1_RightHand>();
 
         playerObject = GameObject.FindGameObjectWithTag("Player");
         playerTransform = playerObject.GetComponent<Transform>();
@@ -127,31 +127,31 @@ public class Boss1Manage : MonoBehaviour
                 if(lHandHealth > 0 || rHandHealth > 0) return;
                 bodyHealth -= damage;
                 if(bodyHealth <= 0){
-                    StartCoroutine(bossBody.Boss1BodyDestroyed());
+                    StartCoroutine(bossBody.Boss1_BodyDestroyed());
                 }
                 else
                 {
-                    StartCoroutine(bossBody.Boss1BodyHit());
+                    StartCoroutine(bossBody.Boss1_BodyHit());
                 }
                 break;
             case BossPart.LHand:
                 lHandHealth -= damage;
                 if(lHandHealth <= 0){
-                    StartCoroutine(bossLeftHand.Boss1LHandDestroyed());
+                    StartCoroutine(bossLeftHand.Boss1_LHandDestroyed());
                 }
                 else
                 {
-                    StartCoroutine(bossLeftHand.Boss1LHandHit());
+                    StartCoroutine(bossLeftHand.Boss1_LHandHit());
                 }
                 break;
             case BossPart.RHand:
                 rHandHealth -= damage;
                 if(rHandHealth <= 0){
-                    StartCoroutine(bossRightHand.Boss1RHandDestroyed());
+                    StartCoroutine(bossRightHand.Boss1_RHandDestroyed());
                 }
                 else
                 {
-                    StartCoroutine(bossRightHand.Boss1RHandHit());
+                    StartCoroutine(bossRightHand.Boss1_RHandHit());
                 }
                 break;
         }
@@ -220,7 +220,7 @@ public class Boss1Manage : MonoBehaviour
         {
             case BodyPattern.Shockwave:
                 Vector2 direction = (playerTransform.position - transform.position).normalized;
-                bossBody.Boss1Shockwave(direction);
+                bossBody.Boss1_Shockwave(direction);
                 Debug.Log("Shockwave!! Direction: " + direction);
                 break;
             case BodyPattern.Judgement:
@@ -235,7 +235,7 @@ public class Boss1Manage : MonoBehaviour
                         targetAltar = altar;
                     }
                 }
-                if (targetAltar != null) bossBody.Boss1Judgement(targetAltar);
+                if (targetAltar != null) bossBody.Boss1_Judgement(targetAltar);
                 else currentBodyPattern = BodyPattern.Idle;
                 break;
         }
@@ -260,10 +260,10 @@ public class Boss1Manage : MonoBehaviour
         switch (currentLeftHandPattern)
         {
             case LHandPattern.Grasp:
-                bossLeftHand.Boss1Grasp();
+                bossLeftHand.Boss1_Grasp();
                 break;
             case LHandPattern.Bind:
-                // bossLeftHand.Boss1LHandBind();
+                // bossLeftHand.Boss1_LHandBind();
                 break;
 
         }
@@ -288,10 +288,10 @@ public class Boss1Manage : MonoBehaviour
         switch (currentRightHandPattern)
         {
             case RHandPattern.Smite:
-                // bossRightHand.Boss1Smite();
+                // bossRightHand.Boss1_Smite();
                 break;
             case RHandPattern.Haunt:
-                bossRightHand.Boss1Haunt(3);
+                bossRightHand.Boss1_Haunt(3);
                 break;
 
         }

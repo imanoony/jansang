@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Boss1Altar : MonoBehaviour
+public class Boss1_Altar : MonoBehaviour
 {
     [Header("Sprites")]
     [SerializeField] private List<Sprite> altarSprites;
@@ -11,7 +11,7 @@ public class Boss1Altar : MonoBehaviour
     public bool active = true;
     private int currentHealth;
 
-    [SerializeField] private Boss1Manage bossManage;
+    [SerializeField] private Boss1_Manage bossManage;
     private SpriteRenderer altarSR;
 
     private void Awake()

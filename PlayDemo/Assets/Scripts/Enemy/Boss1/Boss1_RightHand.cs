@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class Boss1RightHand : MonoBehaviour
+public class Boss1_RightHand : MonoBehaviour
 {
     [Header("Sprites")]
     [SerializeField] private Sprite idleSprite;
@@ -17,13 +17,13 @@ public class Boss1RightHand : MonoBehaviour
     [SerializeField] private float spiritMinSpeed = 1f;
     [SerializeField] private float spiritMaxSpeed = 3f;
 
-    private Boss1Manage bossManage;
+    private Boss1_Manage bossManage;
     private SpriteRenderer spriteRenderer;
 
 
     private void Awake()
     {
-        bossManage = GetComponentInParent<Boss1Manage>();
+        bossManage = GetComponentInParent<Boss1_Manage>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         if (playerObject == null)
@@ -35,7 +35,7 @@ public class Boss1RightHand : MonoBehaviour
 
     public void BackToOrigin()
     {
-        StartCoroutine(Boss1Manage.ObjectMoveControl(
+        StartCoroutine(Boss1_Manage.ObjectMoveControl(
             gameObject,
             transform.position,
             bossManage.rHandOrigin,
@@ -44,7 +44,7 @@ public class Boss1RightHand : MonoBehaviour
         ));
     }
 
-    public void Boss1Haunt(int count)
+    public void Boss1_Haunt(int count)
     {
         StartCoroutine(HauntCoroutine(count));
     }
@@ -57,7 +57,7 @@ public class Boss1RightHand : MonoBehaviour
         {
             Vector2 spawnPosition = gameObject.transform.position + new Vector3(0f, 1f, 0f);
             GameObject spirit = Instantiate(spiritPrefab, spawnPosition, Quaternion.identity, gameObject.transform);
-            spirit.GetComponent<Boss1Haunt>().maxSpeed = Mathf.Lerp(spiritMinSpeed, spiritMaxSpeed, i / (count - 1f));
+            spirit.GetComponent<Boss1_Haunt>().maxSpeed = Mathf.Lerp(spiritMinSpeed, spiritMaxSpeed, i / (count - 1f));
 
             Rigidbody2D spiritRigidbody = spirit.GetComponent<Rigidbody2D>();
             spiritRigidbody.linearVelocity = Vector2.up * 2f;
@@ -79,14 +79,14 @@ public class Boss1RightHand : MonoBehaviour
         }
     }
 
-    public IEnumerator Boss1RHandHit()
+    public IEnumerator Boss1_RHandHit()
     {
         // Right Hand Hit Animation
         spriteRenderer.color = Color.red;
         yield return new WaitForSeconds(0.1f);
         spriteRenderer.color = Color.white;
     }
-    public IEnumerator Boss1RHandDestroyed()
+    public IEnumerator Boss1_RHandDestroyed()
     {
         // Right Hand Destroyed Animation
         gameObject.SetActive(false);
