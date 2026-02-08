@@ -80,12 +80,23 @@ public class Boss1Body : MonoBehaviour
             startPosition,
             targetAltar.transform.position,
             1f,
-            4f
+            6f
         ));
         
         float timer = 0f;
 
         yield return new WaitForSeconds(judgementWait);
+
+        if(targetAltar.GetComponent<Boss1Altar>().active == false)
+        {
+            bossManage.currentBodyPattern = BodyPattern.Idle;
+            bossManage.SetPatternTimer("Body");
+            foreach(GameObject altar in bossManage.altarObjects)
+            {
+                altar.GetComponent<Boss1Altar>().ResetAltar();
+            }
+            yield break;
+        }
 
         Vector2 direction = (bossManage.playerTransform.position - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -116,6 +127,10 @@ public class Boss1Body : MonoBehaviour
 
         bossManage.currentBodyPattern = BodyPattern.Idle;
         bossManage.SetPatternTimer("Body");
+        foreach(GameObject altar in bossManage.altarObjects)
+        {
+            altar.GetComponent<Boss1Altar>().ResetAltar();
+        }
         yield return null;
     }
 }

@@ -1,13 +1,53 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Boss1Altar : MonoBehaviour
 {
     [Header("Sprites")]
-    [SerializeField] private Sprite inactiveSprite;
-    [SerializeField] private Sprite activeSprite;
+    [SerializeField] private List<Sprite> altarSprites;
 
-    
+    [Header("Health Settings")]
+    [SerializeField] private LayerMask attackLayer;
+    [SerializeField] private int health;
+    public bool active = true;
+    private int currentHealth;
 
+    [SerializeField] private Boss1Manage bossManage;
+    private SpriteRenderer altarSR;
 
+    private void Awake()
+    {
+        altarSR = GetComponent<SpriteRenderer>();
+        health = altarSprites.Count - 1;
+    }
+
+    private void Start()
+    {
+        active = true;
+        currentHealth = health;
+        altarSR.sprite = altarSprites[0];
+    }
+
+    public void ResetAltar()
+    {
+        active = true;
+        currentHealth = health;
+        altarSR.sprite = altarSprites[0];
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (bossManage.currentBodyPattern != BodyPattern.Judgement) return;
+
+        if ((attackLayer.value & (1 << other.gameObject.layer)) > 0 && currentHealth > 0)
+        {
+            currentHealth--;
+            altarSR.sprite = altarSprites[health-currentHealth];
+
+            if(currentHealth <= 0)
+            {
+                active = false;
+            }
+        }
+    }
 
 }

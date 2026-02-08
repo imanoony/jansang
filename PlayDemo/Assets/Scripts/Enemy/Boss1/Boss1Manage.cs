@@ -50,7 +50,7 @@ public class Boss1Manage : MonoBehaviour
     public Rigidbody2D playerRigidbody;
 
     [Header("Object References")]
-    [SerializeField] private List<GameObject> altarObjects;
+    public List<GameObject> altarObjects;
 
 
     [Header("Patterns")]

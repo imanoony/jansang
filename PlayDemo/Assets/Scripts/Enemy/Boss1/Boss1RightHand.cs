@@ -14,6 +14,8 @@ public class Boss1RightHand : MonoBehaviour
 
     [Header("Haunt")]
     [SerializeField] private GameObject spiritPrefab;
+    [SerializeField] private float spiritMinSpeed = 1f;
+    [SerializeField] private float spiritMaxSpeed = 3f;
 
     private Boss1Manage bossManage;
     private SpriteRenderer spriteRenderer;
@@ -55,6 +57,7 @@ public class Boss1RightHand : MonoBehaviour
         {
             Vector2 spawnPosition = gameObject.transform.position + new Vector3(0f, 1f, 0f);
             GameObject spirit = Instantiate(spiritPrefab, spawnPosition, Quaternion.identity, gameObject.transform);
+            spirit.GetComponent<Boss1Haunt>().maxSpeed = Mathf.Lerp(spiritMinSpeed, spiritMaxSpeed, i / (count - 1f));
 
             Rigidbody2D spiritRigidbody = spirit.GetComponent<Rigidbody2D>();
             spiritRigidbody.linearVelocity = Vector2.up * 2f;
