@@ -38,6 +38,7 @@ public class PlayerMovement2D : MonoBehaviour
     Rigidbody2D rb;
     Collider2D col;
     MeleeController2D attack;
+    private PlayerGFXController playerGFX; 
 
     private float gravity = 1;
     float moveInput;
@@ -50,6 +51,7 @@ public class PlayerMovement2D : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         attack = GetComponent<MeleeController2D>();
+        playerGFX = GetComponent<PlayerGFXController>();
         gravity = -Physics.gravity.y * rb.gravityScale;
     }
 
@@ -125,6 +127,8 @@ public class PlayerMovement2D : MonoBehaviour
 
         if (moveInput > 0) attack.isRight = true;
         else if (moveInput < 0) attack.isRight = false;
+        
+        playerGFX.Flip(attack.isRight);
     }
 
     public void ResetJump()
@@ -151,7 +155,7 @@ public class PlayerMovement2D : MonoBehaviour
         float currentTileY = Mathf.Round(transform.position.y / tileHeight);
         float targetY = (currentTileY+jumpOffset + jumpTile)* tileHeight;
         float jumpForce = Mathf.Sqrt(2*(targetY - transform.position.y/tileHeight)*gravity);
-        Debug.Log(gravity);
+        playerGFX.Stretch();
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
 
@@ -228,13 +232,25 @@ public class PlayerMovement2D : MonoBehaviour
             return;
         }
         
-        // 노멀 체크 (옆면/벽 배제)
-        isGrounded = hit.collider != null && hit.normal.y > 0.7f;
-
-        if (isGrounded)
+        if (!isGrounded)
         {
-            airJumpUsed = false;
+            // 노멀 체크 (옆면/벽 배제)
+            if (hit.collider != null && hit.normal.y > 0.7f)
+            {
+                isGrounded = true;
+                playerGFX.Squash();
+                airJumpUsed = false;
+
+                return;
+            }
+            else
+            {
+                return;
+            }
         }
+        
+        isGrounded = hit.collider != null && hit.normal.y > 0.7f;
+        
     }
 
 #if UNITY_EDITOR
