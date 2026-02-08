@@ -228,6 +228,7 @@ GameObject:
   - component: {fileID: 7796931820783239575}
   - component: {fileID: 8144941878329839698}
   - component: {fileID: 5865790102697253617}
+  - component: {fileID: 7153793870612742348}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -560,20 +561,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51eb73a7b9b14d54798de517b919a5d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-
   rawInput: {x: 0, y: 0}
-  moveSpeed: 5
-  jumpForce: 7
-
-  moveTile: 4
-  jumpTile: 1
+  moveSpeed: 8
+  jumpForce: 12
+  moveTile: 2
+  jumpTile: 2
   tileHeight: 1
   jumpOffset: 0.5
-
   groundLayer:
     serializedVersion: 2
-    m_Bits: 4160
-  groundCheckDistance: 0.1
+    m_Bits: 0
+  groundCheckDistance: 0.05
   dashCooldown: 2
   dashCurrentCooldown: 0
   dashSpeed: 20
@@ -699,3 +697,16 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &7153793870612742348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043352431804775299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b65ebae78ed3a5e4d8bfa8845190f349, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteract
+  interactAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

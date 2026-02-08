@@ -19,7 +19,10 @@ public class CameraFollow2D : MonoBehaviour
     public float zoomLerpSpeed = 5f;
 
     bool isTransforming = true; // 변환 상태
-
+    [Header("Interaction")] 
+    public float desiredZoom = 3f;
+    private bool isZooming = false;
+    private Vector3 interactPos;
     void Awake()
     {
         cam = GetComponent<Camera>();
@@ -29,32 +32,60 @@ public class CameraFollow2D : MonoBehaviour
 
     void LateUpdate()
     {
-        if (!target) return;
+        if (!isZooming)
+        {
+            if (!target) return;
+            // === 마우스 오프셋 계산 ===
+            Vector3 mouseWorld = cam.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 offset = mouseWorld - target.position;
+            offset.z = 0;
+            offset = Vector3.ClampMagnitude(offset, mouseInfluence);
 
-        // === 마우스 오프셋 계산 ===
-        Vector3 mouseWorld = cam.ScreenToWorldPoint(Input.mousePosition);
-        Vector3 offset = mouseWorld - target.position;
-        offset.z = 0;
-        offset = Vector3.ClampMagnitude(offset, mouseInfluence);
+            // === 카메라 위치 ===
+            Vector3 desiredPos = target.position + offset;
+            desiredPos.z = transform.position.z;
 
-        // === 카메라 위치 ===
-        Vector3 desiredPos = target.position + offset;
-        desiredPos.z = transform.position.z;
+            transform.position = Vector3.Lerp(
+                transform.position,
+                desiredPos,
+                Time.deltaTime * followLerpSpeed
+            );
 
-        transform.position = Vector3.Lerp(
-            transform.position,
-            desiredPos,
-            Time.deltaTime * followLerpSpeed
-        );
+            // === 줌 ===
+            float targetZoom = baseZoom + (isTransforming ? extraZoom : 0f);
 
-        // === 줌 ===
-        float targetZoom = baseZoom + (isTransforming ? extraZoom : 0f);
+            cam.orthographicSize = Mathf.Lerp(
+                cam.orthographicSize,
+                targetZoom,
+                Time.deltaTime * zoomLerpSpeed
+            );
+        }
+        else
+        {
+            interactPos.z = transform.position.z;
+            transform.position = Vector3.Lerp(
+                transform.position,
+                interactPos,
+                Time.deltaTime * followLerpSpeed
+            );
+            // === 줌 ===
+            cam.orthographicSize = Mathf.Lerp(
+                cam.orthographicSize,
+                desiredZoom,
+                Time.deltaTime * zoomLerpSpeed
+            );
+        }
+    }
 
-        cam.orthographicSize = Mathf.Lerp(
-            cam.orthographicSize,
-            targetZoom,
-            Time.deltaTime * zoomLerpSpeed
-        );
+    public void StartFocus(Vector2 pos)
+    {
+        isZooming = true;
+        interactPos = pos;
+    }
+
+    public void StopFocus()
+    {
+        isZooming = false;
     }
 
     // 외부에서 호출

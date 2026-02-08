@@ -3997,8 +3997,10 @@ MonoBehaviour:
   enemyRoot: {fileID: 1596391089}
   grid: {fileID: 591800932}
   tiles:
-  - {fileID: 11400000, guid: a81d378593c6fb04f8bac4036bb1e3f4, type: 2}
-  - {fileID: 11400000, guid: 47b409cc25787fa4585cf528b04529d5, type: 2}
+  - type: 2
+    tiles: []
+  - type: 2
+    tiles: []
   testData: {fileID: 11400000, guid: c90a92b6b98ce714d99fa7ec879e03ea, type: 2}
 --- !u!156049354 &591800932
 Grid:
