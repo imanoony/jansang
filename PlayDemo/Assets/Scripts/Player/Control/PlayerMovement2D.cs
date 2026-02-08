@@ -235,7 +235,7 @@ public class PlayerMovement2D : MonoBehaviour
         if (!isGrounded)
         {
             // 노멀 체크 (옆면/벽 배제)
-            if (hit.collider != null && hit.normal.y > 0.7f)
+            if (rb.linearVelocityY < 0 && hit.collider != null && hit.normal.y > 0.7f)
             {
                 isGrounded = true;
                 playerGFX.Squash();
