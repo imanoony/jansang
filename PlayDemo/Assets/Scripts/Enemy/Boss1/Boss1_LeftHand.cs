@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using UnityEngine.Assertions.Must;
 
-public class Boss1LeftHand : MonoBehaviour
+public class Boss1_LeftHand : MonoBehaviour
 {
     [Header("Sprites")]
     [SerializeField] private Sprite idleSprite;
@@ -18,7 +18,7 @@ public class Boss1LeftHand : MonoBehaviour
     private MeleeController2D playerMeleeController;
 
 
-    private Boss1Manage bossManage;
+    private Boss1_Manage bossManage;
     private SpriteRenderer spriteRenderer;
 
     private bool grasping = false;
@@ -27,7 +27,7 @@ public class Boss1LeftHand : MonoBehaviour
 
     private void Awake()
     {   
-        bossManage = GetComponentInParent<Boss1Manage>();
+        bossManage = GetComponentInParent<Boss1_Manage>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         if(playerObject == null)
@@ -42,7 +42,7 @@ public class Boss1LeftHand : MonoBehaviour
 
     public void BackToOrigin()
     {
-        StartCoroutine(Boss1Manage.ObjectMoveControlLocalPos(
+        StartCoroutine(Boss1_Manage.ObjectMoveControlLocalPos(
             gameObject,
             transform.localPosition,
             bossManage.lHandOrigin,
@@ -89,14 +89,14 @@ public class Boss1LeftHand : MonoBehaviour
     }
 
     
-    public void Boss1Grasp()
+    public void Boss1_Grasp()
     {
         float playerDistance = Vector2.Distance(gameObject.transform.position, playerObject.transform.position);
         Vector2 playerDirection = (playerObject.transform.position - transform.position).normalized;
         Vector2 targetPos = (Vector2)transform.position + playerDirection * Math.Max(Math.Min(playerDistance, 5f), 3f);
         
 
-        graspCoroutine = StartCoroutine(Boss1Manage.ObjectMoveControl(
+        graspCoroutine = StartCoroutine(Boss1_Manage.ObjectMoveControl(
             gameObject,
             transform.position,
             targetPos,
@@ -134,14 +134,14 @@ public class Boss1LeftHand : MonoBehaviour
         }
     }
 
-    public IEnumerator Boss1LHandHit()
+    public IEnumerator Boss1_LHandHit()
     {
         // Left Hand Hit Animation
         spriteRenderer.color = Color.red;
         yield return new WaitForSeconds(0.1f);
         spriteRenderer.color = Color.white;
     }
-    public IEnumerator Boss1LHandDestroyed()
+    public IEnumerator Boss1_LHandDestroyed()
     {
         // Left Hand Destroyed Animation
         gameObject.SetActive(false);

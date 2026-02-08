@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Boss1Haunt : MonoBehaviour
+public class Boss1_Haunt : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float maxSpeed = 3f;
@@ -12,11 +12,11 @@ public class Boss1Haunt : MonoBehaviour
     private Transform spiritTransform;
     private Rigidbody2D spiritRigidbody;
 
-    private Boss1Manage bossManage;
+    private Boss1_Manage bossManage;
 
     private void Awake()
     {
-        bossManage = GetComponentInParent<Boss1Manage>();
+        bossManage = GetComponentInParent<Boss1_Manage>();
 
         spiritTransform = GetComponent<Transform>();
         spiritRigidbody = GetComponent<Rigidbody2D>();
