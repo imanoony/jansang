@@ -11,6 +11,7 @@ public class CameraZoom : MonoBehaviour
     [Header("Clamp (Optional)")]
     public float minSize = 0f;
     public float maxSize = 0f;
+    public bool stack = false;
 
     private CameraFollow2D follow;
 
@@ -22,6 +23,7 @@ public class CameraZoom : MonoBehaviour
         follow.zoomFxDefaultDuration = defaultDuration;
         follow.zoomFxDefaultAmount = defaultAmount;
         follow.zoomFxUseUnscaledTime = useUnscaledTime;
+        follow.zoomFxStack = stack;
         follow.zoomFxMinSize = minSize;
         follow.zoomFxMaxSize = maxSize;
     }

@@ -29,6 +29,7 @@ public class CameraFollow2D : MonoBehaviour
     public float zoomFxDefaultDuration = 0.08f;
     public float zoomFxDefaultAmount = 0.5f;
     public bool zoomFxUseUnscaledTime = true;
+    public bool zoomFxStack = false;
     public float zoomFxMinSize = 0f;
     public float zoomFxMaxSize = 0f;
 
@@ -295,12 +296,13 @@ public class CameraFollow2D : MonoBehaviour
         for (int i = 0; i < zoomRequests.Count; i++)
         {
             ZoomRequest req = zoomRequests[i];
+            float value;
             if (req.mode == ZoomMode.Pulse)
             {
                 float duration = req.endTime - req.startTime;
                 float progress = duration > 0f ? Mathf.Clamp01((now - req.startTime) / duration) : 1f;
                 float weight = Mathf.Sin(progress * Mathf.PI);
-                combined += req.amount * weight;
+                value = req.amount * weight;
             }
             else
             {
@@ -331,7 +333,16 @@ public class CameraFollow2D : MonoBehaviour
                     weight = 0f;
                 }
 
-                combined += req.amount * weight;
+                value = req.amount * weight;
+            }
+
+            if (zoomFxStack)
+            {
+                combined += value;
+            }
+            else
+            {
+                if (Mathf.Abs(value) > Mathf.Abs(combined)) combined = value;
             }
         }
 

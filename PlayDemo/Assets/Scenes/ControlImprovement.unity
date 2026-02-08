@@ -2262,7 +2262,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 4
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2352,9 +2352,9 @@ MonoBehaviour:
   targetRoot: {fileID: 914012525}
   followLerpSpeed: 3
   mouseInfluence: 1
-  baseZoom: 2
+  baseZoom: 3
   extraZoom: 1
-  zoomLerpSpeed: 0.1
+  zoomLerpSpeed: 5
   shakeDefaultDuration: 0.08
   shakeDefaultAmplitude: 0.2
   shakeDefaultFrequency: 25
@@ -2362,6 +2362,7 @@ MonoBehaviour:
   zoomFxDefaultDuration: 0.08
   zoomFxDefaultAmount: 0.5
   zoomFxUseUnscaledTime: 1
+  zoomFxStack: 0
   zoomFxMinSize: 0
   zoomFxMaxSize: 0
 --- !u!1 &914012524
