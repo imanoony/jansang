@@ -1356,7 +1356,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2464659344240176211, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 725870519}
   m_SourcePrefab: {fileID: 100100000, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
 --- !u!1 &474305602
 GameObject:
@@ -2104,6 +2107,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e22f484b669a90245933a52d18d208fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SummonerEnemy
+--- !u!1 &725870513 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2464659344240176211, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+  m_PrefabInstance: {fileID: 465470662}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &725870519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 725870513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cc2b07044bd45a4d8ee707984c9125f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimeManager
 --- !u!1 &777354486
 GameObject:
   m_ObjectHideFlags: 0
@@ -2335,6 +2355,15 @@ MonoBehaviour:
   baseZoom: 2
   extraZoom: 1
   zoomLerpSpeed: 0.1
+  shakeDefaultDuration: 0.08
+  shakeDefaultAmplitude: 0.2
+  shakeDefaultFrequency: 25
+  shakeUseUnscaledTime: 1
+  zoomFxDefaultDuration: 0.08
+  zoomFxDefaultAmount: 0.5
+  zoomFxUseUnscaledTime: 1
+  zoomFxMinSize: 0
+  zoomFxMaxSize: 0
 --- !u!1 &914012524
 GameObject:
   m_ObjectHideFlags: 0
@@ -2632,6 +2661,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 914012525}
     m_Modifications:
     - target: {fileID: 548038150764793076, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: attackRadius
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 548038150764793076, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: enemyLayerMask.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 548038150764793076, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: 'chargingTime.Array.data[0]'
       value: 0.5
       objectReference: {fileID: 0}
@@ -2643,13 +2680,41 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5798332138023723292, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitSlowScale
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798332138023723292, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitZoomAmount
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798332138023723292, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitSlowDuration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798332138023723292, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: enemyLayer.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798332138023723292, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitZoomInDuration
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798332138023723292, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitZoomOutDuration
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798332138023723292, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitZoomHoldDuration
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 7279371306044431877, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.17
+      value: 9.95
       objectReference: {fileID: 0}
     - target: {fileID: 7279371306044431877, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.92
+      value: -10.28
       objectReference: {fileID: 0}
     - target: {fileID: 7279371306044431877, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_LocalPosition.z
