@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public enum BossPart
+{
+    Body = 0,
+    LHand = 1,
+    RHand = 2,
+}
 public enum BodyPattern
 {
     Idle = 0,
@@ -48,6 +54,8 @@ public class Boss1Manage : MonoBehaviour
     public PlayerHitCheck playerHitCheck;
     public PlayerMovement2D playerMovement;
     public Rigidbody2D playerRigidbody;
+    public LayerMask attackLayer;
+    
 
     [Header("Object References")]
     public List<GameObject> altarObjects;
@@ -72,6 +80,10 @@ public class Boss1Manage : MonoBehaviour
     private float rHandPatternMinTime = 4f;
     private float rHandPatternMaxTime = 6f;
 
+    [Header("Boss Health")]
+    [SerializeField] private int lHandHealth = 10;
+    [SerializeField] private int rHandHealth = 10;
+    [SerializeField] private int bodyHealth = 20;
 
     private void Awake()
     {
@@ -108,6 +120,42 @@ public class Boss1Manage : MonoBehaviour
         RHandPatternManage();
     }
 
+    public void TakeDamage(BossPart part, int damage)
+    {
+        switch(part){
+            case BossPart.Body:
+                if(lHandHealth > 0 || rHandHealth > 0) return;
+                bodyHealth -= damage;
+                if(bodyHealth <= 0){
+                    StartCoroutine(bossBody.Boss1BodyDestroyed());
+                }
+                else
+                {
+                    StartCoroutine(bossBody.Boss1BodyHit());
+                }
+                break;
+            case BossPart.LHand:
+                lHandHealth -= damage;
+                if(lHandHealth <= 0){
+                    StartCoroutine(bossLeftHand.Boss1LHandDestroyed());
+                }
+                else
+                {
+                    StartCoroutine(bossLeftHand.Boss1LHandHit());
+                }
+                break;
+            case BossPart.RHand:
+                rHandHealth -= damage;
+                if(rHandHealth <= 0){
+                    StartCoroutine(bossRightHand.Boss1RHandDestroyed());
+                }
+                else
+                {
+                    StartCoroutine(bossRightHand.Boss1RHandHit());
+                }
+                break;
+        }
+    }
 
     private void BossMoveManage()
     {
@@ -155,6 +203,7 @@ public class Boss1Manage : MonoBehaviour
 
     private void BodyPatternManage()
     {
+        if (bodyHealth <= 0) return;
         if (currentBodyPattern != BodyPattern.Idle) return;
         if (currentBodyPattern == BodyPattern.Idle && bodyPatternTimer > 0f)
         {
@@ -194,6 +243,7 @@ public class Boss1Manage : MonoBehaviour
 
     private void LHandPatternManage()
     {
+        if (lHandHealth <= 0) return;
         if (currentLeftHandPattern != LHandPattern.Idle ||
            currentBodyPattern == BodyPattern.Judgement) return;
         if (currentLeftHandPattern == LHandPattern.Idle && lHandPatternTimer > 0f)
@@ -221,6 +271,7 @@ public class Boss1Manage : MonoBehaviour
 
     private void RHandPatternManage()
     {
+        if (rHandHealth <= 0) return;
         if (currentRightHandPattern != RHandPattern.Idle ||
            currentBodyPattern == BodyPattern.Judgement) return;
         if (currentRightHandPattern == RHandPattern.Idle && rHandPatternTimer > 0f)

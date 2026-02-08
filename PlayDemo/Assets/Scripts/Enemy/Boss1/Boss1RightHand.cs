@@ -71,7 +71,26 @@ public class Boss1RightHand : MonoBehaviour
     }
     
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if ((bossManage.attackLayer.value & (1 << other.gameObject.layer)) > 0)
+        {
+            bossManage.TakeDamage(BossPart.RHand, 1);
+        }
+    }
 
-
+    public IEnumerator Boss1RHandHit()
+    {
+        // Right Hand Hit Animation
+        spriteRenderer.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        spriteRenderer.color = Color.white;
+    }
+    public IEnumerator Boss1RHandDestroyed()
+    {
+        // Right Hand Destroyed Animation
+        gameObject.SetActive(false);
+        yield return null;
+    }
 
 }

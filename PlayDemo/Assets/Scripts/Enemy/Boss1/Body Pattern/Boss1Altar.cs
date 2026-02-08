@@ -7,7 +7,6 @@ public class Boss1Altar : MonoBehaviour
     [SerializeField] private List<Sprite> altarSprites;
 
     [Header("Health Settings")]
-    [SerializeField] private LayerMask attackLayer;
     [SerializeField] private int health;
     public bool active = true;
     private int currentHealth;
@@ -38,7 +37,7 @@ public class Boss1Altar : MonoBehaviour
     {
         if (bossManage.currentBodyPattern != BodyPattern.Judgement) return;
 
-        if ((attackLayer.value & (1 << other.gameObject.layer)) > 0 && currentHealth > 0)
+        if ((bossManage.attackLayer.value & (1 << other.gameObject.layer)) > 0 && currentHealth > 0)
         {
             currentHealth--;
             altarSR.sprite = altarSprites[health-currentHealth];

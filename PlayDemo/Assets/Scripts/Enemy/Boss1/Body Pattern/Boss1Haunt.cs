@@ -7,7 +7,6 @@ public class Boss1Haunt : MonoBehaviour
     public float acceleration = 0.05f;
 
     [Header("Health Settings")]
-    [SerializeField] LayerMask attackLayer;
     [SerializeField] int health = 2;
 
     private Transform spiritTransform;
@@ -57,7 +56,7 @@ public class Boss1Haunt : MonoBehaviour
             Destroy(gameObject);
         }
 
-        if ((attackLayer.value & (1 << other.gameObject.layer)) > 0)
+        if ((bossManage.attackLayer.value & (1 << other.gameObject.layer)) > 0)
         {
             health--;
             if(health <= 0){

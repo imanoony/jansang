@@ -5,8 +5,7 @@ using UnityEngine;
 
 public class Boss1Body : MonoBehaviour
 {
-    [SerializeField] private Boss1Manage bossManage;
-
+    
     [Header("Shockwave")]
     [SerializeField] private GameObject shockwave;
     [SerializeField] private List<Sprite> shockwaveSprites;
@@ -19,9 +18,13 @@ public class Boss1Body : MonoBehaviour
     [SerializeField] private GameObject judgementLazer;
     private Transform judgementTransform;
 
+    private Boss1Manage bossManage;
+    private SpriteRenderer spriteRenderer;
+
     private void Awake()
     {
-        if (bossManage == null) bossManage = GetComponentInParent<Boss1Manage>();
+        bossManage = GetComponentInParent<Boss1Manage>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         if (shockwave == null) {
             shockwave = transform.Find("Shockwave").gameObject;
         }
@@ -133,4 +136,27 @@ public class Boss1Body : MonoBehaviour
         }
         yield return null;
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if ((bossManage.attackLayer.value & (1 << other.gameObject.layer)) > 0)
+        {
+            bossManage.TakeDamage(BossPart.Body, 1);
+        }
+    }
+
+    public IEnumerator Boss1BodyHit()
+    {
+        // Body Hit Animation
+        spriteRenderer.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        spriteRenderer.color = Color.white;
+    }
+    public IEnumerator Boss1BodyDestroyed()
+    {
+        // Body Destroyed Animation
+        gameObject.SetActive(false);
+        yield return null;
+    }    
+
 }

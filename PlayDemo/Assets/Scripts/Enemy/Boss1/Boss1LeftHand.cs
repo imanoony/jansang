@@ -89,8 +89,6 @@ public class Boss1LeftHand : MonoBehaviour
     }
 
     
-
-    
     public void Boss1Grasp()
     {
         float playerDistance = Vector2.Distance(gameObject.transform.position, playerObject.transform.position);
@@ -126,6 +124,28 @@ public class Boss1LeftHand : MonoBehaviour
             spriteRenderer.sprite = idleSprite;
             spriteRenderer.sortingOrder = 2;
         }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if ((bossManage.attackLayer.value & (1 << other.gameObject.layer)) > 0)
+        {
+            bossManage.TakeDamage(BossPart.LHand, 1);
+        }
+    }
+
+    public IEnumerator Boss1LHandHit()
+    {
+        // Left Hand Hit Animation
+        spriteRenderer.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        spriteRenderer.color = Color.white;
+    }
+    public IEnumerator Boss1LHandDestroyed()
+    {
+        // Left Hand Destroyed Animation
+        gameObject.SetActive(false);
+        yield return null;
     }
 
 }
