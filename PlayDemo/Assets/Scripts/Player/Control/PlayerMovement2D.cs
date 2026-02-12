@@ -182,7 +182,6 @@ public class PlayerMovement2D : MonoBehaviour
 
     IEnumerator DashCooldownRoutine(Vector2 dV)
     {
-        Debug.Log("Dash Start, Dash Direction: " + dV);
         float dashTime = 0.01f;
         dashing = true;
         float gS = rb.gravityScale;
@@ -202,7 +201,6 @@ public class PlayerMovement2D : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
 
-        Debug.Log("Dash End");
 
         dashing = false;
         rb.gravityScale = gS;

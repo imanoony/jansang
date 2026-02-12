@@ -41,6 +41,7 @@ public class Boss2_Manage : MonoBehaviour
     
     [Header("Pattern")]
     public Boss2_Pattern currentPattern;
+    [SerializeField] private Boss2_Pattern testingPattern = Boss2_Pattern.Dash;
     public float patternTimer = 3f;
     public float patternCooldown = 6f;
     public float moveTimer = 0f;
@@ -56,6 +57,7 @@ public class Boss2_Manage : MonoBehaviour
     public float tileSize = 1f;
 
     private Collider2D bossCol;
+    private Boss2_Action bossAction;
 
     private void Awake()
     {
@@ -63,13 +65,13 @@ public class Boss2_Manage : MonoBehaviour
         bossObject = gameObject.transform.GetChild(0).gameObject;
         bossSR = bossObject.GetComponent<SpriteRenderer>();
         bossCol = bossObject.GetComponent<Collider2D>();
+        bossAction = bossObject.GetComponentInChildren<Boss2_Action>();
 
         playerObject = GameObject.FindGameObjectWithTag("Player");
         playerTransform = playerObject.GetComponent<Transform>();
         playerMovement = playerObject.GetComponent<PlayerMovement2D>();
         playerRigidbody = playerObject.GetComponent<Rigidbody2D>();
         playerHitCheck = playerObject.GetComponent<PlayerHitCheck>();
-
     }
 
 
@@ -169,7 +171,6 @@ public class Boss2_Manage : MonoBehaviour
         if (hit.collider != null && hit.collider.OverlapPoint(start)){ return false; }
         if (hit.collider != null && hit.normal.y > 0.7f && bossRB.linearVelocity.y <= 0f)
         {
-            Debug.Log("Grounddddddddddddddd");
             isJumped = false;
             isDoubleJumped = false;
             return true;
@@ -179,6 +180,8 @@ public class Boss2_Manage : MonoBehaviour
 
     private void MoveManage()
     {
+        if(currentPattern != Boss2_Pattern.Moving && currentPattern != Boss2_Pattern.Idle){ return; }
+        
         if(moveTimer > 0f){ 
             moveTimer -= Time.deltaTime; 
             currentPattern = Boss2_Pattern.Idle;
@@ -244,6 +247,8 @@ public class Boss2_Manage : MonoBehaviour
             groundLayer            
         );
 
+        // 그냥 점프로 갈 수 없는 상황
+
         if (yDiff > tileSize*0.5f)
         {
             if (hit.collider == null)
@@ -255,6 +260,7 @@ public class Boss2_Manage : MonoBehaviour
                 if(cellingHit.collider != null){ Jump(); }
                 else{
                     bossRB.linearVelocity = Vector2.zero;
+                    moveTimer = moveCooldown;
                     currentPattern = Boss2_Pattern.Idle;
                 }
             }
@@ -272,7 +278,31 @@ public class Boss2_Manage : MonoBehaviour
 
     private void PatternManage()
     {
-        
+        if(patternTimer > 0f){ patternTimer -= Time.deltaTime; }
+        if(currentPattern != Boss2_Pattern.Idle || patternTimer > 0f){ return; }
+
+        // Pattern 조건 고려하여 패턴 변경
+        currentPattern = testingPattern;
+
+        switch (currentPattern)
+        {
+            case Boss2_Pattern.Dash:
+                isRight = playerTransform.position.x > gameObject.transform.position.x ? true : false;
+                bossSR.flipX = !isRight;
+                StartCoroutine(bossAction.Boss2_Charge<bool>(
+                    1.0f,
+                    bossAction.Boss2_DashAction,
+                    isRight
+                ));
+                break;
+            case Boss2_Pattern.Slash:
+                break;
+            case Boss2_Pattern.Counter:
+                break;
+            case Boss2_Pattern.Laser:
+                break;
+        }
+
     }
 
 
