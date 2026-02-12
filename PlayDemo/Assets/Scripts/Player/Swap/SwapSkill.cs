@@ -72,6 +72,7 @@ public class SwapSkill : MonoBehaviour
         foreach (var t in allTargets)
         {
             if (t.gameObject == gameObject) continue;
+            if (!t.enabled) continue;
             bool visible = HasLineOfSight(transform.position, t.transform.position);
             // [comment]
             // 아래 HasLineOfSight() 에서 적은대로 땅에 의한 막힘을 생각해서
@@ -105,7 +106,7 @@ public class SwapSkill : MonoBehaviour
 
         SwapTarget target = hit.GetComponent<SwapTarget>();
         if (target == null) return;
-
+        if(!target.enabled) return;
         if (!visibleTargets.Contains(target)) return;
 
         manager.UseGauge(Vector2.SqrMagnitude(transform.position - target.transform.position));

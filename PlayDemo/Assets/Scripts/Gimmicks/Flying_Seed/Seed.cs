@@ -13,7 +13,7 @@ public class Seed : MonoBehaviour
     [Header("Sway")]
     [SerializeField] float swayStrength = 0.3f;
     [SerializeField] float swaySpeed = 4f;
-
+    [SerializeField] private SwapTarget swap;
     [Header("Ground Check")]
     [SerializeField] float groundCheckDistance = 0.15f;
     [SerializeField] LayerMask groundLayer;
@@ -21,6 +21,7 @@ public class Seed : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        swap.enabled = false;
     }
 
     void Update()
@@ -35,7 +36,7 @@ public class Seed : MonoBehaviour
         {
             // 좌우 흔들림 (단풍나무 씨앗 느낌)
             float sway = Mathf.Sin(Time.time * swaySpeed) * swayStrength;
-            rb.linearVelocity += Vector2.right * sway * Time.fixedDeltaTime;
+            rb.linearVelocity += Vector2.right * (sway * Time.fixedDeltaTime);
         }
     }
 
@@ -50,8 +51,8 @@ public class Seed : MonoBehaviour
 
             if (stopXVelocityAtApex)
                 rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-
             rb.gravityScale = dropGravityScale;
+            swap.enabled = true;
         }
     }
 
