@@ -65,7 +65,7 @@ public class Boss1_Body : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         shockwave.SetActive(false);
 
-        bossManage.currentBodyPattern = BodyPattern.Idle;
+        bossManage.currentBodyPattern = Boss1_BodyPattern.Idle;
         bossManage.SetPatternTimer("Body");
     }
 
@@ -92,7 +92,7 @@ public class Boss1_Body : MonoBehaviour
 
         if(targetAltar.GetComponent<Boss1_Altar>().active == false)
         {
-            bossManage.currentBodyPattern = BodyPattern.Idle;
+            bossManage.currentBodyPattern = Boss1_BodyPattern.Idle;
             bossManage.SetPatternTimer("Body");
             foreach(GameObject altar in bossManage.altarObjects)
             {
@@ -128,7 +128,7 @@ public class Boss1_Body : MonoBehaviour
         }
         judgementLazer.SetActive(false);
 
-        bossManage.currentBodyPattern = BodyPattern.Idle;
+        bossManage.currentBodyPattern = Boss1_BodyPattern.Idle;
         bossManage.SetPatternTimer("Body");
         foreach(GameObject altar in bossManage.altarObjects)
         {
@@ -141,7 +141,7 @@ public class Boss1_Body : MonoBehaviour
     {
         if ((bossManage.attackLayer.value & (1 << other.gameObject.layer)) > 0)
         {
-            bossManage.TakeDamage(BossPart.Body, 1);
+            bossManage.TakeDamage(Boss1_Part.Body, 1);
         }
     }
 

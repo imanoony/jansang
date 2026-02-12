@@ -54,7 +54,7 @@ public class Boss1_LeftHand : MonoBehaviour
 
     private void Update()
     {
-        if(bossManage.currentLeftHandPattern == LHandPattern.Grasp)
+        if(bossManage.currentLeftHandPattern == Boss1_LHandPattern.Grasp)
         {
             if(Vector2.Distance(gameObject.transform.position, playerObject.transform.position) < 1f && !grasping)
             {
@@ -82,7 +82,7 @@ public class Boss1_LeftHand : MonoBehaviour
         
         grasping = false;
         bossManage.lHandPatternTimer = 5f;
-        bossManage.currentLeftHandPattern = LHandPattern.Idle;
+        bossManage.currentLeftHandPattern = Boss1_LHandPattern.Idle;
         spriteRenderer.sprite = idleSprite;
         spriteRenderer.sortingOrder = 2;
         BackToOrigin();
@@ -120,7 +120,7 @@ public class Boss1_LeftHand : MonoBehaviour
         if(!grasping){
             BackToOrigin();
             bossManage.SetPatternTimer("LHand");
-            bossManage.currentLeftHandPattern = LHandPattern.Idle;
+            bossManage.currentLeftHandPattern = Boss1_LHandPattern.Idle;
             spriteRenderer.sprite = idleSprite;
             spriteRenderer.sortingOrder = 2;
         }
@@ -130,7 +130,7 @@ public class Boss1_LeftHand : MonoBehaviour
     {
         if ((bossManage.attackLayer.value & (1 << other.gameObject.layer)) > 0)
         {
-            bossManage.TakeDamage(BossPart.LHand, 1);
+            bossManage.TakeDamage(Boss1_Part.LHand, 1);
         }
     }
 
