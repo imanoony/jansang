@@ -229,6 +229,7 @@ GameObject:
   - component: {fileID: 8144941878329839698}
   - component: {fileID: 5865790102697253617}
   - component: {fileID: 7153793870612742348}
+  - component: {fileID: 253913667999482567}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -710,3 +711,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteract
   interactAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  cameraFollow: {fileID: 0}
+--- !u!114 &253913667999482567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5043352431804775299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcf90f142fd14114bb7bf79c3c237b7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MobileInput
+  player: {fileID: 7937889744083868383}
+  moveSensitivity: 100
+  jumpThreshold: 150
+  dashThreshold: 120
+  tapThreshold: 30

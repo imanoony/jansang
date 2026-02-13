@@ -55,32 +55,40 @@ public class PlayerMovement2D : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        rawInput = context.ReadValue<Vector2>();
-
-        if (dashing) return;
-
         if (context.performed || context.canceled)
         {
-            moveInput = context.ReadValue<Vector2>().x;
+            Vector2 raw = context.ReadValue<Vector2>();
+            SetMoveInput(raw.x);
         }
     }
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (dashing) return;
-
         if (context.performed)
-        {
-            TryJump();
-        }
+            TriggerJump();
     }
-    
+
     public void OnDash(InputAction.CallbackContext context)
     {
         if (context.performed)
-        {
-            TryDash();
-        }
+            TriggerDash(Vector2.zero);
+    }
+    // 🔹 공통 로직 함수
+    public void SetMoveInput(float value)
+    {
+        if (dashing) return;
+        moveInput = value;
+    }
+
+    public void TriggerJump()
+    {
+        if (dashing) return;
+        TryJump();
+    }
+
+    public void TriggerDash(Vector2 dir)
+    {
+        TryDash(dir);
     }
 
     void FixedUpdate()
@@ -128,18 +136,18 @@ public class PlayerMovement2D : MonoBehaviour
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
 
-    void TryDash()
+    void TryDash(Vector2 dir)
     {
         if(dashCurrentCooldown <= 0f)
         {
             dashCurrentCooldown = dashCooldown;
-            Dash();
+            Dash(dir);
         }
     }
 
-    void Dash()
+    void Dash(Vector2 dir)
     {
-        Vector2 dashDir = rawInput.sqrMagnitude > 0 ? rawInput.normalized : (attack.isRight ? Vector2.right : Vector2.left);
+        Vector2 dashDir = dir.normalized;
 
         Vector2 dashV = new Vector2(dashDir.x * dashSpeed, dashDir.y * dashSpeed);
         rb.linearVelocity = dashV;
