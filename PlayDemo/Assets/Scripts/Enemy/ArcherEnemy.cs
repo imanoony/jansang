@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
 public class ArcherEnemy : EnemyBase
 {
@@ -25,6 +26,8 @@ public class ArcherEnemy : EnemyBase
     #region status
     private bool found = false;
     private Vector3? nextPlatform;
+    private bool canJump = false;
+    private bool canAttack = false;
     #endregion
 #if UNITY_EDITOR
     private void OnDrawGizmos()
@@ -62,74 +65,83 @@ public class ArcherEnemy : EnemyBase
         await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
         while (!token.IsCancellationRequested)
         {
-            if (found == false || TilemapPlatformIndex.Instance.AreOnSamePlatformByRay(Player, transform))
+            if (canJump && TilemapPlatformIndex.Instance.AreOnSamePlatformByRay(Player, transform))
             {
                 CurrentTarget = null;
+                canAttack = true;
                 SetBaseColor(new Color(0f, 1f, 0f, 1f));
                 await ChangePlatformAsync(token);
+                canJump = false;
                 SetBaseColor(new Color(0f, 1f, 1f, 1f));
             }
-            else
+            else if (found && canAttack)
             {
+                canJump = true;
                 CurrentTarget = Player;
                 SetBaseColor(new Color(1f, 0f, 0f, 1f));
                 await AttackRoutineAsync(token);
+            }
+            else
+            {
+#if UNITY_EDITOR
+                Debug.Log("Where?");
+#endif
+                canJump = true;
+                await UniTask.Delay(TimeSpan.FromSeconds(0.3f), cancellationToken: token);
             }
         }
     }
     private async UniTask ChangePlatformAsync(CancellationToken token)
     {
+        Debug.Log("HERE1");
         Vector3 nextPos = FindNextPlatform() ?? transform.position;
         SetBaseColor(new Color(0f, 0f, 1f, 1f));
         if ((nextPos - transform.position).sqrMagnitude < 0.1f) return;
+
+        float targetspeed = 0f;
+        float jumpPower = 0f;
+        float xposDiff = nextPos.x - transform.position.x;
+        float calculatedTime = 0f;
+        float gravity = Mathf.Abs(Physics2D.gravity.y);
+        
         if (nextPos.y > transform.position.y)
         {
             ChangeDirection(0);
-            float xposDiff = nextPos.x - transform.position.x;
             float yposDiff = nextPos.y - transform.position.y;
-            float gravity = Mathf.Abs(Physics2D.gravity.y);
-            float calculatedJumpPower = CalculateJumpPower(1.5f, yposDiff);
-            float calculatedTime = calculatedJumpPower / gravity
+            
+            jumpPower = CalculateJumpPower(1.5f, yposDiff);
+            calculatedTime = jumpPower / gravity
                                    + Mathf.Sqrt(2 * 0.5f * yposDiff / gravity);
-            float targetspeed = xposDiff / calculatedTime;
-            while (!TryJump(calculatedJumpPower))
-            {
-                await UniTask.Yield(PlayerLoopTiming.Update, token);
-                if (found) return;
-            }
-            int tmp = (int)(nextPos.x - transform.position.x);
-            if (tmp == 0) return;
-            ChangeDirection(tmp / Math.Abs(tmp));
-            ChangeMoveSpeed(Math.Abs(targetspeed / moveSpeed));
-            await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: token); 
-            await UniTask.WaitUntil(() => isGrounded, cancellationToken: token);
-            ChangeDirection(0);
-            ChangeMoveSpeed(1);
         }
         else
         {
-            float xposDiff = nextPos.x - transform.position.x;
             float yposDiff = Mathf.Abs(nextPos.y - transform.position.y);
-            float jumpPower = 3f;
-            float gravity = Mathf.Abs(Physics2D.gravity.y);
+            jumpPower  = 3f;
             float additionalS = Mathf.Pow(jumpPower, 2) / (2 * gravity);
-            float calculatedTime = jumpPower / gravity
+            calculatedTime = jumpPower / gravity
                                    + Mathf.Sqrt(2 * (yposDiff + additionalS) * yposDiff / gravity);
-            float targetspeed = xposDiff / calculatedTime;
-            while (!TryJump(jumpPower))
-            {
-                await UniTask.Yield(PlayerLoopTiming.Update, token);
-                if (found) return;
-            }
-            int tmp = (int)(nextPos.x - transform.position.x);
-            if (tmp == 0) return;
-            ChangeDirection(tmp / Math.Abs(tmp));
-            ChangeMoveSpeed(Math.Abs(targetspeed / moveSpeed));
-            await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: token); 
-            await UniTask.WaitUntil(() => isGrounded, cancellationToken: token);
-            ChangeDirection(0);
-            ChangeMoveSpeed(1);
         }
+        targetspeed = xposDiff / calculatedTime;
+        
+        int jumpcnt = 0;
+        while (!TryJump(jumpPower))
+        {
+            Debug.Log("HERE3");
+            jumpcnt++;
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
+            if (found || jumpcnt>10) return;
+        }
+
+        canJump = false;
+        
+        int tmp = (int)(nextPos.x - transform.position.x);
+        if (tmp == 0) return;
+        ChangeDirection(tmp / Math.Abs(tmp));
+        ChangeMoveSpeed(Math.Abs(targetspeed / moveSpeed));
+        await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: token); 
+        await UniTask.WaitUntil(() => isGrounded, cancellationToken: token);
+        ChangeDirection(0);
+        ChangeMoveSpeed(1);
     }
     float CalculateJumpPower(float rate, float s)
     {

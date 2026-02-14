@@ -94,20 +94,19 @@ public class EnemyBase : MonoBehaviour
             return;
         }
         Bounds bounds = col.bounds;
-        var start = bounds.center + bounds.extents.y * Vector3.down;
-        RaycastHit2D hit = Physics2D.BoxCast(
-            bounds.center,
-            bounds.size,
-            0f,
-            Vector2.down,
-            groundCheckDistance,
-            groundLayer
-        );
-        if (hit.collider != null && hit.collider.OverlapPoint(start + Vector3.up * float.Epsilon))
+        Vector2 start = bounds.center + bounds.extents.y * Vector3.down;
+
+        if (Physics2D.OverlapPoint(start, groundLayer) != null)
         {
             isGrounded = false;
             return;
         }
+        RaycastHit2D hit = Physics2D.Raycast(
+            start,
+            Vector2.down,
+            groundCheckDistance,
+            groundLayer
+        );
         isGrounded = hit.collider != null && hit.normal.y > 0.7f;
     }
     private void Move()
@@ -237,4 +236,3 @@ public class EnemyBase : MonoBehaviour
         }
     }
 }
-

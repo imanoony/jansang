@@ -246,7 +246,7 @@ MonoBehaviour:
   platformLayer:
     serializedVersion: 2
     m_Bits: 4096
-  platformFindingHeight: 2
+  platformFindingHeight: 4
   platformFindingSampleCount: 10
 --- !u!120 &5394050712877876237
 LineRenderer:
