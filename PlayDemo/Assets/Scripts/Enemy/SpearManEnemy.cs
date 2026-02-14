@@ -14,6 +14,7 @@ public class SpearManEnemy : EnemyBase
     [SerializeField] private LayerMask wallLayer;
     [Header("Movement!")] 
     [SerializeField] private float directionTimeChange = 2f;
+    [SerializeField] private float rushSpeed = 2f;
     [Header("Combat")] 
     [SerializeField] private float thrustRadius = 1.3f;
     #endregion
@@ -26,11 +27,15 @@ public class SpearManEnemy : EnemyBase
     private bool rushStart;
     private bool canThrust;
     private bool automaticFlip = false;
+    private float localSpeedRate = 1f;
+    private float preRushSpeedRate = 1f;
     #endregion
     protected override void Start()
     {
         damageArea.enabled = false;
         base.Start();
+        localSpeedRate = 1f;
+        preRushSpeedRate = 1f;
     }
     protected override void FixedUpdate()
     {
@@ -66,7 +71,7 @@ public class SpearManEnemy : EnemyBase
                     Physics2D.OverlapCircle(transform.position, thrustRadius, playerMask) != null ||
                     MoveDirection == 0)
                 {
-                    rushStart = false;
+                    SetRushStart(false);
                     canThrust = true;
                 }
             } 
@@ -116,9 +121,8 @@ public class SpearManEnemy : EnemyBase
         else dir = 1;
         automaticFlip = false;
         ChangeDirection(dir);
-        ChangeMoveSpeed(2);
         FlipByDirection(dir);
-        rushStart = true;
+        SetRushStart(true);
         canThrust = false;
         await UniTask.WaitUntil(() => canThrust, cancellationToken: token);
         SetBaseColor(new Color(1f, 1f, 0f, 1f));
@@ -128,10 +132,30 @@ public class SpearManEnemy : EnemyBase
         SetBaseColor(new Color(0.5f, 0.5f, 1f, 1f));
         damageArea.enabled = false;
         ChangeDirection(-dir);
-        ChangeMoveSpeed(0.2f);
+        SetSpeedRate(0.2f);
         await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: token);
         ChangeDirection(0);
-        ChangeMoveSpeed(1f);
+        SetSpeedRate(1f);
+    }
+
+    private void SetSpeedRate(float rate)
+    {
+        localSpeedRate = rate;
+        ChangeMoveSpeed(rate);
+    }
+
+    private void SetRushStart(bool value)
+    {
+        if (rushStart == value) return;
+        rushStart = value;
+        if (rushStart)
+        {
+            preRushSpeedRate = localSpeedRate;
+            SetSpeedRate(rushSpeed);
+        }
+        else
+        {
+            SetSpeedRate(preRushSpeedRate);
+        }
     }
 }
-

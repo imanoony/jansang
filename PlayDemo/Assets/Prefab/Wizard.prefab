@@ -92,9 +92,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4044428486906286431}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.31, y: -17.55, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.5, z: 1}
+  m_LocalScale: {x: 0.69774, y: 1.1629, z: 2.3258}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6347648164053323581}
@@ -263,7 +263,9 @@ MonoBehaviour:
     m_Bits: 4160
   groundCheckDistance: 0.05
   moveSpeed: 2
-  summoner: {fileID: 0}
+  commander: {fileID: 0}
+  talkChance: 0.002
+  canTalkTime: 0
   detectionRadius: 3
   combatRadius: 4
   sightMask:
@@ -280,7 +282,6 @@ MonoBehaviour:
   magicball: {fileID: 8602366827079406384, guid: a38e22430c6a4ee48a3db63b7b7d009a, type: 3}
   attackCooldown: 3
   magicballSpeed: 2
-  player: {fileID: 0}
 --- !u!1 &6982323184378053331
 GameObject:
   m_ObjectHideFlags: 0

@@ -16,6 +16,8 @@ public class ArcherEnemy : EnemyBase
     [Header("Attack!")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed = 5f;
+    [Header("Platform Finding")]
+    [SerializeField] private LayerMask platformLayer;
     #endregion
     #region components
     private LineRenderer lineRenderer;
@@ -144,7 +146,7 @@ public class ArcherEnemy : EnemyBase
             for (int j = 0; j < platformFindingSampleCount; j++)
             {
                 var tmp = sampleStart + Vector3.right * Random.Range(-5f, 5f);
-                RaycastHit2D hit = Physics2D.Raycast(tmp, Vector3.down, platformFindingHeight * 2f, groundLayer);
+                RaycastHit2D hit = Physics2D.Raycast(tmp, Vector3.down, platformFindingHeight * 2f, platformLayer);
                 if (hit.collider != null && !hit.collider.OverlapPoint(tmp))
                 {
                     if (Mathf.Abs(hit.point.y - transform.position.y + col.bounds.extents.y) < 0.1f) continue;
@@ -185,4 +187,3 @@ public class ArcherEnemy : EnemyBase
         rb.linearVelocity = dir * bulletSpeed;
     }
 }
-
