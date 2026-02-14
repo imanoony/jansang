@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.7711509, y: 0.8174641, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.05, z: 1}
+  m_LocalScale: {x: 0.5288, y: 0.1322, z: 2.644}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -47,6 +47,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e68bb3a2528117948a56e79cc50c66f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyHittableLayer:
+    serializedVersion: 2
+    m_Bits: 262144
+  hitShakeDuration: 0.2
+  hitShakeAmplitude: 0.2
+  hitShakeFrequency: 25
+  hitSlowScale: 0.2
+  hitSlowDuration: 0.2
 --- !u!212 &146014842004163015
 SpriteRenderer:
   m_ObjectHideFlags: 0

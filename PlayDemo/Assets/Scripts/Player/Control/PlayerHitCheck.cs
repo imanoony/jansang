@@ -48,10 +48,6 @@ public class PlayerHitCheck : MonoBehaviour
         {
             TakeDamage(1);
         }
-        else if (other.CompareTag("EnemyAttack"))
-        {
-            TakeDamage(1);
-        }
     }
 
     public void TakeDamage(int damage)

@@ -3675,53 +3675,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 159788844}
     m_Modifications:
-    - target: {fileID: 985704927360163837, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_Name
-      value: Spear
-      objectReference: {fileID: 0}
-    - target: {fileID: 985704927360163837, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2737640904995590904, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
       propertyPath: m_Name
       value: SpearMan (1)
       objectReference: {fileID: 0}
-    - target: {fileID: 2737640904995590904, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5656490446390898610, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_Color.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5656490446390898610, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_Color.g
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5656490446390898610, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_Color.r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5656490446390898610, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 5720162815233390108, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: summoner
-      value: 
-      objectReference: {fileID: 612949838}
-    - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.69774
-      objectReference: {fileID: 0}
-    - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1.1629
-      objectReference: {fileID: 0}
-    - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 2.3258
+      propertyPath: wallLayer.m_Bits
+      value: 4160
       objectReference: {fileID: 0}
     - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6437,10 +6397,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpearMan (7)
       objectReference: {fileID: 0}
-    - target: {fileID: 2737640904995590904, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
       propertyPath: m_LocalPosition.x
       value: 36.96
@@ -7083,10 +7039,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpearMan (4)
       objectReference: {fileID: 0}
-    - target: {fileID: 2737640904995590904, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
       propertyPath: m_LocalPosition.x
       value: 37.16
@@ -7380,6 +7332,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5720162815233390108, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
+      propertyPath: combatRadius
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
       propertyPath: m_LocalPosition.x
       value: 17.82
@@ -7635,6 +7591,14 @@ PrefabInstance:
       propertyPath: 'chargingTime.Array.data[1]'
       value: 1.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1356419120706315528, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3352813320103272926, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: slowScale
+      value: 0.05
+      objectReference: {fileID: 0}
     - target: {fileID: 5043352431804775299, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_Name
       value: Player
@@ -7652,8 +7616,16 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5798332138023723292, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitShakeDuration
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798332138023723292, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: enemyLayer.m_Bits
       value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 5798332138023723292, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitShakeAmplitude
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 5798332138023723292, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: hitZoomInDuration
@@ -7670,6 +7642,18 @@ PrefabInstance:
     - target: {fileID: 5865790102697253617, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_GravityScale
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7218432460646019001, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5215
+      objectReference: {fileID: 0}
+    - target: {fileID: 7218432460646019001, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5215
+      objectReference: {fileID: 0}
+    - target: {fileID: 7218432460646019001, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5215
       objectReference: {fileID: 0}
     - target: {fileID: 7279371306044431877, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_LocalScale.x
@@ -8245,10 +8229,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ShieldMan
       objectReference: {fileID: 0}
-    - target: {fileID: 2937699623890234527, guid: a6514df26cbd4d4449ca11a4dd857f06, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7845534671062800480, guid: a6514df26cbd4d4449ca11a4dd857f06, type: 3}
       propertyPath: m_LocalPosition.x
       value: 17.64
@@ -8428,10 +8408,6 @@ PrefabInstance:
     - target: {fileID: 2737640904995590904, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
       propertyPath: m_Name
       value: SpearMan
-      objectReference: {fileID: 0}
-    - target: {fileID: 2737640904995590904, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
       propertyPath: m_LocalPosition.x

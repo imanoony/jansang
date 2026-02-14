@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -17,6 +18,14 @@ public class SpearManEnemy : EnemyBase
     [SerializeField] private float rushSpeed = 2f;
     [Header("Combat")] 
     [SerializeField] private float thrustRadius = 1.3f;
+    [SerializeField] private LayerMask enemyHittableLayer;
+    [Header("Hit FX")]
+    [SerializeField] private float hitShakeDuration = 0.08f;
+    [SerializeField] private float hitShakeAmplitude = 0.2f;
+    [SerializeField] private float hitShakeFrequency = 25f;
+    [Header("Hit Slow")]
+    [SerializeField] private float hitSlowScale = 0.2f;
+    [SerializeField] private float hitSlowDuration = 0.06f;
     #endregion
     #region components
     [SerializeField] private Collider2D damageArea;
@@ -29,6 +38,13 @@ public class SpearManEnemy : EnemyBase
     private bool automaticFlip = false;
     private float localSpeedRate = 1f;
     private float preRushSpeedRate = 1f;
+    private readonly HashSet<Collider2D> damageAreaHitTargets = new HashSet<Collider2D>();
+    private readonly Collider2D[] damageAreaHitResults = new Collider2D[8];
+    private ContactFilter2D enemyHittableFilter;
+    private ContactFilter2D playerFilter;
+    private CameraFollow2D camFollow;
+    private CameraShake camShake;
+    
     #endregion
     protected override void Start()
     {
@@ -36,6 +52,19 @@ public class SpearManEnemy : EnemyBase
         base.Start();
         localSpeedRate = 1f;
         preRushSpeedRate = 1f;
+        enemyHittableFilter = new ContactFilter2D
+        {
+            useLayerMask = true,
+            layerMask = enemyHittableLayer,
+            useTriggers = true
+        };
+        playerFilter = new ContactFilter2D
+        {
+            useLayerMask = true,
+            layerMask = playerMask,
+            useTriggers = true
+        };
+        CacheCameraFx();
     }
     protected override void FixedUpdate()
     {
@@ -72,12 +101,16 @@ public class SpearManEnemy : EnemyBase
                     MoveDirection == 0)
                 {
                     SetRushStart(false);
-                    canThrust = true;
                 }
             } 
             found = DetectPlayer(combatRadius, sightMask); 
         }
         if (DetectCliff(wallLayer)) ChangeDirection(0);
+
+        if (damageArea.enabled)
+        {
+            ApplyDamageAreaHits();
+        }
     }
     protected override async UniTask RunAIAsync(CancellationToken token)
     {
@@ -124,13 +157,14 @@ public class SpearManEnemy : EnemyBase
         FlipByDirection(dir);
         SetRushStart(true);
         canThrust = false;
+        damageArea.enabled = true;
+        damageAreaHitTargets.Clear();
         await UniTask.WaitUntil(() => canThrust, cancellationToken: token);
         SetBaseColor(new Color(1f, 1f, 0f, 1f));
         automaticFlip = true;
-        damageArea.enabled = true;
+        damageArea.enabled = false;
         await UniTask.Delay(TimeSpan.FromSeconds(0.3f), cancellationToken: token);
         SetBaseColor(new Color(0.5f, 0.5f, 1f, 1f));
-        damageArea.enabled = false;
         ChangeDirection(-dir);
         SetSpeedRate(0.2f);
         await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: token);
@@ -147,6 +181,7 @@ public class SpearManEnemy : EnemyBase
     private void SetRushStart(bool value)
     {
         if (rushStart == value) return;
+        if (!value) canThrust = true;
         rushStart = value;
         if (rushStart)
         {
@@ -157,5 +192,98 @@ public class SpearManEnemy : EnemyBase
         {
             SetSpeedRate(preRushSpeedRate);
         }
+    }
+
+    private void ApplyDamageAreaHits()
+    {
+        ApplyPlayerDamage();
+        ApplyEnemyHittableDamage();
+    }
+
+    private void ApplyPlayerDamage()
+    {
+        if (playerMask.value == 0) return;
+
+        int count = damageArea.Overlap(playerFilter, damageAreaHitResults);
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D col = damageAreaHitResults[i];
+            if (col == null) continue;
+            if (col.transform.IsChildOf(transform)) continue;
+            if (!damageAreaHitTargets.Add(col)) continue;
+
+            PlayerHitCheck player = col.GetComponentInParent<PlayerHitCheck>();
+            if (player != null)
+            {
+                SetRushStart(false);
+                player.TakeDamage(1);
+            }
+        }
+    }
+
+    private void ApplyEnemyHittableDamage()
+    {
+        if (enemyHittableLayer.value == 0) return;
+
+        int count = damageArea.Overlap(enemyHittableFilter, damageAreaHitResults);
+        Debug.Log("HERER!!!" + count);
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D col = damageAreaHitResults[i];
+            if (col == null) continue;
+            if (col.transform.IsChildOf(transform)) continue;
+            if (!damageAreaHitTargets.Add(col)) continue;
+
+            EnemyBase enemy = col.GetComponent<EnemyBase>();
+            if (enemy != null)
+            {
+				Debug.Log("OKAY I HIT THAT ");
+                SetRushStart(false);
+                enemy.Hit();
+                ApplyHitFx();
+            }
+        }
+    }
+
+    private void ApplyHitFx()
+    {
+        ApplyHitSlow();
+        ApplyHitFx(
+            hitShakeDuration,
+            hitShakeAmplitude,
+            hitShakeFrequency
+        );
+    }
+
+    private void ApplyHitFx(
+        float shakeDuration,
+        float shakeAmplitude,
+        float shakeFrequency
+    )
+    {
+        if (camFollow != null)
+        {
+            camFollow.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
+            return;
+        }
+
+        if (camShake != null) camShake.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
+    }
+
+    private void ApplyHitSlow()
+    {
+        var timeManager = GameManager.Instance != null ? GameManager.Instance.TimeManager : null;
+        if (timeManager == null) return;
+
+        if (hitSlowDuration > 0f) timeManager.EnterBulletTime(hitSlowScale, hitSlowDuration);
+        else timeManager.EnterBulletTime(hitSlowScale);
+    }
+
+    private void CacheCameraFx()
+    {
+        var cam = Camera.main;
+        if (cam == null) return;
+        camFollow = cam.GetComponent<CameraFollow2D>();
+        camShake = cam.GetComponent<CameraShake>();
     }
 }

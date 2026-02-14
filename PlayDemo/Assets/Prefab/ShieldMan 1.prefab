@@ -204,8 +204,8 @@ MonoBehaviour:
   commander: {fileID: 0}
   talkChance: 0.002
   canTalkTime: 0
-  detectionRadius: 3
-  combatRadius: 1.5
+  detectionRadius: 10
+  combatRadius: 10
   sightMask:
     serializedVersion: 2
     m_Bits: 320
@@ -214,10 +214,18 @@ MonoBehaviour:
     m_Bits: 256
   wallLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 4160
   directionTimeChange: 2
   flipTimeChange: 2
   thrustRadius: 1.3
+  enemyHittableLayer:
+    serializedVersion: 2
+    m_Bits: 262144
+  hitShakeDuration: 0.2
+  hitShakeAmplitude: 0.2
+  hitShakeFrequency: 25
+  hitSlowScale: 0.2
+  hitSlowDuration: 0.2
   attackArea: {fileID: 3231353124348335431}
 --- !u!1 &3322214596802110020
 GameObject:

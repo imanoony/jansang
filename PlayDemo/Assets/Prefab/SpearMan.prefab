@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 985704927360163837}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.31, y: 0, z: 0}
+  m_LocalPosition: {x: 0.476, y: -0.138, z: 0}
   m_LocalScale: {x: 2.3, y: 0.1546875, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -79,7 +79,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 8
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
@@ -342,7 +342,7 @@ MonoBehaviour:
   talkChance: 0.002
   canTalkTime: 0
   detectionRadius: 15
-  combatRadius: 5
+  combatRadius: 10
   sightMask:
     serializedVersion: 2
     m_Bits: 320
@@ -351,10 +351,18 @@ MonoBehaviour:
     m_Bits: 256
   wallLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 4160
   directionTimeChange: 2
   rushSpeed: 5
   thrustRadius: 0.5
+  enemyHittableLayer:
+    serializedVersion: 2
+    m_Bits: 262144
+  hitShakeDuration: 0.2
+  hitShakeAmplitude: 0.2
+  hitShakeFrequency: 25
+  hitSlowScale: 0.2
+  hitSlowDuration: 0.2
   damageArea: {fileID: 1176785323935155784}
 --- !u!1 &3363786626522051080
 GameObject:

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -17,6 +18,14 @@ public class ShieldManEnemy : EnemyBase
     [SerializeField] private float flipTimeChange = 2f;
     [Header("Combat")] 
     [SerializeField] private float thrustRadius = 1.3f;
+    [SerializeField] private LayerMask enemyHittableLayer;
+    [Header("Hit FX")]
+    [SerializeField] private float hitShakeDuration = 0.08f;
+    [SerializeField] private float hitShakeAmplitude = 0.2f;
+    [SerializeField] private float hitShakeFrequency = 25f;
+    [Header("Hit Slow")]
+    [SerializeField] private float hitSlowScale = 0.2f;
+    [SerializeField] private float hitSlowDuration = 0.06f;
     #endregion
     #region components
     [SerializeField] private Collider2D attackArea;
@@ -28,11 +37,31 @@ public class ShieldManEnemy : EnemyBase
     private bool rushStart;
     private bool canThrust;
     private bool automaticFlip = false;
+    private readonly HashSet<Collider2D> damageAreaHitTargets = new HashSet<Collider2D>();
+    private readonly Collider2D[] damageAreaHitResults = new Collider2D[8];
+    private ContactFilter2D enemyHittableFilter;
+    private ContactFilter2D playerFilter;
+    private CameraFollow2D camFollow;
+    private CameraShake camShake;
+    
     #endregion
     protected override void Start()
     {
         attackArea.enabled = false;
         base.Start();
+        enemyHittableFilter = new ContactFilter2D
+        {
+            useLayerMask = true,
+            layerMask = enemyHittableLayer,
+            useTriggers = true
+        };
+        playerFilter = new ContactFilter2D
+        {
+            useLayerMask = true,
+            layerMask = playerMask,
+            useTriggers = true
+        };
+        CacheCameraFx();
     }
     protected override void FixedUpdate()
     {
@@ -80,6 +109,11 @@ public class ShieldManEnemy : EnemyBase
             found = DetectPlayer(combatRadius, sightMask); 
         }
         if (DetectCliff(wallLayer)) ChangeDirection(0);
+
+        if (attackArea.enabled)
+        {
+            ApplyDamageAreaHits();
+        }
     }
     protected override async UniTask RunAIAsync(CancellationToken token)
     {
@@ -127,6 +161,7 @@ public class ShieldManEnemy : EnemyBase
         ChangeMoveSpeed(2);
         FlipByDirection(dir);
         attackArea.enabled = true;
+        damageAreaHitTargets.Clear();
         rushStart = true;
         canThrust = false;
         await UniTask.WaitUntil(() => canThrust, cancellationToken: token);
@@ -152,5 +187,97 @@ public class ShieldManEnemy : EnemyBase
         else 
             FlashColorAsync(Color.yellow, 0.5f, this.GetCancellationTokenOnDestroy()).Forget();
     }
-}
 
+    private void ApplyDamageAreaHits()
+    {
+        ApplyPlayerDamage();
+        ApplyEnemyHittableDamage();
+    }
+
+    private void ApplyPlayerDamage()
+    {
+        if (playerMask.value == 0) return;
+
+        int count = attackArea.Overlap(playerFilter, damageAreaHitResults);
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D col = damageAreaHitResults[i];
+            if (col == null) continue;
+            if (col.transform.IsChildOf(transform)) continue;
+            if (!damageAreaHitTargets.Add(col)) continue;
+
+            PlayerHitCheck player = col.GetComponentInParent<PlayerHitCheck>();
+            if (player != null)
+            {
+                rushStart = false;
+                canThrust = true;
+                player.TakeDamage(1);
+            }
+        }
+    }
+
+    private void ApplyEnemyHittableDamage()
+    {
+        if (enemyHittableLayer.value == 0) return;
+
+        int count = attackArea.Overlap(enemyHittableFilter, damageAreaHitResults);
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D col = damageAreaHitResults[i];
+            if (col == null) continue;
+            if (col.transform.IsChildOf(transform)) continue;
+            if (!damageAreaHitTargets.Add(col)) continue;
+
+            EnemyBase enemy = col.GetComponentInParent<EnemyBase>();
+            if (enemy != null)
+            {
+                rushStart = false;
+                canThrust = true;
+                enemy.Hit();
+                ApplyHitFx();
+            }
+        }
+    }
+
+    private void ApplyHitFx()
+    {
+        ApplyHitSlow();
+        ApplyHitFx(
+            hitShakeDuration,
+            hitShakeAmplitude,
+            hitShakeFrequency
+        );
+    }
+
+    private void ApplyHitFx(
+        float shakeDuration,
+        float shakeAmplitude,
+        float shakeFrequency
+    )
+    {
+        if (camFollow != null)
+        {
+            camFollow.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
+            return;
+        }
+
+        if (camShake != null) camShake.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
+    }
+
+    private void ApplyHitSlow()
+    {
+        var timeManager = GameManager.Instance != null ? GameManager.Instance.TimeManager : null;
+        if (timeManager == null) return;
+
+        if (hitSlowDuration > 0f) timeManager.EnterBulletTime(hitSlowScale, hitSlowDuration);
+        else timeManager.EnterBulletTime(hitSlowScale);
+    }
+
+    private void CacheCameraFx()
+    {
+        var cam = Camera.main;
+        if (cam == null) return;
+        camFollow = cam.GetComponent<CameraFollow2D>();
+        camShake = cam.GetComponent<CameraShake>();
+    }
+}
