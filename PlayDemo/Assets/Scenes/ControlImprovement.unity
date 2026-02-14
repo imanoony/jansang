@@ -3845,6 +3845,10 @@ PrefabInstance:
       propertyPath: Background
       value: 
       objectReference: {fileID: 1384203897}
+    - target: {fileID: 6602807900092744083, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: initialMaxHP
+      value: 1555
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7621,7 +7625,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 548038150764793076, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: enemyLayerMask.m_Bits
-      value: 512
+      value: 262656
       objectReference: {fileID: 0}
     - target: {fileID: 548038150764793076, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: 'chargingTime.Array.data[0]'
@@ -7720,9 +7724,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7796931820783239575, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitSlowScale
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7796931820783239575, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: spriteRenderer
       value: 
       objectReference: {fileID: 172045099}
+    - target: {fileID: 7796931820783239575, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitSlowDuration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7796931820783239575, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitShakeDuration
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7796931820783239575, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: hitZoomHoldDuration
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 7937889744083868383, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: jumpTile
       value: 3.5
