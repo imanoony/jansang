@@ -162,7 +162,7 @@ public class SpearManEnemy : EnemyBase
             lineRenderer.enabled = true;
             lineRenderer.positionCount = 2;
 
-            lineRenderer.SetPosition(0, transform.position);
+            
             lineRenderer.SetPosition(1, transform.position);
 
             lineRenderer.startWidth = 2f;
@@ -178,6 +178,7 @@ public class SpearManEnemy : EnemyBase
             while (true)
             {
                 elapsed += Time.deltaTime;
+                lineRenderer.SetPosition(0, transform.position);
                 if (elapsed < 0.7f) lineRenderer.SetPosition(1, transform.position + dir * elapsed * 5 * Vector3.right);
                 else if (aiming)
                 {

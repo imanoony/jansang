@@ -234,17 +234,23 @@ public class ArcherEnemy : EnemyBase
             lineRenderer.endWidth = 0.1f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
             lineRenderer.SetPosition(0, transform.position);
             
-            if (elapsed < aimingTime / 2) finalTarget = CurrentTarget?.position ?? transform.position;
-            else if (!goodtogo)
+            if (elapsed < aimingTime / 2)
+            {
+                finalTarget = CurrentTarget?.position ?? transform.position;
+                lineRenderer.SetPosition(1, finalTarget);
+            }
+            else 
             {
                 lineRenderer.startColor = Color.red;
                 Color c = Color.red;
                 c.a = 0;
                 lineRenderer.endColor = c;
-                goodtogo = true;
+                
+                Vector3 dirgo = (finalTarget - transform.position).normalized;
+                lineRenderer.SetPosition(1, transform.position + dirgo * 20);
             }
             
-            lineRenderer.SetPosition(1, finalTarget);
+            
             elapsed += Time.deltaTime;
 
             await UniTask.Yield(PlayerLoopTiming.Update, token);
