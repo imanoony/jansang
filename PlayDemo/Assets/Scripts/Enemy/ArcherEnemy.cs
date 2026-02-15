@@ -24,10 +24,9 @@ public class ArcherEnemy : EnemyBase
     private LineRenderer lineRenderer;
     #endregion
     #region status
-    private bool found = false;
     private Vector3? nextPlatform;
     private bool canJump = false;
-    private bool canAttack = false;
+    private bool canAttack = true;
     #endregion
 #if UNITY_EDITOR
     private void OnDrawGizmos()
@@ -50,8 +49,12 @@ public class ArcherEnemy : EnemyBase
     }
     protected override void Update()
     {
+        base.Update();
         if (!alerted) alerted = DetectPlayer(detectionRadius, sightMask);
-        else found = DetectPlayer(combatRadius, sightMask);
+        else
+        {
+            UpdateFound(combatRadius, sightMask);
+        }
     }
     protected override async UniTask RunAIAsync(CancellationToken token)
     {

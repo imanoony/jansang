@@ -8193,10 +8193,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Summoner
       objectReference: {fileID: 0}
-    - target: {fileID: 8480676413817879325, guid: 93df4286ad0e84a43befbf3b5d71bd15, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8325,10 +8321,6 @@ PrefabInstance:
     - target: {fileID: 4044428486906286431, guid: 99af213a0fb043b4b999c2a5a311b962, type: 3}
       propertyPath: m_Name
       value: Wizard
-      objectReference: {fileID: 0}
-    - target: {fileID: 4044428486906286431, guid: 99af213a0fb043b4b999c2a5a311b962, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

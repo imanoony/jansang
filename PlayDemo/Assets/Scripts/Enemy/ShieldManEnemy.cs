@@ -31,7 +31,6 @@ public class ShieldManEnemy : EnemyBase
     [SerializeField] private Collider2D attackArea;
     #endregion
     #region status
-    private bool found = false;
     private float directionTimeChangeElapsed;
     private float flipTimeChangeElapsed;
     private bool rushStart;
@@ -69,6 +68,7 @@ public class ShieldManEnemy : EnemyBase
     }
     protected override void Update()
     {
+        base.Update();
         if (!alerted)
         {
             if (directionTimeChangeElapsed > 0)
@@ -105,8 +105,9 @@ public class ShieldManEnemy : EnemyBase
                     rushStart = false;
                     canThrust = true;
                 }
-            } 
-            found = DetectPlayer(combatRadius, sightMask); 
+            }
+
+            UpdateFound(combatRadius, sightMask);
         }
         if (DetectCliff(wallLayer)) ChangeDirection(0);
 

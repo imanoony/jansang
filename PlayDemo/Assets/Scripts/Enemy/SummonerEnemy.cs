@@ -20,7 +20,6 @@ public class SummonerEnemy : EnemyBase
     [SerializeField] private EnemyAlertEmitter alertEmitter;
     #endregion
     #region status
-    private bool found = false;
     private bool automaticFlip;
     private float sumWeights;
     private float[] summonProbabilities;
@@ -55,6 +54,7 @@ public class SummonerEnemy : EnemyBase
     }
     protected override void Update()
     {
+        base.Update();
         if (automaticFlip && Player != null)
         {
             if (Player.position.x > transform.position.x) FlipByDirection(1);
@@ -66,7 +66,7 @@ public class SummonerEnemy : EnemyBase
         }
         else
         {
-            found = DetectPlayer(combatRadius, sightMask); 
+            UpdateFound(combatRadius, sightMask);
         }
     }
     protected override async UniTask RunAIAsync(CancellationToken token)
@@ -116,4 +116,3 @@ public class SummonerEnemy : EnemyBase
         var summon = Instantiate(summonees[num], transform.position + Vector3.left, Quaternion.identity);
     }
 }
-

@@ -20,7 +20,6 @@ public class WizardEnemy : EnemyBase
     [SerializeField] private float magicballSpeed = 2f;
     #endregion
     #region status
-    private bool found = false;
     private bool automaticFlip = false;
     private float attackCooldownElapsed;
     #endregion
@@ -34,6 +33,7 @@ public class WizardEnemy : EnemyBase
     }
     protected override void Update()
     {
+        base.Update();
         if (!alerted)
         {
             alerted = DetectPlayer(detectionRadius, sightMask);
@@ -45,7 +45,7 @@ public class WizardEnemy : EnemyBase
                 if (Player.position.x > transform.position.x) FlipByDirection(1);
                 else if (Player.position.x < transform.position.x) FlipByDirection(-1);
             }
-            found = DetectPlayer(combatRadius, sightMask); 
+            UpdateFound(combatRadius, sightMask);
         }
         if (attackCooldownElapsed > 0) attackCooldownElapsed -= Time.deltaTime;
     }
@@ -92,4 +92,3 @@ public class WizardEnemy : EnemyBase
         attackCooldownElapsed = attackCooldown;
     }
 }
-

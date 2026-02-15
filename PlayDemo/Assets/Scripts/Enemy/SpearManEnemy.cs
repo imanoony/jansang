@@ -31,7 +31,6 @@ public class SpearManEnemy : EnemyBase
     [SerializeField] private Collider2D damageArea;
     #endregion
     #region status
-    private bool found = false;
     private float directionTimeChangeElapsed;
     private bool rushStart;
     private bool canThrust;
@@ -72,6 +71,7 @@ public class SpearManEnemy : EnemyBase
     }
     protected override void Update()
     {
+        base.Update();
         if (!alerted)
         {
             if (directionTimeChangeElapsed > 0)
@@ -103,7 +103,7 @@ public class SpearManEnemy : EnemyBase
                     SetRushStart(false);
                 }
             } 
-            found = DetectPlayer(combatRadius, sightMask); 
+            UpdateFound(combatRadius, sightMask);
         }
         if (DetectCliff(wallLayer)) ChangeDirection(0);
 

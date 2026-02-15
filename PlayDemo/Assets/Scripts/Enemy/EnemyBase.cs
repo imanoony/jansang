@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -25,10 +26,13 @@ public class EnemyBase : MonoBehaviour
     protected Collider2D col;
     private Rigidbody2D rb;
     protected SpriteRenderer spriteRenderer;
+    public SpriteRenderer detectionStatusRenderer;
+    public Sprite[] detectionStatusSprites; // 0 : miss, 1 : found
     #endregion
     #region status
     private float currentSpeedRate;
     protected bool alerted = false;
+    protected bool found = false;
     protected enum State
     {
         Idle,
@@ -77,6 +81,7 @@ public class EnemyBase : MonoBehaviour
     }
     protected virtual void Update()
     {
+        detectionStatusRenderer.flipX = transform.localScale.x < 0;
     }
     protected virtual UniTask RunAIAsync(CancellationToken token)
     {
@@ -181,6 +186,90 @@ public class EnemyBase : MonoBehaviour
         if (hit.collider != null && hit.collider.CompareTag("Player"))
             return true;
         return false;
+    }
+
+    private int _detectionSeq = 0;
+    private async UniTask UpdateDetectionStatusRenderer(CancellationToken token, Color color, Sprite status)
+    {
+        int myid = _detectionSeq++;
+        
+        detectionStatusRenderer.gameObject.SetActive(true);
+        detectionStatusRenderer.color = color;
+
+        detectionStatusRenderer.sprite = status;
+
+        try
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
+        
+            float a = 1f;
+            Color c = detectionStatusRenderer.color;
+            while (!token.IsCancellationRequested && a > 0)
+            {
+                a -= Time.deltaTime;
+                c.a = a;
+                detectionStatusRenderer.color = c;
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken: token);
+            }
+        
+        }
+        finally
+        {
+            if (myid == _detectionSeq) detectionStatusRenderer.gameObject.SetActive(false);
+        }
+    }
+
+    private CancellationTokenSource _detectionStatusCTS;
+    
+    private async UniTaskVoid RunDetectionStatusAsync(Color color, Sprite status, CancellationTokenSource localCts)
+    {
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(
+            localCts.Token,
+            this.GetCancellationTokenOnDestroy());
+
+        try
+        {
+            await UpdateDetectionStatusRenderer(linked.Token, color, status);
+        }
+        catch (OperationCanceledException)
+        {
+            // 정상 취소
+        }
+    }
+
+    protected void UpdateFound(float radius, LayerMask sightMask)
+    {
+        var tmp = found;
+        found = DetectPlayer(radius, sightMask);
+
+        if (detectionStatusRenderer == null) return;
+        if (tmp && !found)
+        {
+            MissTarget();
+        }
+
+        if (!tmp && found)
+        {
+            FoundTarget();
+        }
+    }
+
+    protected void MissTarget()
+    {
+        _detectionStatusCTS?.Cancel();
+        _detectionStatusCTS?.Dispose();
+        
+        _detectionStatusCTS = new CancellationTokenSource();
+        RunDetectionStatusAsync(Color.yellow, detectionStatusSprites[0], _detectionStatusCTS).Forget();
+    }
+    
+    protected void FoundTarget()
+    {
+        _detectionStatusCTS?.Cancel();
+        _detectionStatusCTS?.Dispose();
+        
+        _detectionStatusCTS = new CancellationTokenSource();
+        RunDetectionStatusAsync(Color.red, detectionStatusSprites[1], _detectionStatusCTS).Forget();
     }
     protected bool DetectCliff(LayerMask wallLayer)
     {
