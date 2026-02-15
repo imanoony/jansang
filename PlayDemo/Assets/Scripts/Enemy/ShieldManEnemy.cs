@@ -22,6 +22,7 @@ public class ShieldManEnemy : EnemyBase
     #endregion
     #region components
     [SerializeField] private Collider2D attackArea;
+    private LineRenderer lineRenderer;
     #endregion
     #region status
     private float directionTimeChangeElapsed;
@@ -38,6 +39,7 @@ public class ShieldManEnemy : EnemyBase
     {
         attackArea.enabled = false;
         base.Start();
+        lineRenderer = GetComponent<LineRenderer>();
         enemyHittableFilter = new ContactFilter2D
         {
             useLayerMask = true,
@@ -141,6 +143,7 @@ public class ShieldManEnemy : EnemyBase
     }
 
     public float rushSpeedRate = 5;
+    
     private async UniTask AttackRoutineAsync(CancellationToken token)
     {
         if (CurrentTarget == null) return;
@@ -150,6 +153,49 @@ public class ShieldManEnemy : EnemyBase
         else dir = 1;
         automaticFlip = false;
         ChangeDirection(dir);
+        // 1: 돌진 전에 알려주기
+        if (lineRenderer != null)
+        {
+            ChangeMoveSpeed(0);
+
+            lineRenderer.enabled = true;
+            lineRenderer.positionCount = 2;
+
+            
+            lineRenderer.SetPosition(1, transform.position);
+
+            lineRenderer.startWidth = 4f;
+            lineRenderer.endWidth = 4f;
+
+            Color c = Color.yellow;
+            c.a = 0;
+            lineRenderer.startColor = Color.yellow;
+            lineRenderer.endColor = c;
+
+            float elapsed = 0f;
+            bool aiming = true;
+            while (true)
+            {
+                elapsed += Time.deltaTime;
+                lineRenderer.SetPosition(0, transform.position);
+                if (elapsed < 0.7f) lineRenderer.SetPosition(1, transform.position + dir * elapsed * 5 * Vector3.right);
+                else if (aiming)
+                {
+                    c = Color.red;
+                    c.a = 0;
+                    lineRenderer.startColor = Color.red;
+                    lineRenderer.endColor = c;
+                    aiming = false;
+                }
+
+                if (elapsed > 1) break;
+
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken: token);
+            }
+        }
+
+        // 2: 돌진해버리기
+        lineRenderer.enabled = false;
         ChangeMoveSpeed(rushSpeedRate);
         FlipByDirection(dir);
         attackArea.enabled = true;
