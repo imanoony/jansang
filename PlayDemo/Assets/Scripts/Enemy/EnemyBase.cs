@@ -189,6 +189,12 @@ public class EnemyBase : MonoBehaviour
         ApplyHitFx(damage);
         ApplyDamageAsync(damage).Forget();
     }
+    
+    public virtual void Hit(int damage, Vector3 pos)
+    {
+        Hit(damage);
+    }
+    
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Pitfall"))

@@ -181,6 +181,21 @@ public class ShieldManEnemy : EnemyBase
         else 
             FlashColorAsync(Color.yellow, 0.5f, this.GetCancellationTokenOnDestroy()).Forget();
     }
+    
+    public override void Hit(int damage, Vector3 pos)
+    {
+        if (Player == null)
+        {
+            base.Hit(damage);
+            return;
+        }
+        if (pos.x < transform.position.x && transform.localScale.x > 0) 
+            base.Hit(damage);
+        else if (pos.x > transform.position.x && transform.localScale.x < 0) 
+            base.Hit(damage);
+        else 
+            FlashColorAsync(Color.yellow, 0.5f, this.GetCancellationTokenOnDestroy()).Forget();
+    }
 
     private void ApplyDamageAreaHits()
     {
@@ -227,7 +242,7 @@ public class ShieldManEnemy : EnemyBase
             {
                 rushStart = false;
                 canThrust = true;
-                enemy.Hit(8);
+                enemy.Hit(8, transform.position);
             }
         }
     }

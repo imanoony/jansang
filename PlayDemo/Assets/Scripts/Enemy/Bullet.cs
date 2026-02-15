@@ -20,7 +20,7 @@ public class Bullet : MonoBehaviour
             EnemyBase enemy = other.GetComponentInParent<EnemyBase>();
             if (enemy != null)
             {
-                enemy.Hit(attackDamage);
+                enemy.Hit(attackDamage, transform.position);
             }
             Destroy(gameObject);
             return;

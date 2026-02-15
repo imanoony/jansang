@@ -230,8 +230,8 @@ public class ArcherEnemy : EnemyBase
         bool goodtogo = false;
         while (elapsed < aimingTime && !token.IsCancellationRequested)
         {
-            lineRenderer.startWidth = 0.05f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
-            lineRenderer.endWidth = 0.05f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
+            lineRenderer.startWidth = 0.1f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
+            lineRenderer.endWidth = 0.1f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
             lineRenderer.SetPosition(0, transform.position);
             
             if (elapsed < aimingTime / 2) finalTarget = CurrentTarget?.position ?? transform.position;

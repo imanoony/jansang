@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,13 @@ public class HitBox : MonoBehaviour
     HashSet<Collider2D> hitTargets = new HashSet<Collider2D>();
 
     public MeleeController2D.AttackState attackState;
+
+    private Transform playerTransform;
+    
+    private void Start()
+    {
+        playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+    }
 
 
     void OnEnable()
@@ -51,13 +59,13 @@ public class HitBox : MonoBehaviour
             switch (attackState)
             {
                 case MeleeController2D.AttackState.Weak:
-                    enemy.Hit(1);
+                    enemy.Hit(1, playerTransform.position);
                     break;
                 case MeleeController2D.AttackState.Middle:
-                    enemy.Hit(2);
+                    enemy.Hit(2, playerTransform.position);
                     break;
                 case MeleeController2D.AttackState.Strong:
-                    enemy.Hit(5);
+                    enemy.Hit(5, playerTransform.position);
                     break;
                 default:
                     break;
