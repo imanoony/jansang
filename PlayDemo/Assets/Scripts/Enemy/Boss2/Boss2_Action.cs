@@ -8,6 +8,8 @@ public class Boss2_Action : MonoBehaviour
     public Boss2_Manage bossManage;
     public Boss2_Collision bossCollision;
     public Boss2_Slash bossSlash;
+    public Boss2_Counter bossCounter;
+    public Boss2_Laser bossLaser;
     public SpriteRenderer bossSR;
 
     [Header("Dash")]
@@ -17,12 +19,26 @@ public class Boss2_Action : MonoBehaviour
     public float knockbackForce = 10f;
     public float knockbackDuration = 1f;
 
+    [Header("Counter")]
+    public float counterDuration = 3f;
+    public bool exploded = false;
+
+    [Header("Laser")]
+    public float laserDuration = 0.4f;
+
     void Awake()
     {
-        bossManage = GetComponentInParent<Boss2_Manage>(includeInactive: true);
+        bossManage = GetComponentInParent<Boss2_Manage>();
         bossCollision = GetComponentInChildren<Boss2_Collision>(includeInactive: true);
         bossSlash = GetComponentInChildren<Boss2_Slash>(includeInactive: true);
+        bossCounter = GetComponentInChildren<Boss2_Counter>(includeInactive: true);
+        bossLaser = GetComponentInChildren<Boss2_Laser>(includeInactive: true);
+        
         bossSR = GetComponent<SpriteRenderer>();
+
+        bossSlash.gameObject.SetActive(false);
+        bossCounter.gameObject.SetActive(false);
+        bossLaser.gameObject.SetActive(false);
     }
 
     public IEnumerator Boss2_Charge<T>(float chargeTime, bool isRight, System.Func<T, IEnumerator> skill, T parameter)
@@ -78,7 +94,7 @@ public class Boss2_Action : MonoBehaviour
         StartCoroutine(KnockbackCoroutine(knockbackDirection, knockbackForce, knockbackDuration));
     }
 
-    IEnumerator KnockbackCoroutine(Vector2 direction, float force, float duration)
+    public IEnumerator KnockbackCoroutine(Vector2 direction, float force, float duration)
     {
         bossManage.playerMovement.Stun(duration);
 
@@ -106,16 +122,44 @@ public class Boss2_Action : MonoBehaviour
 #endregion
 
 #region Counter
-    public IEnumerator Boss2_CounterAction(bool isRight)
+    public IEnumerator Boss2_CounterAction()
     {
+        bossCounter.gameObject.SetActive(true);
+        bossCounter.counterEffect.SetActive(true);
+
+        exploded = false;
+        bossCounter.gameObject.transform.localScale = new Vector3(0.3f, 0.3f, 1f);
+        yield return new WaitForSeconds(counterDuration);
+
+        bossCounter.counterEffect.SetActive(false);
+        bossCounter.explodeEffect.SetActive(true);
+
+        exploded = true;
+        bossCounter.gameObject.transform.localScale = new Vector3(1f, 1f, 1f);
+        yield return new WaitForSeconds(0.2f);
+
+        bossCounter.explodeEffect.SetActive(false);
+        bossCounter.gameObject.SetActive(false);
+
+
+        bossManage.patternTimer = bossManage.patternCooldown;
+        bossManage.currentPattern = Boss2_Pattern.Idle;
+
         yield return null;
     }
 #endregion
 
 #region Laser
-    public IEnumerator Boss2_LaserAction(bool isRight)
+    public IEnumerator Boss2_LaserAction(float angle)
     {
-        yield return null;
+        bossLaser.gameObject.SetActive(true);
+        bossLaser.SetRotation(angle);
+        yield return new WaitForSeconds(laserDuration);
+        bossLaser.gameObject.SetActive(false);
+
+
+        bossManage.patternTimer = bossManage.patternCooldown;
+        bossManage.currentPattern = Boss2_Pattern.Idle;
     }
 #endregion
 

@@ -48,6 +48,10 @@ public class Boss2_Manage : MonoBehaviour
     public float moveTimer = 0f;
     public float moveCooldown = 1.5f;
 
+    [Header("Pattern Settings")]
+    public float laserDistance = 8f;
+    public float closeDistance = 2f;
+
     [Header("Destination Check")]
     public float xDiff = 0f;
     public float yDiff = 0f;
@@ -274,12 +278,25 @@ public class Boss2_Manage : MonoBehaviour
 
         // Pattern 조건 고려하여 패턴 변경
         currentPattern = testingPattern;
+        float xD = playerTransform.position.x - gameObject.transform.position.x;
+        float yD = playerTransform.position.y - gameObject.transform.position.y;
+        float distance = Mathf.Sqrt(xD * xD + yD * yD);
+
+        if(distance > laserDistance){ currentPattern = Boss2_Pattern.Laser; }
+        else if(distance > closeDistance){ 
+            currentPattern = (Boss2_Pattern)UnityEngine.Random.Range(
+                (int)Boss2_Pattern.Slash, (int)Boss2_Pattern.Counter + 1
+            );
+        }
+        else{ currentPattern = Boss2_Pattern.Dash; }
+
+
         isRight = playerTransform.position.x > gameObject.transform.position.x ? true : false;
 
         switch (currentPattern)
         {
             case Boss2_Pattern.Dash:
-                StartCoroutine(bossAction.Boss2_Charge(
+                StartCoroutine(bossAction.Boss2_Charge<bool>(
                     1.0f,
                     isRight,
                     bossAction.Boss2_DashAction,
@@ -287,7 +304,7 @@ public class Boss2_Manage : MonoBehaviour
                 ));
                 break;
             case Boss2_Pattern.Slash:
-                StartCoroutine(bossAction.Boss2_Charge(
+                StartCoroutine(bossAction.Boss2_Charge<bool>(
                     1.0f,
                     isRight,
                     bossAction.Boss2_SlashAction,
@@ -295,8 +312,23 @@ public class Boss2_Manage : MonoBehaviour
                 ));
                 break;
             case Boss2_Pattern.Counter:
+                StartCoroutine(bossAction.Boss2_Charge(
+                    0.0f,
+                    isRight,
+                    bossAction.Boss2_CounterAction
+                ));
                 break;
             case Boss2_Pattern.Laser:
+                float angle = Mathf.Atan2(
+                    playerTransform.position.y - transform.position.y,
+                    playerTransform.position.x - transform.position.x
+                ) * Mathf.Rad2Deg + 90f;
+                StartCoroutine(bossAction.Boss2_Charge<float>(
+                    1.0f,
+                    isRight,
+                    bossAction.Boss2_LaserAction,
+                    angle
+                ));
                 break;
         }
 

@@ -9,10 +9,10 @@ public class Boss2_Slash : MonoBehaviour
 
     public bool hitPlayer = false;
 
-    private void OnEnable()
+    private void Awake()
     {
         bossAction = GetComponentInParent<Boss2_Action>();
-        bossManage = bossAction.bossManage;
+        bossManage = bossAction.GetComponentInParent<Boss2_Manage>();
         slashSR = GetComponent<SpriteRenderer>();
 
         hitPlayer = false;
@@ -29,8 +29,6 @@ public class Boss2_Slash : MonoBehaviour
 
     public void FlipSlash(bool isRight)
     {
-        if(bossAction == null || bossManage == null || slashSR == null) { OnEnable(); }
-
         transform.localPosition = new Vector2(isRight ? 0.1f : -0.1f, 0.1f);
         slashSR.flipX = !isRight;
     }
