@@ -212,7 +212,7 @@ public class ShieldManEnemy : EnemyBase
             {
                 rushStart = false;
                 canThrust = true;
-                player.TakeDamage(1);
+                player.TakeDamage(8);
             }
         }
     }
@@ -234,7 +234,7 @@ public class ShieldManEnemy : EnemyBase
             {
                 rushStart = false;
                 canThrust = true;
-                enemy.Hit();
+                enemy.Hit(8);
                 ApplyHitFx();
             }
         }

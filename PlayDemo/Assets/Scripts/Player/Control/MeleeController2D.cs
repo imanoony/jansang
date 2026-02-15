@@ -77,6 +77,7 @@ public class MeleeController2D : MonoBehaviour
     private async UniTask ChargingLevel(CancellationToken token)
     {
         attackState = AttackState.Weak;
+        hitBox.attackState = attackState;
         
         chargingCTS = new CancellationTokenSource();
         var cts = chargingCTS.Token;
@@ -84,9 +85,11 @@ public class MeleeController2D : MonoBehaviour
         
         await UniTask.WaitUntil(() => chargingTimeElapsed > chargingTime[0], cancellationToken: linkedCts.Token);
         attackState = AttackState.Middle;
+        hitBox.attackState = attackState;
         
         await UniTask.WaitUntil(() => chargingTimeElapsed > chargingTime[1], cancellationToken: linkedCts.Token);
         attackState = AttackState.Strong;
+        hitBox.attackState = attackState;
     }
 
     private void FinishCharging()

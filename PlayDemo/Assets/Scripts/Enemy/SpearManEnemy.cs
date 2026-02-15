@@ -216,7 +216,7 @@ public class SpearManEnemy : EnemyBase
             if (player != null)
             {
                 SetRushStart(false);
-                player.TakeDamage(1);
+                player.TakeDamage(8);
             }
         }
     }
@@ -237,7 +237,7 @@ public class SpearManEnemy : EnemyBase
             if (enemy != null)
             {
                 SetRushStart(false);
-                enemy.Hit();
+                enemy.Hit(8);
                 ApplyHitFx();
             }
         }

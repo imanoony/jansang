@@ -33,11 +33,11 @@ public class PlayerHitCheck : MonoBehaviour
     {
         if (other.CompareTag("Pitfall"))
         {
-            TakeDamage(1);
+            TakeDamage(5);
         }
         else if (other.CompareTag("EnemyProjectile"))
         {
-            TakeDamage(1);
+            TakeDamage(5);
             Destroy(other.gameObject);
         }
     }
@@ -50,11 +50,18 @@ public class PlayerHitCheck : MonoBehaviour
         }
     }
 
+    public float playerHeight;
     public void TakeDamage(int damage)
     {
         if (isInvincible)
             return;
         manager.SubHP(damage);
+        
+        var go = Instantiate(GameManager.Instance.UI.damageUI, 
+            transform.position + Vector3.up * playerHeight, 
+            Quaternion.identity).GetComponent<DamageUI>();
+        
+        go.Init(damage);
 
         if (manager.HP <= 0)
         {

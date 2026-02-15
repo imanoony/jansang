@@ -165,6 +165,11 @@ public class EnemyBase : MonoBehaviour
     
     public virtual void Hit(int damage)
     {
+        var go = Instantiate(GameManager.Instance.UI.damageUI, 
+            transform.position + Vector3.up * col.bounds.size.y, 
+            Quaternion.identity).GetComponent<DamageUI>();
+        
+        go.Init(damage);
         ApplyDamageAsync(damage).Forget();
     }
     private void OnTriggerEnter2D(Collider2D other)
