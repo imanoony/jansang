@@ -258,7 +258,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb5a22bc2ade46b097b6a8c5b3b8d6b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WizardEnemy
-  MaxHP: 2
+  MaxHP: 6
   groundLayer:
     serializedVersion: 2
     m_Bits: 4160

@@ -174,7 +174,7 @@ public class ShieldManEnemy : EnemyBase
         await UniTask.Delay(TimeSpan.FromSeconds(2f), cancellationToken: token);
         automaticFlip = true;
     }
-    public override void Hit()
+    public override void Hit(int damage)
     {
         if (Player == null)
         {
@@ -182,9 +182,9 @@ public class ShieldManEnemy : EnemyBase
             return;
         }
         if (Player.transform.position.x < transform.position.x && transform.localScale.x > 0) 
-            ApplyDamageAsync(1f).Forget();
+            ApplyDamageAsync(damage).Forget();
         else if (Player.transform.position.x > transform.position.x && transform.localScale.x < 0) 
-            ApplyDamageAsync(1f).Forget();
+            ApplyDamageAsync(damage).Forget();
         else 
             FlashColorAsync(Color.yellow, 0.5f, this.GetCancellationTokenOnDestroy()).Forget();
     }

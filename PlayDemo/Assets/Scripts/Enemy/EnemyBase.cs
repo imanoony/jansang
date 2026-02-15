@@ -158,9 +158,14 @@ public class EnemyBase : MonoBehaviour
     {
         if (commander != null) commander.Unregister(OnAlerted);
     }
-    public virtual void Hit()
+    public void Hit()
     {
-        ApplyDamageAsync(1f).Forget();
+        Hit(1);
+    }
+    
+    public virtual void Hit(int damage)
+    {
+        ApplyDamageAsync(damage).Forget();
     }
     private void OnTriggerEnter2D(Collider2D other)
     {

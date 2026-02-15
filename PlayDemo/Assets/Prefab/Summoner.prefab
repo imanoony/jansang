@@ -530,7 +530,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e22f484b669a90245933a52d18d208fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SummonerEnemy
-  MaxHP: 3
+  MaxHP: 12
   groundLayer:
     serializedVersion: 2
     m_Bits: 4160

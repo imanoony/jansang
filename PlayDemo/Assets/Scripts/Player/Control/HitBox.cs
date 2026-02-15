@@ -22,6 +22,9 @@ public class HitBox : MonoBehaviour
     private CameraShake camShake;
     private CameraZoom camZoom;
 
+    public MeleeController2D.AttackState attackState;
+
+
     void Start()
     {
         CacheCameraFx();
@@ -64,7 +67,21 @@ public class HitBox : MonoBehaviour
         var enemy = other.GetComponent<EnemyBase>();
         if (enemy != null)
         {
-            enemy.Hit();
+            switch (attackState)
+            {
+                case MeleeController2D.AttackState.Weak:
+                    enemy.Hit(1);
+                    break;
+                case MeleeController2D.AttackState.Middle:
+                    enemy.Hit(2);
+                    break;
+                case MeleeController2D.AttackState.Strong:
+                    enemy.Hit(5);
+                    break;
+                default:
+                    break;
+            }
+            
             hitEnemy = true;
         }
 

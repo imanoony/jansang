@@ -88,7 +88,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -5177388603050735206, guid: 8884154dfe85442a3a3578be807dbcdf, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.4, g: 0.4, b: 0.4, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -196,7 +196,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ae1a4883e888664eb2fe2aacfa50d87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShieldManEnemy
-  MaxHP: 5
+  MaxHP: 20
   groundLayer:
     serializedVersion: 2
     m_Bits: 4160

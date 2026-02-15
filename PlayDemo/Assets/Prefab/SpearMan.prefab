@@ -333,7 +333,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a792494b7be13942bb4f1543a49f771, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpearManEnemy
-  MaxHP: 3
+  MaxHP: 12
   groundLayer:
     serializedVersion: 2
     m_Bits: 4160
