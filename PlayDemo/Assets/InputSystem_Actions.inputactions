@@ -122,6 +122,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "UseTimeSlow",
+                    "type": "Button",
+                    "id": "1d3f3c5f-87c7-4f0d-bb25-4ed4ce696175",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -523,6 +532,17 @@
                 },
                 {
                     "name": "",
+                    "id": "d5fae532-e1cf-4076-ba2b-8249a028ba0d",
+                    "path": "<Touchscreen>/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Touch",
+                    "action": "TimeSlow",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "f59aff2c-8dc8-4c58-9797-653908a776fb",
                     "path": "<Keyboard>/e",
                     "interactions": "",
@@ -551,6 +571,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6944841f-63d5-4740-a8c7-a2a735dfb327",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "UseTimeSlow",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

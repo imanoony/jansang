@@ -12,10 +12,12 @@ public class SwapSkill : MonoBehaviour
     private Camera cam;
     private bool skillActive = false;
     private CharacterManager manager;
+    private Rigidbody2D rb;
     void Start()
     {
         cam = Camera.main;
         manager = GameManager.Instance.Char;
+        rb = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
@@ -31,19 +33,29 @@ public class SwapSkill : MonoBehaviour
         }
     }
 
-    public void OnTimeSlow(InputAction.CallbackContext ctx)
+    public void TrySkillByKey(InputAction.CallbackContext ctx)
     {
         if (ctx.started)
         {
-            if (manager.CheckGauge(0))
-            {
-                ActivateSkill();
-            }
+            TryUseSkill();
         }
+    }
+    public void TryUseSkill()
+    {
+        if (skillActive)
+        {
+            DeactivateSkill();
+        }
+        else if (manager.CheckGauge(0))
+        {
+            ActivateSkill();
+        }
+    }
+    public void OnTimeSlow(InputAction.CallbackContext ctx)
+    {
         if (ctx.canceled)
         {
             CheckClick();
-            DeactivateSkill();
         }
     }
 
@@ -61,7 +73,6 @@ public class SwapSkill : MonoBehaviour
         bulletTimeController.ExitBulletTime();
         foreach (var t in visibleTargets)
             t.SetHighlight(false);
-
         visibleTargets.Clear();
     }
 
@@ -111,14 +122,13 @@ public class SwapSkill : MonoBehaviour
 
         manager.UseGauge(Vector2.SqrMagnitude(transform.position - target.transform.position));
         SwapPosition(target.transform);
-        DeactivateSkill();
     }
 
     // =============================
     void SwapPosition(Transform target)
     {
         (transform.position, target.position) = (target.position, transform.position);
-
+        rb.linearVelocityY = 0;
         GameManager.Instance.Char.CancelTry();
     }
 
