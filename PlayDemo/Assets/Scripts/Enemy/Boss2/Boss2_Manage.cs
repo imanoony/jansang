@@ -1,4 +1,5 @@
 using System;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -89,6 +90,7 @@ public class Boss2_Manage : MonoBehaviour
         
     }
 
+#region Jump
     public void Jump()
     {
         if (!isJumped)
@@ -112,6 +114,33 @@ public class Boss2_Manage : MonoBehaviour
             return;
         }
     }
+
+    private bool CheckGround()
+    {
+        Bounds bounds = bossCol.bounds;
+        var start = bounds.center + bounds.extents.y * Vector3.down;
+
+        RaycastHit2D hit = Physics2D.BoxCast(
+            bounds.center,
+            bounds.size,
+            0f,
+            Vector2.down,
+            0.2f,
+            groundLayer
+        );
+
+        if (hit.collider != null && hit.collider.OverlapPoint(start)){ return false; }
+        if (hit.collider != null && hit.normal.y > 0.7f && bossRB.linearVelocity.y <= 0f)
+        {
+            isJumped = false;
+            isDoubleJumped = false;
+            return true;
+        }
+        return false;
+    }
+#endregion
+
+#region Move
 
     private void CheckPlayer()
     {
@@ -137,46 +166,7 @@ public class Boss2_Manage : MonoBehaviour
         else{ playerPlatform = playerTransform.position; }
     }
 
-    // private void CheckGround()
-    // {
-    //     RaycastHit2D hit = Physics2D.BoxCast(
-    //         transform.position + new Vector3(0f, -tileSize * 0.5f, 0f),
-    //         new Vector2(tileSize * 0.2f, tileSize * 0.2f),
-    //         0f,
-    //         Vector2.down,
-    //         tileSize,
-    //         groundLayer
-    //     );
-    //     if (hit && bossRB.linearVelocity.y <= 0f)
-    //     {
-    //         isJumped = false;
-    //         isDoubleJumped = false;
-    //     }
-    // }
 
-    private bool CheckGround()
-    {
-        Bounds bounds = bossCol.bounds;
-        var start = bounds.center + bounds.extents.y * Vector3.down;
-
-        RaycastHit2D hit = Physics2D.BoxCast(
-            bounds.center,
-            bounds.size,
-            0f,
-            Vector2.down,
-            0.2f,
-            groundLayer
-        );
-
-        if (hit.collider != null && hit.collider.OverlapPoint(start)){ return false; }
-        if (hit.collider != null && hit.normal.y > 0.7f && bossRB.linearVelocity.y <= 0f)
-        {
-            isJumped = false;
-            isDoubleJumped = false;
-            return true;
-        }
-        return false;
-    }
 
     private void MoveManage()
     {
@@ -248,7 +238,6 @@ public class Boss2_Manage : MonoBehaviour
         );
 
         // 그냥 점프로 갈 수 없는 상황
-
         if (yDiff > tileSize*0.5f)
         {
             if (hit.collider == null)
@@ -274,7 +263,9 @@ public class Boss2_Manage : MonoBehaviour
             );
         }
     }
+#endregion
 
+#region Pattern
 
     private void PatternManage()
     {
@@ -283,19 +274,25 @@ public class Boss2_Manage : MonoBehaviour
 
         // Pattern 조건 고려하여 패턴 변경
         currentPattern = testingPattern;
+        isRight = playerTransform.position.x > gameObject.transform.position.x ? true : false;
 
         switch (currentPattern)
         {
             case Boss2_Pattern.Dash:
-                isRight = playerTransform.position.x > gameObject.transform.position.x ? true : false;
-                bossSR.flipX = !isRight;
-                StartCoroutine(bossAction.Boss2_Charge<bool>(
+                StartCoroutine(bossAction.Boss2_Charge(
                     1.0f,
+                    isRight,
                     bossAction.Boss2_DashAction,
                     isRight
                 ));
                 break;
             case Boss2_Pattern.Slash:
+                StartCoroutine(bossAction.Boss2_Charge(
+                    1.0f,
+                    isRight,
+                    bossAction.Boss2_SlashAction,
+                    isRight
+                ));
                 break;
             case Boss2_Pattern.Counter:
                 break;
@@ -305,6 +302,6 @@ public class Boss2_Manage : MonoBehaviour
 
     }
 
-
+#endregion
 
 }
