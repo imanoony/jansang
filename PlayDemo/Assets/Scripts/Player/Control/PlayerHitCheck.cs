@@ -35,11 +35,6 @@ public class PlayerHitCheck : MonoBehaviour
         {
             TakeDamage(5);
         }
-        else if (other.CompareTag("EnemyProjectile"))
-        {
-            TakeDamage(5);
-            Destroy(other.gameObject);
-        }
     }
 
     private void OnTriggerStay2D(Collider2D other)

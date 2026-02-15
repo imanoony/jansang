@@ -20,6 +20,17 @@ public class EnemyBase : MonoBehaviour
     [Header("Commander")] [SerializeField] private EnemyAlertEmitter commander;
     [Header("Talk")] 
     [SerializeField] private float talkChance = 0.002f;
+    [Header("Hit FX")]
+    [SerializeField] private float hitShakeDuration = 0.08f;
+    [SerializeField] private float hitShakeAmplitude = 0.2f;
+    [SerializeField] private float hitShakeFrequency = 25f;
+    [SerializeField] private float hitZoomAmount = 0.5f;
+    [SerializeField] private float hitZoomInDuration = 0.04f;
+    [SerializeField] private float hitZoomHoldDuration = 0.05f;
+    [SerializeField] private float hitZoomOutDuration = 0.08f;
+    [Header("Hit Slow")]
+    [SerializeField] private float hitSlowScale = 0.2f;
+    [SerializeField] private float hitSlowDuration = 0.06f;
     #endregion
     #region components
     protected Animator animator;
@@ -28,6 +39,9 @@ public class EnemyBase : MonoBehaviour
     protected SpriteRenderer spriteRenderer;
     public SpriteRenderer detectionStatusRenderer;
     public Sprite[] detectionStatusSprites; // 0 : miss, 1 : found
+    private CameraFollow2D camFollow;
+    private CameraShake camShake;
+    private CameraZoom camZoom;
     #endregion
     #region status
     private float currentSpeedRate;
@@ -67,6 +81,7 @@ public class EnemyBase : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         if (spriteRenderer != null) baseColor = spriteRenderer.color;
+        CacheCameraFx();
         Player = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (commander != null) commander.Register(OnAlerted);
         HP = MaxHP;
@@ -170,6 +185,7 @@ public class EnemyBase : MonoBehaviour
             Quaternion.identity).GetComponent<DamageUI>();
         
         go.Init(damage);
+        ApplyHitFx();
         ApplyDamageAsync(damage).Forget();
     }
     private void OnTriggerEnter2D(Collider2D other)
@@ -333,5 +349,58 @@ public class EnemyBase : MonoBehaviour
                 if (spriteRenderer != null) spriteRenderer.color = baseColor;
             }
         }
+    }
+
+    private void ApplyHitFx()
+    {
+        ApplyHitSlow();
+        ApplyHitFx(
+            hitShakeDuration,
+            hitShakeAmplitude,
+            hitShakeFrequency,
+            hitZoomAmount,
+            hitZoomInDuration,
+            hitZoomHoldDuration,
+            hitZoomOutDuration
+        );
+    }
+
+    private void ApplyHitFx(
+        float shakeDuration,
+        float shakeAmplitude,
+        float shakeFrequency,
+        float zoomAmount,
+        float zoomInDuration,
+        float zoomHoldDuration,
+        float zoomOutDuration
+    )
+    {
+        if (camFollow != null)
+        {
+            camFollow.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
+            camFollow.ZoomInHoldOut(zoomAmount, zoomInDuration, zoomHoldDuration, zoomOutDuration);
+            return;
+        }
+
+        if (camShake != null) camShake.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
+        if (camZoom != null) camZoom.ZoomInHoldOut(zoomAmount, zoomInDuration, zoomHoldDuration, zoomOutDuration);
+    }
+
+    private void ApplyHitSlow()
+    {
+        var timeManager = GameManager.Instance != null ? GameManager.Instance.TimeManager : null;
+        if (timeManager == null) return;
+
+        if (hitSlowDuration > 0f) timeManager.EnterBulletTime(hitSlowScale, hitSlowDuration);
+        else timeManager.EnterBulletTime(hitSlowScale);
+    }
+
+    private void CacheCameraFx()
+    {
+        var cam = Camera.main;
+        if (cam == null) return;
+        camFollow = cam.GetComponent<CameraFollow2D>();
+        camShake = cam.GetComponent<CameraShake>();
+        camZoom = cam.GetComponent<CameraZoom>();
     }
 }

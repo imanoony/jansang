@@ -42,11 +42,11 @@ public class ArcherEnemy : EnemyBase
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, combatRadius);
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(nextPlatform ?? transform.position, 1);
+        // Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        // Gizmos.color = Color.red;
+        // Gizmos.DrawWireSphere(transform.position, combatRadius);
+        // Gizmos.color = Color.yellow;
+        // Gizmos.DrawWireSphere(nextPlatform ?? transform.position, 1);
     }
 #endif
     protected override void Start()
@@ -205,7 +205,7 @@ public class ArcherEnemy : EnemyBase
             Vector3 sampleStart = transform.position + Vector3.up * (platformFindingHeight * i);
             for (int j = 0; j < platformFindingSampleCount; j++)
             {
-                var tmp = sampleStart + Vector3.right * Random.Range(-10f, 10f);
+                var tmp = sampleStart + Vector3.right * Random.Range(-5f, 5f);
                 RaycastHit2D hit = Physics2D.Raycast(tmp, Vector3.down, platformFindingHeight * 2f, platformLayer);
                 if (hit.collider != null && !hit.collider.OverlapPoint(tmp))
                 {

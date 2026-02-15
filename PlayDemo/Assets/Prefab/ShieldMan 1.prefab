@@ -201,7 +201,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4160
   groundCheckDistance: 0.1
-  moveSpeed: 5
+  moveSpeed: 2
   commander: {fileID: 0}
   talkChance: 0.002
   detectionStatusRenderer: {fileID: 7990445800922184496}
@@ -232,6 +232,7 @@ MonoBehaviour:
   hitSlowScale: 0.2
   hitSlowDuration: 0.2
   attackArea: {fileID: 3231353124348335431}
+  rushSpeedRate: 4
 --- !u!1 &3322214596802110020
 GameObject:
   m_ObjectHideFlags: 0

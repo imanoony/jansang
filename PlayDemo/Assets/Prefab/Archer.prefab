@@ -235,6 +235,15 @@ MonoBehaviour:
   moveSpeed: 5
   commander: {fileID: 0}
   talkChance: 0.002
+  hitShakeDuration: 0.2
+  hitShakeAmplitude: 0.2
+  hitShakeFrequency: 25
+  hitZoomAmount: 0.5
+  hitZoomInDuration: 0.04
+  hitZoomHoldDuration: 0.2
+  hitZoomOutDuration: 0.08
+  hitSlowScale: 0.2
+  hitSlowDuration: 0.06
   detectionStatusRenderer: {fileID: 3735485871206210956}
   detectionStatusSprites:
   - {fileID: 8774444484602777177, guid: 9d511afaed0da4ed9a79aa0ce649a61f, type: 3}

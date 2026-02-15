@@ -19,13 +19,6 @@ public class SpearManEnemy : EnemyBase
     [Header("Combat")] 
     [SerializeField] private float thrustRadius = 1.3f;
     [SerializeField] private LayerMask enemyHittableLayer;
-    [Header("Hit FX")]
-    [SerializeField] private float hitShakeDuration = 0.08f;
-    [SerializeField] private float hitShakeAmplitude = 0.2f;
-    [SerializeField] private float hitShakeFrequency = 25f;
-    [Header("Hit Slow")]
-    [SerializeField] private float hitSlowScale = 0.2f;
-    [SerializeField] private float hitSlowDuration = 0.06f;
     #endregion
     #region components
     [SerializeField] private Collider2D damageArea;
@@ -41,8 +34,6 @@ public class SpearManEnemy : EnemyBase
     private readonly Collider2D[] damageAreaHitResults = new Collider2D[8];
     private ContactFilter2D enemyHittableFilter;
     private ContactFilter2D playerFilter;
-    private CameraFollow2D camFollow;
-    private CameraShake camShake;
     
     #endregion
     protected override void Start()
@@ -63,7 +54,6 @@ public class SpearManEnemy : EnemyBase
             layerMask = playerMask,
             useTriggers = true
         };
-        CacheCameraFx();
     }
     protected override void FixedUpdate()
     {
@@ -149,25 +139,33 @@ public class SpearManEnemy : EnemyBase
     {
         if (CurrentTarget == null) return;
         SetBaseColor(new Color(1f, 0f, 0f, 1f));
+        
         int dir;
         if (CurrentTarget.transform.position.x < transform.position.x) dir = -1;
         else dir = 1;
+        
         automaticFlip = false;
+        
         ChangeDirection(dir);
         FlipByDirection(dir);
+        
         SetRushStart(true);
+        
         canThrust = false;
         damageArea.enabled = true;
         damageAreaHitTargets.Clear();
         await UniTask.WaitUntil(() => canThrust, cancellationToken: token);
+        
         SetBaseColor(new Color(1f, 1f, 0f, 1f));
         automaticFlip = true;
         damageArea.enabled = false;
         await UniTask.Delay(TimeSpan.FromSeconds(0.3f), cancellationToken: token);
+        
         SetBaseColor(new Color(0.5f, 0.5f, 1f, 1f));
         ChangeDirection(-dir);
         SetSpeedRate(0.2f);
         await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: token);
+        
         ChangeDirection(0);
         SetSpeedRate(1f);
     }
@@ -238,50 +236,7 @@ public class SpearManEnemy : EnemyBase
             {
                 SetRushStart(false);
                 enemy.Hit(8);
-                ApplyHitFx();
             }
         }
-    }
-
-    private void ApplyHitFx()
-    {
-        ApplyHitSlow();
-        ApplyHitFx(
-            hitShakeDuration,
-            hitShakeAmplitude,
-            hitShakeFrequency
-        );
-    }
-
-    private void ApplyHitFx(
-        float shakeDuration,
-        float shakeAmplitude,
-        float shakeFrequency
-    )
-    {
-        if (camFollow != null)
-        {
-            camFollow.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
-            return;
-        }
-
-        if (camShake != null) camShake.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
-    }
-
-    private void ApplyHitSlow()
-    {
-        var timeManager = GameManager.Instance != null ? GameManager.Instance.TimeManager : null;
-        if (timeManager == null) return;
-
-        if (hitSlowDuration > 0f) timeManager.EnterBulletTime(hitSlowScale, hitSlowDuration);
-        else timeManager.EnterBulletTime(hitSlowScale);
-    }
-
-    private void CacheCameraFx()
-    {
-        var cam = Camera.main;
-        if (cam == null) return;
-        camFollow = cam.GetComponent<CameraFollow2D>();
-        camShake = cam.GetComponent<CameraShake>();
     }
 }

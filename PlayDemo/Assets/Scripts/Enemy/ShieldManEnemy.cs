@@ -19,13 +19,6 @@ public class ShieldManEnemy : EnemyBase
     [Header("Combat")] 
     [SerializeField] private float thrustRadius = 1.3f;
     [SerializeField] private LayerMask enemyHittableLayer;
-    [Header("Hit FX")]
-    [SerializeField] private float hitShakeDuration = 0.08f;
-    [SerializeField] private float hitShakeAmplitude = 0.2f;
-    [SerializeField] private float hitShakeFrequency = 25f;
-    [Header("Hit Slow")]
-    [SerializeField] private float hitSlowScale = 0.2f;
-    [SerializeField] private float hitSlowDuration = 0.06f;
     #endregion
     #region components
     [SerializeField] private Collider2D attackArea;
@@ -40,9 +33,6 @@ public class ShieldManEnemy : EnemyBase
     private readonly Collider2D[] damageAreaHitResults = new Collider2D[8];
     private ContactFilter2D enemyHittableFilter;
     private ContactFilter2D playerFilter;
-    private CameraFollow2D camFollow;
-    private CameraShake camShake;
-    
     #endregion
     protected override void Start()
     {
@@ -60,7 +50,6 @@ public class ShieldManEnemy : EnemyBase
             layerMask = playerMask,
             useTriggers = true
         };
-        CacheCameraFx();
     }
     protected override void FixedUpdate()
     {
@@ -150,6 +139,8 @@ public class ShieldManEnemy : EnemyBase
         await UniTask.Delay(TimeSpan.FromSeconds(2f), cancellationToken: token);
         ChangeDirection(0);
     }
+
+    public float rushSpeedRate = 5;
     private async UniTask AttackRoutineAsync(CancellationToken token)
     {
         if (CurrentTarget == null) return;
@@ -159,32 +150,34 @@ public class ShieldManEnemy : EnemyBase
         else dir = 1;
         automaticFlip = false;
         ChangeDirection(dir);
-        ChangeMoveSpeed(2);
+        ChangeMoveSpeed(rushSpeedRate);
         FlipByDirection(dir);
         attackArea.enabled = true;
         damageAreaHitTargets.Clear();
         rushStart = true;
         canThrust = false;
         await UniTask.WaitUntil(() => canThrust, cancellationToken: token);
+        
         attackArea.enabled = false;
         ChangeDirection(0);
         ChangeMoveSpeed(1f);
         GetComponent<Rigidbody2D>().linearVelocityY = 3; 
         SetBaseColor(new Color(0.4f, 0.4f, 0.4f, 1f));
         await UniTask.Delay(TimeSpan.FromSeconds(2f), cancellationToken: token);
+        
         automaticFlip = true;
     }
     public override void Hit(int damage)
     {
         if (Player == null)
         {
-            base.Hit();
+            base.Hit(damage);
             return;
         }
         if (Player.transform.position.x < transform.position.x && transform.localScale.x > 0) 
-            ApplyDamageAsync(damage).Forget();
+            base.Hit(damage);
         else if (Player.transform.position.x > transform.position.x && transform.localScale.x < 0) 
-            ApplyDamageAsync(damage).Forget();
+            base.Hit(damage);
         else 
             FlashColorAsync(Color.yellow, 0.5f, this.GetCancellationTokenOnDestroy()).Forget();
     }
@@ -235,50 +228,7 @@ public class ShieldManEnemy : EnemyBase
                 rushStart = false;
                 canThrust = true;
                 enemy.Hit(8);
-                ApplyHitFx();
             }
         }
-    }
-
-    private void ApplyHitFx()
-    {
-        ApplyHitSlow();
-        ApplyHitFx(
-            hitShakeDuration,
-            hitShakeAmplitude,
-            hitShakeFrequency
-        );
-    }
-
-    private void ApplyHitFx(
-        float shakeDuration,
-        float shakeAmplitude,
-        float shakeFrequency
-    )
-    {
-        if (camFollow != null)
-        {
-            camFollow.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
-            return;
-        }
-
-        if (camShake != null) camShake.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
-    }
-
-    private void ApplyHitSlow()
-    {
-        var timeManager = GameManager.Instance != null ? GameManager.Instance.TimeManager : null;
-        if (timeManager == null) return;
-
-        if (hitSlowDuration > 0f) timeManager.EnterBulletTime(hitSlowScale, hitSlowDuration);
-        else timeManager.EnterBulletTime(hitSlowScale);
-    }
-
-    private void CacheCameraFx()
-    {
-        var cam = Camera.main;
-        if (cam == null) return;
-        camFollow = cam.GetComponent<CameraFollow2D>();
-        camShake = cam.GetComponent<CameraShake>();
     }
 }

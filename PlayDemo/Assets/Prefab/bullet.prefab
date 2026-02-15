@@ -50,11 +50,15 @@ MonoBehaviour:
   enemyHittableLayer:
     serializedVersion: 2
     m_Bits: 262144
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 256
   hitShakeDuration: 0.2
   hitShakeAmplitude: 0.2
   hitShakeFrequency: 25
   hitSlowScale: 0.2
   hitSlowDuration: 0.2
+  attackDamage: 3
 --- !u!212 &146014842004163015
 SpriteRenderer:
   m_ObjectHideFlags: 0
