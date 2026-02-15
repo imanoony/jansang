@@ -280,6 +280,9 @@ MonoBehaviour:
   - {fileID: 8774444484602777177, guid: 9d511afaed0da4ed9a79aa0ce649a61f, type: 3}
   - {fileID: 1201426023284399330, guid: bb59980675df64fd4b8baa556b71f1d0, type: 3}
   canTalkTime: 0
+  damageZoomFxThreshold: 3
+  damageShakeFxFactor: 3
+  damageSlowFxFactor: 3
   detectionRadius: 3
   combatRadius: 4
   sightMask:

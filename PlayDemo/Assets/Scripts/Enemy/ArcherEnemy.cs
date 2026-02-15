@@ -257,7 +257,7 @@ public class ArcherEnemy : EnemyBase
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         GameObject bullet = Instantiate(
             bulletPrefab,
-            transform.position,
+            transform.position + (Vector3)dir ,
             Quaternion.Euler(0, 0, angle)
         );
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();

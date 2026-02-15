@@ -341,11 +341,23 @@ MonoBehaviour:
   moveSpeed: 2
   commander: {fileID: 0}
   talkChance: 0.002
+  hitShakeDuration: 0.2
+  hitShakeAmplitude: 0.2
+  hitShakeFrequency: 25
+  hitZoomAmount: 0.5
+  hitZoomInDuration: 0.04
+  hitZoomHoldDuration: 0.05
+  hitZoomOutDuration: 0.08
+  hitSlowScale: 0.2
+  hitSlowDuration: 0.2
   detectionStatusRenderer: {fileID: 5634325942441367201}
   detectionStatusSprites:
   - {fileID: 8774444484602777177, guid: 9d511afaed0da4ed9a79aa0ce649a61f, type: 3}
   - {fileID: 1201426023284399330, guid: bb59980675df64fd4b8baa556b71f1d0, type: 3}
   canTalkTime: 0
+  damageZoomFxThreshold: 3
+  damageShakeFxFactor: 3
+  damageSlowFxFactor: 3
   detectionRadius: 15
   combatRadius: 10
   sightMask:
@@ -363,11 +375,6 @@ MonoBehaviour:
   enemyHittableLayer:
     serializedVersion: 2
     m_Bits: 262144
-  hitShakeDuration: 0.2
-  hitShakeAmplitude: 0.2
-  hitShakeFrequency: 25
-  hitSlowScale: 0.2
-  hitSlowDuration: 0.2
   damageArea: {fileID: 1176785323935155784}
 --- !u!1 &3363786626522051080
 GameObject:

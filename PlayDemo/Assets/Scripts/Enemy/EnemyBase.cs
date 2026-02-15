@@ -3,6 +3,7 @@ using System.Collections;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 public class EnemyBase : MonoBehaviour
 {
@@ -185,7 +186,7 @@ public class EnemyBase : MonoBehaviour
             Quaternion.identity).GetComponent<DamageUI>();
         
         go.Init(damage);
-        ApplyHitFx();
+        ApplyHitFx(damage);
         ApplyDamageAsync(damage).Forget();
     }
     private void OnTriggerEnter2D(Collider2D other)
@@ -353,7 +354,7 @@ public class EnemyBase : MonoBehaviour
 
     private void ApplyHitFx()
     {
-        ApplyHitSlow();
+        ApplyHitSlow(3);
         ApplyHitFx(
             hitShakeDuration,
             hitShakeAmplitude,
@@ -362,6 +363,22 @@ public class EnemyBase : MonoBehaviour
             hitZoomInDuration,
             hitZoomHoldDuration,
             hitZoomOutDuration
+        );
+    }
+    public int damageZoomFxThreshold = 3;
+    public int damageShakeFxFactor = 3;
+    private void ApplyHitFx(int damage)
+    {
+        float damageShakeRate = Mathf.Clamp((float)damage / damageShakeFxFactor, 0.5f, 1.5f);
+        ApplyHitSlow(damage);
+        ApplyHitFx(
+            hitShakeDuration * damageShakeRate,
+            hitShakeAmplitude * damageShakeRate,
+            hitShakeFrequency,
+            hitZoomAmount,
+            damage > damageZoomFxThreshold ? hitZoomInDuration : 0,
+            damage > damageZoomFxThreshold ? hitZoomHoldDuration : 0,
+            damage > damageZoomFxThreshold ? hitZoomOutDuration : 0
         );
     }
 
@@ -386,12 +403,15 @@ public class EnemyBase : MonoBehaviour
         if (camZoom != null) camZoom.ZoomInHoldOut(zoomAmount, zoomInDuration, zoomHoldDuration, zoomOutDuration);
     }
 
-    private void ApplyHitSlow()
+    public float damageSlowFxFactor = 3;
+    private void ApplyHitSlow(int damage)
     {
+        float slowRate = Mathf.Clamp(damage / damageSlowFxFactor, 0.5f, 1.5f);
+        
         var timeManager = GameManager.Instance != null ? GameManager.Instance.TimeManager : null;
         if (timeManager == null) return;
 
-        if (hitSlowDuration > 0f) timeManager.EnterBulletTime(hitSlowScale, hitSlowDuration);
+        if (hitSlowDuration > 0f) timeManager.EnterBulletTime(hitSlowScale / slowRate, hitSlowDuration * slowRate);
         else timeManager.EnterBulletTime(hitSlowScale);
     }
 
