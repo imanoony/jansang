@@ -226,7 +226,6 @@ public class SpearManEnemy : EnemyBase
         if (enemyHittableLayer.value == 0) return;
 
         int count = damageArea.Overlap(enemyHittableFilter, damageAreaHitResults);
-        Debug.Log("HERER!!!" + count);
         for (int i = 0; i < count; i++)
         {
             Collider2D col = damageAreaHitResults[i];
@@ -237,7 +236,6 @@ public class SpearManEnemy : EnemyBase
             EnemyBase enemy = col.GetComponent<EnemyBase>();
             if (enemy != null)
             {
-				Debug.Log("OKAY I HIT THAT ");
                 SetRushStart(false);
                 enemy.Hit();
                 ApplyHitFx();

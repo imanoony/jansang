@@ -240,8 +240,8 @@ MonoBehaviour:
   - {fileID: 8774444484602777177, guid: 9d511afaed0da4ed9a79aa0ce649a61f, type: 3}
   - {fileID: 1201426023284399330, guid: bb59980675df64fd4b8baa556b71f1d0, type: 3}
   canTalkTime: 0
-  detectionRadius: 3
-  combatRadius: 8
+  detectionRadius: 6
+  combatRadius: 10
   sightMask:
     serializedVersion: 2
     m_Bits: 320
@@ -251,6 +251,13 @@ MonoBehaviour:
   platformLayer:
     serializedVersion: 2
     m_Bits: 4096
+  isSergeant: 0
+  sergeantSearchRadius: 10
+  canAttack: 0
+  mySergeant: {fileID: 0}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 262656
   platformFindingHeight: 4
   platformFindingSampleCount: 10
 --- !u!120 &5394050712877876237

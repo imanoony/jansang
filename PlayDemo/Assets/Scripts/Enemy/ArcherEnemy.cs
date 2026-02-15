@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
 public class ArcherEnemy : EnemyBase
@@ -19,6 +20,11 @@ public class ArcherEnemy : EnemyBase
     [SerializeField] private float bulletSpeed = 5f;
     [Header("Platform Finding")]
     [SerializeField] private LayerMask platformLayer;
+
+    [Header("SERGEANT")]
+    [SerializeField] private bool isSergeant = false;
+
+    [SerializeField] private float sergeantSearchRadius = 8f;
     #endregion
     #region components
     private LineRenderer lineRenderer;
@@ -26,7 +32,12 @@ public class ArcherEnemy : EnemyBase
     #region status
     private Vector3? nextPlatform;
     private bool canJump = false;
-    private bool canAttack = true;
+    public bool canAttack = false;
+    private bool isAttacking = false;
+
+    public ArcherEnemy mySergeant;
+    private UnityEvent onSergeantCommand;
+    
     #endregion
 #if UNITY_EDITOR
     private void OnDrawGizmos()
@@ -42,6 +53,7 @@ public class ArcherEnemy : EnemyBase
     {
         lineRenderer = GetComponent<LineRenderer>();
         base.Start();
+        onSergeantCommand = new UnityEvent();
     }
     protected override void FixedUpdate()
     {
@@ -56,6 +68,11 @@ public class ArcherEnemy : EnemyBase
             UpdateFound(combatRadius, sightMask);
         }
     }
+
+    public void CommandFromSergeant()
+    {
+        if (!isAttacking) canAttack = true;
+    }
     protected override async UniTask RunAIAsync(CancellationToken token)
     {
         await UniTask.WaitUntil(() => alerted, cancellationToken: token);
@@ -63,6 +80,8 @@ public class ArcherEnemy : EnemyBase
         currentState = State.Alert;
         await AlertedActionAsync(token);
     }
+
+    [SerializeField] private LayerMask enemyLayer;
     private async UniTask AlertedActionAsync(CancellationToken token)
     {
         await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
@@ -71,32 +90,58 @@ public class ArcherEnemy : EnemyBase
             if (canJump && TilemapPlatformIndex.Instance.AreOnSamePlatformByRay(Player, transform))
             {
                 CurrentTarget = null;
-                canAttack = true;
                 SetBaseColor(new Color(0f, 1f, 0f, 1f));
                 await ChangePlatformAsync(token);
                 canJump = false;
                 SetBaseColor(new Color(0f, 1f, 1f, 1f));
             }
-            else if (found && canAttack)
+            else if (found)
             {
-                canJump = true;
-                CurrentTarget = Player;
-                SetBaseColor(new Color(1f, 0f, 0f, 1f));
-                await AttackRoutineAsync(token);
+                if (canAttack)
+                {
+                    canJump = true;
+                    isAttacking = true;
+                    canAttack = false;
+                    CurrentTarget = Player;
+                    if (isSergeant) onSergeantCommand?.Invoke();
+                    SetBaseColor(new Color(1f, 0f, 0f, 1f));
+                    if (mySergeant != null) mySergeant.onSergeantCommand.RemoveListener(CommandFromSergeant);
+                    await AttackRoutineAsync(token);
+                    isAttacking = false;
+                    mySergeant = null;
+                    
+                    if (isSergeant) await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: token);
+                }
+                else if (mySergeant == null)
+                {
+                    if (isSergeant) canAttack = true;
+                    var hits = Physics2D.OverlapCircleAll(transform.position, sergeantSearchRadius, enemyLayer);
+                    float minDist = float.MaxValue;
+                    foreach (var hit in hits)
+                    {
+                        float dist = Vector3.Distance(transform.position, hit.transform.position);
+                        if (minDist > dist && (mySergeant = hit.GetComponent<ArcherEnemy>()) != null && mySergeant.isSergeant)
+                        {
+                            minDist = dist;
+                        }
+                    }
+
+                    if (mySergeant == null || !mySergeant.isSergeant) canAttack = true;
+                    else mySergeant.onSergeantCommand.AddListener(CommandFromSergeant);
+                }
+                else {
+                    await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: token);
+                }
             }
             else
             {
-#if UNITY_EDITOR
-                Debug.Log("Where?");
-#endif
                 canJump = true;
-                await UniTask.Delay(TimeSpan.FromSeconds(0.3f), cancellationToken: token);
+                await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: token);
             }
         }
     }
     private async UniTask ChangePlatformAsync(CancellationToken token)
     {
-        Debug.Log("HERE1");
         Vector3 nextPos = FindNextPlatform() ?? transform.position;
         SetBaseColor(new Color(0f, 0f, 1f, 1f));
         if ((nextPos - transform.position).sqrMagnitude < 0.1f) return;
@@ -160,7 +205,7 @@ public class ArcherEnemy : EnemyBase
             Vector3 sampleStart = transform.position + Vector3.up * (platformFindingHeight * i);
             for (int j = 0; j < platformFindingSampleCount; j++)
             {
-                var tmp = sampleStart + Vector3.right * Random.Range(-5f, 5f);
+                var tmp = sampleStart + Vector3.right * Random.Range(-10f, 10f);
                 RaycastHit2D hit = Physics2D.Raycast(tmp, Vector3.down, platformFindingHeight * 2f, platformLayer);
                 if (hit.collider != null && !hit.collider.OverlapPoint(tmp))
                 {
@@ -180,17 +225,34 @@ public class ArcherEnemy : EnemyBase
         lineRenderer.positionCount = 2; 
         lineRenderer.startColor = Color.black;
         lineRenderer.endColor = Color.black;
+
+        Vector3 finalTarget = Vector3.zero;
+        bool goodtogo = false;
         while (elapsed < aimingTime && !token.IsCancellationRequested)
         {
             lineRenderer.startWidth = 0.05f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
             lineRenderer.endWidth = 0.05f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
             lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, CurrentTarget?.position ?? transform.position);
+            
+            if (elapsed < aimingTime / 2) finalTarget = CurrentTarget?.position ?? transform.position;
+            else if (!goodtogo)
+            {
+                lineRenderer.startColor = Color.red;
+                Color c = Color.red;
+                c.a = 0;
+                lineRenderer.endColor = c;
+                goodtogo = true;
+            }
+            
+            lineRenderer.SetPosition(1, finalTarget);
             elapsed += Time.deltaTime;
+
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
+        
+        
         lineRenderer.enabled = false;
-        Vector2 dir = (CurrentTarget?.position ?? transform.position) - transform.position;
+        Vector2 dir = finalTarget - transform.position;
         dir.Normalize();
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         GameObject bullet = Instantiate(

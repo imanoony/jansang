@@ -41,7 +41,6 @@ public class MagicBall : MonoBehaviour
     }
     private void Explosion(Collision2D collision)
     {
-        Debug.Log("EXPLODE!!!!");
         Destroy(gameObject);
     }
 }
