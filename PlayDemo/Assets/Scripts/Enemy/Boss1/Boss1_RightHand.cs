@@ -66,7 +66,7 @@ public class Boss1_RightHand : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
         spriteRenderer.sprite = idleSprite;
-        bossManage.currentRightHandPattern = RHandPattern.Idle;
+        bossManage.currentRightHandPattern = Boss1_RHandPattern.Idle;
         bossManage.SetPatternTimer("RHand");
     }
     
@@ -75,7 +75,7 @@ public class Boss1_RightHand : MonoBehaviour
     {
         if ((bossManage.attackLayer.value & (1 << other.gameObject.layer)) > 0)
         {
-            bossManage.TakeDamage(BossPart.RHand, 1);
+            bossManage.TakeDamage(Boss1_Part.RHand, 1);
         }
     }
 

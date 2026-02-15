@@ -3,27 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum BossPart
+public enum Boss1_Part
 {
     Body = 0,
     LHand = 1,
     RHand = 2,
 }
-public enum BodyPattern
+public enum Boss1_BodyPattern
 {
     Idle = 0,
     Shockwave = 1,
     Judgement = 2,
 }
 
-public enum LHandPattern
+public enum Boss1_LHandPattern
 {
     Idle = 0,
     Grasp = 1,
     Bind = 2,
 }
 
-public enum RHandPattern
+public enum Boss1_RHandPattern
 {
     Idle = 0,
     Smite = 1,
@@ -63,9 +63,9 @@ public class Boss1_Manage : MonoBehaviour
 
     [Header("Patterns")]
     [SerializeField] private Vector2 destinationPoint;
-    public BodyPattern currentBodyPattern = BodyPattern.Idle;
-    public LHandPattern currentLeftHandPattern = LHandPattern.Idle;
-    public RHandPattern currentRightHandPattern = RHandPattern.Idle;
+    public Boss1_BodyPattern currentBodyPattern = Boss1_BodyPattern.Idle;
+    public Boss1_LHandPattern currentLeftHandPattern = Boss1_LHandPattern.Idle;
+    public Boss1_RHandPattern currentRightHandPattern = Boss1_RHandPattern.Idle;
 
     [Header("Pattern Timers")]
     public float bodyPatternTimer = 1f;
@@ -120,10 +120,10 @@ public class Boss1_Manage : MonoBehaviour
         RHandPatternManage();
     }
 
-    public void TakeDamage(BossPart part, int damage)
+    public void TakeDamage(Boss1_Part part, int damage)
     {
         switch(part){
-            case BossPart.Body:
+            case Boss1_Part.Body:
                 if(lHandHealth > 0 || rHandHealth > 0) return;
                 bodyHealth -= damage;
                 if(bodyHealth <= 0){
@@ -134,7 +134,7 @@ public class Boss1_Manage : MonoBehaviour
                     StartCoroutine(bossBody.Boss1_BodyHit());
                 }
                 break;
-            case BossPart.LHand:
+            case Boss1_Part.LHand:
                 lHandHealth -= damage;
                 if(lHandHealth <= 0){
                     StartCoroutine(bossLeftHand.Boss1_LHandDestroyed());
@@ -144,7 +144,7 @@ public class Boss1_Manage : MonoBehaviour
                     StartCoroutine(bossLeftHand.Boss1_LHandHit());
                 }
                 break;
-            case BossPart.RHand:
+            case Boss1_Part.RHand:
                 rHandHealth -= damage;
                 if(rHandHealth <= 0){
                     StartCoroutine(bossRightHand.Boss1_RHandDestroyed());
@@ -159,11 +159,11 @@ public class Boss1_Manage : MonoBehaviour
 
     private void BossMoveManage()
     {
-        if(currentBodyPattern != BodyPattern.Idle ||
-           currentLeftHandPattern != LHandPattern.Idle ||
-           currentRightHandPattern != RHandPattern.Idle){
+        if(currentBodyPattern != Boss1_BodyPattern.Idle ||
+           currentLeftHandPattern != Boss1_LHandPattern.Idle ||
+           currentRightHandPattern != Boss1_RHandPattern.Idle){
 
-            if (currentBodyPattern == BodyPattern.Judgement) return;
+            if (currentBodyPattern == Boss1_BodyPattern.Judgement) return;
 
             if(bossRB.linearVelocity.magnitude > 0.1f) bossRB.AddForce(bossRB.linearVelocity * -breakSpeed);
             else bossRB.linearVelocity = Vector2.zero;
@@ -204,26 +204,26 @@ public class Boss1_Manage : MonoBehaviour
     private void BodyPatternManage()
     {
         if (bodyHealth <= 0) return;
-        if (currentBodyPattern != BodyPattern.Idle) return;
-        if (currentBodyPattern == BodyPattern.Idle && bodyPatternTimer > 0f)
+        if (currentBodyPattern != Boss1_BodyPattern.Idle) return;
+        if (currentBodyPattern == Boss1_BodyPattern.Idle && bodyPatternTimer > 0f)
         {
             bodyPatternTimer -= Time.deltaTime;
             return;
         }
 
         int patternChoice = Random.Range(1, 3);
-        currentBodyPattern = (BodyPattern)patternChoice;
+        currentBodyPattern = (Boss1_BodyPattern)patternChoice;
 
         // Body Pattern 함수 호출
         // 그 함수에서 bodyPatternTimer 설정
         switch (currentBodyPattern)
         {
-            case BodyPattern.Shockwave:
+            case Boss1_BodyPattern.Shockwave:
                 Vector2 direction = (playerTransform.position - transform.position).normalized;
                 bossBody.Boss1_Shockwave(direction);
                 Debug.Log("Shockwave!! Direction: " + direction);
                 break;
-            case BodyPattern.Judgement:
+            case Boss1_BodyPattern.Judgement:
                 float fartestDistance = -1f;
                 GameObject targetAltar = null;
                 foreach (GameObject altar in altarObjects)
@@ -236,7 +236,7 @@ public class Boss1_Manage : MonoBehaviour
                     }
                 }
                 if (targetAltar != null) bossBody.Boss1_Judgement(targetAltar);
-                else currentBodyPattern = BodyPattern.Idle;
+                else currentBodyPattern = Boss1_BodyPattern.Idle;
                 break;
         }
     }
@@ -244,9 +244,9 @@ public class Boss1_Manage : MonoBehaviour
     private void LHandPatternManage()
     {
         if (lHandHealth <= 0) return;
-        if (currentLeftHandPattern != LHandPattern.Idle ||
-           currentBodyPattern == BodyPattern.Judgement) return;
-        if (currentLeftHandPattern == LHandPattern.Idle && lHandPatternTimer > 0f)
+        if (currentLeftHandPattern != Boss1_LHandPattern.Idle ||
+           currentBodyPattern == Boss1_BodyPattern.Judgement) return;
+        if (currentLeftHandPattern == Boss1_LHandPattern.Idle && lHandPatternTimer > 0f)
         {
             lHandPatternTimer -= Time.deltaTime;
             return;
@@ -254,15 +254,15 @@ public class Boss1_Manage : MonoBehaviour
 
         int patternChoice = Random.Range(1, 3);
         patternChoice = 1; // Test Code
-        currentLeftHandPattern = (LHandPattern)patternChoice;
+        currentLeftHandPattern = (Boss1_LHandPattern)patternChoice;
         // L Hand Pattern 함수 호출
         // 그 함수에서 lHandPatternTimer 설정
         switch (currentLeftHandPattern)
         {
-            case LHandPattern.Grasp:
+            case Boss1_LHandPattern.Grasp:
                 bossLeftHand.Boss1_Grasp();
                 break;
-            case LHandPattern.Bind:
+            case Boss1_LHandPattern.Bind:
                 // bossLeftHand.Boss1_LHandBind();
                 break;
 
@@ -272,9 +272,9 @@ public class Boss1_Manage : MonoBehaviour
     private void RHandPatternManage()
     {
         if (rHandHealth <= 0) return;
-        if (currentRightHandPattern != RHandPattern.Idle ||
-           currentBodyPattern == BodyPattern.Judgement) return;
-        if (currentRightHandPattern == RHandPattern.Idle && rHandPatternTimer > 0f)
+        if (currentRightHandPattern != Boss1_RHandPattern.Idle ||
+           currentBodyPattern == Boss1_BodyPattern.Judgement) return;
+        if (currentRightHandPattern == Boss1_RHandPattern.Idle && rHandPatternTimer > 0f)
         {
             rHandPatternTimer -= Time.deltaTime;
             return;
@@ -282,15 +282,15 @@ public class Boss1_Manage : MonoBehaviour
 
         int patternChoice = Random.Range(1, 3);
         patternChoice = 2; // Test Code
-        currentRightHandPattern = (RHandPattern)patternChoice;
+        currentRightHandPattern = (Boss1_RHandPattern)patternChoice;
         // R Hand Pattern 함수 호출
         // 그 함수에서 rHandPatternTimer 설정
         switch (currentRightHandPattern)
         {
-            case RHandPattern.Smite:
+            case Boss1_RHandPattern.Smite:
                 // bossRightHand.Boss1_Smite();
                 break;
-            case RHandPattern.Haunt:
+            case Boss1_RHandPattern.Haunt:
                 bossRightHand.Boss1_Haunt(3);
                 break;
 

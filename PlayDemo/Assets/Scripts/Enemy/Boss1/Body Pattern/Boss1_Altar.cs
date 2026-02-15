@@ -35,7 +35,7 @@ public class Boss1_Altar : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (bossManage.currentBodyPattern != BodyPattern.Judgement) return;
+        if (bossManage.currentBodyPattern != Boss1_BodyPattern.Judgement) return;
 
         if ((bossManage.attackLayer.value & (1 << other.gameObject.layer)) > 0 && currentHealth > 0)
         {
