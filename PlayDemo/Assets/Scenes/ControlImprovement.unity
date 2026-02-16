@@ -6914,10 +6914,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpearMan (8)
       objectReference: {fileID: 0}
-    - target: {fileID: 2737640904995590904, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8035851568953379755, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
       propertyPath: m_LocalPosition.x
       value: 6.44

@@ -90,8 +90,7 @@ public class ShieldManEnemy : EnemyBase
             }
             if (rushStart)
             {
-                if (DetectCliff(wallLayer) ||
-                    Physics2D.OverlapBox(transform.position, col.bounds.size, 0, playerMask) ||
+                if (DetectWall(wallLayer) ||
                     MoveDirection == 0)
                 {
                     rushStart = false;
@@ -101,7 +100,11 @@ public class ShieldManEnemy : EnemyBase
 
             UpdateFound(combatRadius, sightMask);
         }
-        if (DetectCliff(wallLayer)) ChangeDirection(0);
+        
+        if (!rushStart)
+        {
+            if (DetectWall(wallLayer) || DetectCliff()) ChangeDirection(0);
+        }
 
         if (attackArea.enabled)
         {

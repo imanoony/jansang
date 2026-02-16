@@ -304,16 +304,26 @@ public class EnemyBase : MonoBehaviour
         _detectionStatusCTS = new CancellationTokenSource();
         RunDetectionStatusAsync(Color.red, detectionStatusSprites[1], _detectionStatusCTS).Forget();
     }
-    protected bool DetectCliff(LayerMask wallLayer)
+    protected bool DetectCliff()
     {
         if (MoveDirection == 0) return true;
         Vector3 start = transform.position + Vector3.right * (MoveDirection * col.bounds.extents.x * 1.2f);
         RaycastHit2D hit = Physics2D.Raycast(start, Vector3.down, 1, groundLayer);
-        RaycastHit2D hit2 = Physics2D.Raycast(transform.position, Vector3.right * MoveDirection, col.bounds.extents.x * 1.2f, wallLayer);
-        if (hit.collider == null || hit2)
+        if (hit.collider == null)
         {
             return true;
         }
+        return false;
+    }
+
+    protected bool DetectWall(LayerMask wallLayer)
+    {
+        RaycastHit2D hit2 = Physics2D.Raycast(transform.position, Vector3.right * MoveDirection, col.bounds.extents.x * 1.2f, wallLayer);
+        if (hit2.collider != null)
+        {
+            return true;
+        }
+
         return false;
     }
     protected void SetBaseColor(Color color)

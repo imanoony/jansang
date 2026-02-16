@@ -27,7 +27,7 @@ public class SpearManEnemy : EnemyBase
     #endregion
     #region status
     private float directionTimeChangeElapsed;
-    private bool rushStart;
+    public bool rushStart;
     private bool canThrust;
     private bool automaticFlip = false;
     private float localSpeedRate = 1f;
@@ -90,8 +90,7 @@ public class SpearManEnemy : EnemyBase
             }
             if (rushStart)
             {
-                if (DetectCliff(wallLayer) ||
-                    Physics2D.OverlapCircle(transform.position, thrustRadius, playerMask) != null ||
+                if (DetectWall(wallLayer) ||
                     MoveDirection == 0)
                 {
                     SetRushStart(false);
@@ -99,7 +98,11 @@ public class SpearManEnemy : EnemyBase
             } 
             UpdateFound(combatRadius, sightMask);
         }
-        if (DetectCliff(wallLayer)) ChangeDirection(0);
+
+        if (!rushStart && localSpeedRate > 0.5f)
+        {
+            if (DetectWall(wallLayer) || DetectCliff()) ChangeDirection(0);
+        }
 
         if (damageArea.enabled)
         {
@@ -140,7 +143,7 @@ public class SpearManEnemy : EnemyBase
         ChangeDirection(0);
     }
 
-    
+    public float rushDistance = 10f;
     private async UniTask AttackRoutineAsync(CancellationToken token)
     {
         if (CurrentTarget == null) return;
@@ -180,11 +183,11 @@ public class SpearManEnemy : EnemyBase
             {
                 elapsed += Time.deltaTime;
                 lineRenderer.SetPosition(0, transform.position);
-                if (elapsed < 0.7f) lineRenderer.SetPosition(1, transform.position + dir * elapsed * 5 * Vector3.right);
-                else if (aiming)
+                lineRenderer.SetPosition(1, transform.position + dir * elapsed * rushDistance * Vector3.right);
+                if (elapsed > 0.7f && aiming)
                 {
                     c = Color.red;
-                    c.a = 0;
+                    c.a = 0.5f;
                     lineRenderer.startColor = Color.red;
                     lineRenderer.endColor = c;
                     aiming = false;
@@ -195,8 +198,9 @@ public class SpearManEnemy : EnemyBase
                 await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken: token);
             }
         }
-
+        
         // 2: 돌진해버리기
+        float currentX = transform.position.x; 
         lineRenderer.enabled = false;
         SetSpeedRate(1);
         SetRushStart(true);
@@ -204,9 +208,11 @@ public class SpearManEnemy : EnemyBase
         canThrust = false;
         damageArea.enabled = true;
         damageAreaHitTargets.Clear();
-        await UniTask.WaitUntil(() => canThrust, cancellationToken: token);
+        await UniTask.WaitUntil(() => (canThrust || Mathf.Abs(transform.position.x - currentX) >= rushDistance), cancellationToken: token);
         
-        // 3: 돌진 끝 
+        
+        // 3: 돌진 끝
+        SetRushStart(false);
         SetBaseColor(new Color(1f, 1f, 0f, 1f));
         automaticFlip = true;
         damageArea.enabled = false;
@@ -292,7 +298,6 @@ public class SpearManEnemy : EnemyBase
             EnemyBase enemy = col.GetComponent<EnemyBase>();
             if (enemy != null)
             {
-                SetRushStart(false);
                 enemy.Hit(8, transform.position);
             }
         }

@@ -371,7 +371,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4160
   directionTimeChange: 2
-  rushSpeed: 5
+  rushSpeed: 8
   thrustRadius: 0.5
   enemyLayer:
     serializedVersion: 2
@@ -380,6 +380,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 262144
   damageArea: {fileID: 1176785323935155784}
+  rushDistance: 6
 --- !u!120 &257670929051568133
 LineRenderer:
   serializedVersion: 2
