@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
@@ -24,6 +25,23 @@ public class ArcherEnemy : EnemyBase
     [Header("SERGEANT")]
     [SerializeField] private bool isSergeant = false;
 
+    public List<ArcherEnemy> mySoldiers;
+
+    public bool AreMySoldiersReady()
+    {
+        foreach (var ae in mySoldiers)
+        {
+            if (!ae.NotAttacking()) return false;
+        }
+
+        return true;
+    }
+
+    public bool NotAttacking()
+    {
+        return !isAttacking;
+    }
+    
     [SerializeField] private float sergeantSearchRadius = 8f;
     #endregion
     #region components
@@ -54,6 +72,8 @@ public class ArcherEnemy : EnemyBase
         lineRenderer = GetComponent<LineRenderer>();
         base.Start();
         onSergeantCommand = new UnityEvent();
+
+        mySoldiers = new List<ArcherEnemy>();
     }
     protected override void FixedUpdate()
     {
@@ -103,9 +123,17 @@ public class ArcherEnemy : EnemyBase
                     isAttacking = true;
                     canAttack = false;
                     CurrentTarget = Player;
-                    if (isSergeant) onSergeantCommand?.Invoke();
+                    if (isSergeant)
+                    {
+                        UniTask.WaitUntil(AreMySoldiersReady, cancellationToken: token);
+                        onSergeantCommand?.Invoke();
+                    }
                     SetBaseColor(new Color(1f, 0f, 0f, 1f));
-                    if (mySergeant != null) mySergeant.onSergeantCommand.RemoveListener(CommandFromSergeant);
+                    if (mySergeant != null)
+                    {
+                        mySergeant.onSergeantCommand.RemoveListener(CommandFromSergeant);
+                        mySergeant.mySoldiers.Remove(this);
+                    }
                     await AttackRoutineAsync(token);
                     isAttacking = false;
                     mySergeant = null;
@@ -114,20 +142,30 @@ public class ArcherEnemy : EnemyBase
                 }
                 else if (mySergeant == null)
                 {
-                    if (isSergeant) canAttack = true;
+                    if (isSergeant)
+                    {
+                        canAttack = true;
+                        continue;
+                    }
                     var hits = Physics2D.OverlapCircleAll(transform.position, sergeantSearchRadius, enemyLayer);
                     float minDist = float.MaxValue;
+                    ArcherEnemy tmp;
                     foreach (var hit in hits)
                     {
                         float dist = Vector3.Distance(transform.position, hit.transform.position);
-                        if (minDist > dist && (mySergeant = hit.GetComponent<ArcherEnemy>()) != null && mySergeant.isSergeant)
+                        if (minDist > dist && (tmp = hit.GetComponent<ArcherEnemy>()) != null && tmp.isSergeant)
                         {
                             minDist = dist;
+                            mySergeant = tmp;
                         }
                     }
 
                     if (mySergeant == null || !mySergeant.isSergeant) canAttack = true;
-                    else mySergeant.onSergeantCommand.AddListener(CommandFromSergeant);
+                    else
+                    {
+                        mySergeant.onSergeantCommand.AddListener(CommandFromSergeant);
+                        mySergeant.mySoldiers.Add(this);
+                    }
                 }
                 else {
                     await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: token);
