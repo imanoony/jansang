@@ -29,6 +29,7 @@ public class MeleeController2D : MonoBehaviour
     private void Update()
     {
         if (isCharging) chargingTimeElapsed += Time.deltaTime;
+        if (attackButtonPressed && CanAttack()) StartCharging();
     }
 
     [Header("Charging Attack!")]
@@ -36,6 +37,10 @@ public class MeleeController2D : MonoBehaviour
     private float chargingTimeElapsed;
     private bool isCharging = false;
     private CancellationTokenSource chargingCTS;
+    private bool attackButtonPressed = false;
+
+    // TODO: Apply actual charging effect...
+    [SerializeField] private SpriteRenderer chargingEffect;
 
     public enum AttackState
     {
@@ -51,20 +56,24 @@ public class MeleeController2D : MonoBehaviour
     {
         if (context.started)
         {
+            attackButtonPressed = true;
             if (!CanAttack()) return;
             // 차징 시작
+            
             StartCharging();
         }
         
         if (context.canceled)
         {
+            attackButtonPressed = false;
             // 차징이 아니라면 리턴
             if (!isCharging) return; 
-            
             // 차징 끝
+            
             FinishCharging();
         }
     }
+    
 
     private void StartCharging()
     {
@@ -76,33 +85,45 @@ public class MeleeController2D : MonoBehaviour
 
     private async UniTask ChargingLevel(CancellationToken token)
     {
+        chargingEffect.gameObject.SetActive(true);
+        chargingEffect.color = Color.green;
         attackState = AttackState.Weak;
         hitBox.attackState = attackState;
         
         chargingCTS = new CancellationTokenSource();
         var cts = chargingCTS.Token;
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts, token);
-        
-        await UniTask.WaitUntil(() => chargingTimeElapsed > chargingTime[0], cancellationToken: linkedCts.Token);
-        attackState = AttackState.Middle;
-        hitBox.attackState = attackState;
-        
-        await UniTask.WaitUntil(() => chargingTimeElapsed > chargingTime[1], cancellationToken: linkedCts.Token);
-        attackState = AttackState.Strong;
-        hitBox.attackState = attackState;
+
+        try
+        {
+            await UniTask.WaitUntil(() => chargingTimeElapsed > chargingTime[0], cancellationToken: linkedCts.Token);
+            attackState = AttackState.Middle;
+            hitBox.attackState = attackState;
+            chargingEffect.color = Color.yellow;
+
+            await UniTask.WaitUntil(() => chargingTimeElapsed > chargingTime[1], cancellationToken: linkedCts.Token);
+            attackState = AttackState.Strong;
+            hitBox.attackState = attackState;
+            chargingEffect.color = Color.red;
+        }
+        finally
+        {
+            
+        }
     }
 
     private void FinishCharging()
     {
         isCharging = false;
         chargingCTS.Cancel();
+        chargingEffect.gameObject.SetActive(false);
 
         Attack();
     }
     
     private bool CanAttack()
     {
-        return !isReloading && !isAttacking;
+        return !isReloading && !isAttacking && !isCharging;
     }
 
     public float attackRadius;
