@@ -18,6 +18,7 @@ public class ShieldManEnemy : EnemyBase
     [SerializeField] private float flipTimeChange = 2f;
     [Header("Combat")] 
     [SerializeField] private float thrustRadius = 1.3f;
+    [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private LayerMask enemyHittableLayer;
     #endregion
     #region components
@@ -275,6 +276,12 @@ public class ShieldManEnemy : EnemyBase
     {
         if (enemyHittableLayer.value == 0) return;
 
+        LayerMask mask = enemyHittableLayer;
+        if ((enemyHittableLayer.value & (1 << gameObject.layer)) != 0)
+        {
+            mask |= enemyLayer;
+        }
+        enemyHittableFilter.layerMask = mask;
         int count = attackArea.Overlap(enemyHittableFilter, damageAreaHitResults);
         for (int i = 0; i < count; i++)
         {

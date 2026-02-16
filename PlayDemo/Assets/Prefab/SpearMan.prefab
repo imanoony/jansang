@@ -373,6 +373,9 @@ MonoBehaviour:
   directionTimeChange: 2
   rushSpeed: 5
   thrustRadius: 0.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 512
   enemyHittableLayer:
     serializedVersion: 2
     m_Bits: 262144
