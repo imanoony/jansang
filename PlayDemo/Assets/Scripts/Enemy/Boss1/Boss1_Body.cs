@@ -78,7 +78,7 @@ public class Boss1_Body : MonoBehaviour
     private IEnumerator JudgementCoroutine(GameObject targetAltar)
     {
         Vector2 startPosition = bossManage.gameObject.transform.position;
-        yield return StartCoroutine(Boss1_Manage.ObjectMoveControl(
+        yield return StartCoroutine(bossManage.ObjectMoveControl(
             bossManage.gameObject,
             startPosition,
             targetAltar.transform.position,
@@ -86,6 +86,8 @@ public class Boss1_Body : MonoBehaviour
             6f
         ));
         
+        if(bossManage.isInCutScene) yield break;
+
         float timer = 0f;
 
         yield return new WaitForSeconds(judgementWait);
@@ -148,15 +150,13 @@ public class Boss1_Body : MonoBehaviour
     public IEnumerator Boss1_BodyHit()
     {
         // Body Hit Animation
-        spriteRenderer.color = Color.red;
+        spriteRenderer.color = Color.Lerp(Color.red, Color.white, 0.8f);
         yield return new WaitForSeconds(0.1f);
         spriteRenderer.color = Color.white;
     }
     public IEnumerator Boss1_BodyDestroyed()
     {
-        // Body Destroyed Animation
-        gameObject.SetActive(false);
-        yield return null;
+        yield return StartCoroutine(bossManage.Boss1_DestroyScene());
     }    
 
 }

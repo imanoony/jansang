@@ -20,6 +20,7 @@ public class Boss1_LeftHand : MonoBehaviour
 
     private Boss1_Manage bossManage;
     private SpriteRenderer spriteRenderer;
+    private Collider2D handCollider;
 
     private bool grasping = false;
     private Coroutine graspCoroutine;
@@ -29,6 +30,7 @@ public class Boss1_LeftHand : MonoBehaviour
     {   
         bossManage = GetComponentInParent<Boss1_Manage>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        handCollider = GetComponent<PolygonCollider2D>();
 
         if(playerObject == null)
         {
@@ -42,7 +44,7 @@ public class Boss1_LeftHand : MonoBehaviour
 
     public void BackToOrigin()
     {
-        StartCoroutine(Boss1_Manage.ObjectMoveControlLocalPos(
+        StartCoroutine(bossManage.ObjectMoveControlLocalPos(
             gameObject,
             transform.localPosition,
             bossManage.lHandOrigin,
@@ -96,7 +98,7 @@ public class Boss1_LeftHand : MonoBehaviour
         Vector2 targetPos = (Vector2)transform.position + playerDirection * Math.Max(Math.Min(playerDistance, 5f), 3f);
         
 
-        graspCoroutine = StartCoroutine(Boss1_Manage.ObjectMoveControl(
+        graspCoroutine = StartCoroutine(bossManage.ObjectMoveControl(
             gameObject,
             transform.position,
             targetPos,
@@ -137,13 +139,46 @@ public class Boss1_LeftHand : MonoBehaviour
     public IEnumerator Boss1_LHandHit()
     {
         // Left Hand Hit Animation
-        spriteRenderer.color = Color.red;
-        yield return new WaitForSeconds(0.1f);
+        Vector2 originalPos = transform.localPosition;
+        float timer = 0f;
+
+        spriteRenderer.color = Color.Lerp(Color.red, Color.white, 0.8f);
+        while(timer < 0.3f)
+        {
+            timer += Time.deltaTime;
+            transform.localPosition = originalPos + new Vector2(
+                Mathf.Sin(timer * 20f) * 0.1f,
+                Mathf.Cos(timer * 20f) * 0.1f
+            );
+            yield return null;
+        }
         spriteRenderer.color = Color.white;
     }
     public IEnumerator Boss1_LHandDestroyed()
     {
         // Left Hand Destroyed Animation
+        handCollider.enabled = false;
+        Vector2 originalSize = transform.localScale;
+        Vector2 originalPos = transform.localPosition;
+        Color originalColor = spriteRenderer.color;
+        float timer = 0f;
+
+        while(timer < 1f)
+        {
+            if(timer < 0.3f)
+            {
+                transform.localPosition = originalPos + new Vector2(
+                    Mathf.Sin(timer * 20f) * 0.1f,
+                    Mathf.Cos(timer * 20f) * 0.1f
+                );
+            }
+            timer += Time.deltaTime;
+            transform.localScale = Vector2.Lerp(originalSize, originalSize*0.8f, timer/1f);
+            spriteRenderer.color = Color.Lerp(originalColor, Color.clear, timer/1f);
+            yield return null;
+        }
+
+        handCollider.enabled = true;
         gameObject.SetActive(false);
         yield return null;
     }

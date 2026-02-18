@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using UnityEngine;
 
 public enum Boss1_Part
@@ -14,6 +15,7 @@ public enum Boss1_BodyPattern
     Idle = 0,
     Shockwave = 1,
     Judgement = 2,
+    Destroyed = 3,
 }
 
 public enum Boss1_LHandPattern
@@ -32,6 +34,18 @@ public enum Boss1_RHandPattern
 
 public class Boss1_Manage : MonoBehaviour
 {
+    [Header("Cut Scene Settings")]
+    public float appearTime = 3f;
+    public float handAppearTime = 3f;
+    public float destroyTime = 3f; 
+    
+    [Header("Cut Scene References")]
+    public CameraFollow2D cameraFollow;
+    public bool isInCutScene = false;
+    public GameObject rewardSpirit;
+    public ParticleSystem rewardParticle;
+    public ParticleSystem destroyParticle;
+
     [Header("Movement")]
     [SerializeField] private Rigidbody2D bossRB;
     [SerializeField] private float moveSpeed = 2.5f;
@@ -46,6 +60,9 @@ public class Boss1_Manage : MonoBehaviour
     private Boss1_Body bossBody;
     private Boss1_LeftHand bossLeftHand;
     private Boss1_RightHand bossRightHand;
+    private SpriteRenderer leftHandSprite;
+    private SpriteRenderer rightHandSprite;
+    private SpriteRenderer bodySprite;
 
 
     [Header("Player References")]
@@ -53,12 +70,22 @@ public class Boss1_Manage : MonoBehaviour
     public Transform playerTransform;
     public PlayerHitCheck playerHitCheck;
     public PlayerMovement2D playerMovement;
+    public MeleeController2D playerMeleeController;
     public Rigidbody2D playerRigidbody;
     public LayerMask attackLayer;
-    
 
     [Header("Object References")]
     public List<GameObject> altarObjects;
+    public List<GameObject> spawnPoints;
+
+    [Header("Map Enemy Spawn")]
+    public GameObject enemyRoot;
+    public float spawnCooldown = 6f;
+    public float spawnTimer = 0f;
+    public int maxSpawnCount = 5;
+    public int enemySpawnIndex = 0;
+    public List<GameObject> enemyPrefabs;
+    public List<GameObject> spawnedEnemies;
 
 
     [Header("Patterns")]
@@ -85,41 +112,197 @@ public class Boss1_Manage : MonoBehaviour
     [SerializeField] private int rHandHealth = 10;
     [SerializeField] private int bodyHealth = 20;
 
+#region Get Components
     private void Awake()
     {
+        cameraFollow = Camera.main.GetComponent<CameraFollow2D>();
+
         bossRB = GetComponent<Rigidbody2D>();
 
         bodyObject = transform.Find("Body").gameObject;
         leftHandObject = transform.Find("LeftHand").gameObject;
         rightHandObject = transform.Find("RightHand").gameObject;
+        rewardSpirit = transform.Find("Reward").gameObject;
+        rewardParticle = rewardSpirit.transform.Find("Reward Particle").GetComponent<ParticleSystem>();    
+        destroyParticle = transform.Find("Destroy Particle").GetComponent<ParticleSystem>();
 
         bossBody = bodyObject.GetComponent<Boss1_Body>();
         bossLeftHand = leftHandObject.GetComponent<Boss1_LeftHand>();
         bossRightHand = rightHandObject.GetComponent<Boss1_RightHand>();
 
+        leftHandSprite = leftHandObject.GetComponent<SpriteRenderer>();
+        rightHandSprite = rightHandObject.GetComponent<SpriteRenderer>();
+        bodySprite = bodyObject.GetComponent<SpriteRenderer>();
         playerObject = GameObject.FindGameObjectWithTag("Player");
         playerTransform = playerObject.GetComponent<Transform>();
         playerMovement = playerObject.GetComponent<PlayerMovement2D>();
         playerRigidbody = playerObject.GetComponent<Rigidbody2D>();
         playerHitCheck = playerObject.GetComponent<PlayerHitCheck>();
+        playerMeleeController = playerObject.GetComponent<MeleeController2D>();
     }
 
     private void Start()
     {
+        // For Cut Scene Test
+        StartCoroutine(Boss1_AppearScene());
+
         altarObjects = FindObjectsByType<Transform>(FindObjectsSortMode.None)
         .Where(t => t.gameObject.name == "Altar")
         .Select(t => t.gameObject)
         .ToList();
+
+        spawnPoints = FindObjectsByType<Transform>(FindObjectsSortMode.None)
+        .Where(t => t.gameObject.name == "Spawn Point")
+        .Select(t => t.gameObject)
+        .ToList();
     }
+#endregion
 
     private void Update()
     {
+        if(currentBodyPattern == Boss1_BodyPattern.Destroyed || isInCutScene) return;
+
+        MapPatternManage();
         BossMoveManage();
         BodyPatternManage();
         LHandPatternManage();
         RHandPatternManage();
     }
 
+#region Cut Scene
+
+    public IEnumerator Boss1_AppearScene()
+    {
+        rewardSpirit.SetActive(false);
+
+        isInCutScene = true;
+        cameraFollow.SetTransformMode(false);
+        cameraFollow.SetTargetRoot(transform);
+        float originalMouseInfluence = cameraFollow.mouseInfluence;
+        cameraFollow.mouseInfluence = 0f;
+
+        playerMovement.Stun(appearTime + handAppearTime);
+        playerMeleeController.AttackSilence(appearTime + handAppearTime);
+
+        bodyObject.SetActive(true);
+        leftHandObject.SetActive(false);
+        rightHandObject.SetActive(false);
+
+        bodyObject.transform.localPosition = Vector2.zero;
+        leftHandObject.transform.localPosition = lHandOrigin;
+        rightHandObject.transform.localPosition = rHandOrigin;
+
+
+        yield return new WaitForSeconds(appearTime);
+
+        leftHandObject.SetActive(true);
+        leftHandObject.transform.localScale = Vector2.one * 0.5f;
+        Color originLHandColor = leftHandSprite.color;
+        leftHandSprite.color = new Vector4(originLHandColor.r, originLHandColor.g, originLHandColor.b, 0f);
+        rightHandObject.SetActive(true);
+        rightHandObject.transform.localScale = Vector2.one * 0.5f;
+        Color originRHandColor = rightHandSprite.color;
+        rightHandSprite.color = new Vector4(originRHandColor.r, originRHandColor.g, originRHandColor.b, 0f);
+        
+        float timer = 0f;
+        while (timer < handAppearTime)
+        {
+            timer += Time.deltaTime;
+            
+            leftHandObject.transform.localScale = Vector2.Lerp(Vector2.one * 0.5f, Vector2.one, timer / handAppearTime);
+            leftHandSprite.color = new Vector4(originLHandColor.r, originLHandColor.g, originLHandColor.b, Mathf.Lerp(0f, originLHandColor.a, timer / handAppearTime));
+            rightHandObject.transform.localScale = Vector2.Lerp(Vector2.one * 0.5f, Vector2.one, timer / handAppearTime);
+            rightHandSprite.color = new Vector4(originRHandColor.r, originRHandColor.g, originRHandColor.b, Mathf.Lerp(0f, originRHandColor.a, timer / handAppearTime));
+            yield return null;
+        }
+
+        cameraFollow.SetTransformMode(true);
+        cameraFollow.SetTargetRoot(playerTransform);
+        cameraFollow.mouseInfluence = originalMouseInfluence;
+        isInCutScene = false;
+    }
+
+
+
+    public IEnumerator Boss1_DestroyScene()
+    {
+        StopCoroutine("ObjectMoveControl");
+        StopCoroutine("ObjectMoveControlLocalPos");
+
+        gameObject.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+        playerRigidbody.linearVelocity = Vector2.zero;
+
+        isInCutScene = true;
+        cameraFollow.SetTransformMode(false);
+        cameraFollow.SetTargetRoot(rewardSpirit.transform);
+        float originalMouseInfluence = cameraFollow.mouseInfluence;
+        cameraFollow.mouseInfluence = 0f;
+
+        playerMovement.Stun(60f);
+        playerMeleeController.AttackSilence(60f);
+
+        destroyParticle.gameObject.SetActive(true);
+        destroyParticle.Play();
+        yield return new WaitForSeconds(destroyTime);
+        destroyParticle.gameObject.SetActive(false);
+
+        rewardSpirit.SetActive(true);
+
+        Color bodyOriginalColor = bodySprite.color;
+        float timer = 0f;
+        while(timer < 0.5f)
+        {
+            timer += Time.deltaTime;
+            bodyObject.transform.localPosition = Vector2.Lerp(Vector2.zero, new Vector2(0f, 3f), timer / 0.5f);
+            bodySprite.color = new Vector4(bodyOriginalColor.r, bodyOriginalColor.g, bodyOriginalColor.b, Mathf.Lerp(1f, 0f, timer / 0.5f));
+            yield return null;
+        }
+
+        timer = 0f;
+        bossRB.AddForce(new Vector2(0f, 2f), ForceMode2D.Impulse);
+        bossRB.constraints = RigidbodyConstraints2D.None;
+        while(Vector2.Distance(transform.position, playerTransform.position) > 0.3f)
+        {
+            Debug.Log("In While");
+
+            timer += Time.deltaTime;
+            Vector2 direction = (playerTransform.position - transform.position).normalized;
+            bossRB.AddForce(direction * (timer > 2f ? 5f : 1f));
+            if(bossRB.linearVelocity.magnitude > 3f)
+            {
+                bossRB.linearVelocity = bossRB.linearVelocity.normalized * 3f;
+            }
+
+            Vector2 vDirection = bossRB.linearVelocity.normalized;
+            rewardSpirit.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(vDirection.y, vDirection.x) * Mathf.Rad2Deg - 90f);
+            yield return null;
+            Debug.Log("After Yield");
+        }
+
+        Debug.Log("Out of While");
+        rewardParticle.gameObject.SetActive(true);
+        rewardParticle.Play();
+        Debug.Log("Play Particle");
+        SpriteRenderer rewardSR = rewardSpirit.GetComponent<SpriteRenderer>();
+        rewardSR.color = new Vector4(rewardSR.color.r, rewardSR.color.g, rewardSR.color.b, 0f);
+        bossRB.linearVelocity = Vector2.zero;
+        yield return new WaitForSeconds(0.5f);
+        rewardSpirit.SetActive(false);
+
+        playerMeleeController.attackSilenced = false;
+        playerMovement.stunned = false;
+        playerRigidbody.linearVelocity = Vector2.zero;
+
+        gameObject.SetActive(false);
+        isInCutScene = false;
+        cameraFollow.SetTransformMode(true);
+        cameraFollow.SetTargetRoot(playerTransform);
+        cameraFollow.mouseInfluence = originalMouseInfluence;
+    }
+
+#endregion
+
+#region Damage and Death
     public void TakeDamage(Boss1_Part part, int damage)
     {
         switch(part){
@@ -127,6 +310,12 @@ public class Boss1_Manage : MonoBehaviour
                 if(lHandHealth > 0 || rHandHealth > 0) return;
                 bodyHealth -= damage;
                 if(bodyHealth <= 0){
+                    foreach(GameObject enemy in spawnedEnemies)
+                    {
+                        if(enemy != null) Destroy(enemy);
+                    }
+                    currentBodyPattern = Boss1_BodyPattern.Destroyed;
+
                     StartCoroutine(bossBody.Boss1_BodyDestroyed());
                 }
                 else
@@ -154,6 +343,38 @@ public class Boss1_Manage : MonoBehaviour
                     StartCoroutine(bossRightHand.Boss1_RHandHit());
                 }
                 break;
+        }
+    }
+#endregion
+
+
+#region Pattern Manage
+
+    private void MapPatternManage()
+    {
+        spawnedEnemies.RemoveAll(t => t == null);
+
+        if(spawnTimer > 0f)
+        {
+            spawnTimer -= Time.deltaTime;
+        }
+        else
+        {
+            spawnTimer = spawnCooldown;
+            foreach(GameObject spawnPoint in spawnPoints)
+            {
+                if(spawnedEnemies.Count >= maxSpawnCount) break;
+
+                GameObject enemy = Instantiate(
+                    enemyPrefabs[enemySpawnIndex], 
+                    spawnPoint.transform.position, 
+                    Quaternion.identity,
+                    enemyRoot != null ? enemyRoot.transform : null
+                );
+                spawnedEnemies.Add(enemy);
+
+                enemySpawnIndex = (enemySpawnIndex + 1) % enemyPrefabs.Count;
+            }
         }
     }
 
@@ -214,6 +435,9 @@ public class Boss1_Manage : MonoBehaviour
         int patternChoice = Random.Range(1, 3);
         currentBodyPattern = (Boss1_BodyPattern)patternChoice;
 
+        // test
+        currentBodyPattern = Boss1_BodyPattern.Judgement;
+
         // Body Pattern 함수 호출
         // 그 함수에서 bodyPatternTimer 설정
         switch (currentBodyPattern)
@@ -252,9 +476,8 @@ public class Boss1_Manage : MonoBehaviour
             return;
         }
 
-        int patternChoice = Random.Range(1, 3);
-        patternChoice = 1; // Test Code
-        currentLeftHandPattern = (Boss1_LHandPattern)patternChoice;
+        Boss1_LHandPattern patternChoice = Boss1_LHandPattern.Grasp; // Test Code
+        currentLeftHandPattern = patternChoice;
         // L Hand Pattern 함수 호출
         // 그 함수에서 lHandPatternTimer 설정
         switch (currentLeftHandPattern)
@@ -280,9 +503,8 @@ public class Boss1_Manage : MonoBehaviour
             return;
         }
 
-        int patternChoice = Random.Range(1, 3);
-        patternChoice = 2; // Test Code
-        currentRightHandPattern = (Boss1_RHandPattern)patternChoice;
+        Boss1_RHandPattern patternChoice = Boss1_RHandPattern.Haunt;
+        currentRightHandPattern = patternChoice;
         // R Hand Pattern 함수 호출
         // 그 함수에서 rHandPatternTimer 설정
         switch (currentRightHandPattern)
@@ -297,9 +519,12 @@ public class Boss1_Manage : MonoBehaviour
         }
     }
 
+#endregion
 
 
-    public static IEnumerator ObjectMoveControl(GameObject obj, Vector2 startPos, Vector2 targetPos,
+#region Smooth Move
+
+    public IEnumerator ObjectMoveControl(GameObject obj, Vector2 startPos, Vector2 targetPos,
                                                 float dur1, float dur2, System.Action onComplete = null)
     {
         float timer = 0f;
@@ -313,6 +538,8 @@ public class Boss1_Manage : MonoBehaviour
                 Mathf.Lerp(startPos.y, targetPos.y, (float)Mathf.Pow(timer / dur1, 2) * endPotion)
             );
             yield return null;
+
+            if(isInCutScene) yield break;
         }
 
         timer = 0f;
@@ -324,6 +551,8 @@ public class Boss1_Manage : MonoBehaviour
                 Mathf.Lerp(startPos.y, targetPos.y, endPotion + timer / (dur1 + dur2))
             );
             yield return null;
+
+            if(isInCutScene) yield break;
         }
 
         timer = 0f;
@@ -335,13 +564,15 @@ public class Boss1_Manage : MonoBehaviour
                 Mathf.Lerp(startPos.y, targetPos.y, 1f - (float)Mathf.Pow((dur1 - timer) / dur1, 2) * endPotion)
             );
             yield return null;
+
+            if(isInCutScene) yield break;
         }
 
 
         onComplete?.Invoke();
     }
 
-    public static IEnumerator ObjectMoveControlLocalPos(GameObject obj, Vector2 startPos, Vector2 targetPos,
+    public IEnumerator ObjectMoveControlLocalPos(GameObject obj, Vector2 startPos, Vector2 targetPos,
                                                 float dur1, float dur2, System.Action onComplete = null)
     {
         float timer = 0f;
@@ -355,6 +586,8 @@ public class Boss1_Manage : MonoBehaviour
                 Mathf.Lerp(startPos.y, targetPos.y, (float)Mathf.Pow(timer/dur1, 2) * endPotion)
             );
             yield return null;
+
+            if(isInCutScene) yield break;
         }
         
         timer = 0f;
@@ -366,6 +599,8 @@ public class Boss1_Manage : MonoBehaviour
                 Mathf.Lerp(startPos.y, targetPos.y, endPotion + timer/(dur1 + dur2))
             );
             yield return null;
+
+            if(isInCutScene) yield break;
         }
         
         timer = 0f;
@@ -377,12 +612,14 @@ public class Boss1_Manage : MonoBehaviour
                 Mathf.Lerp(startPos.y, targetPos.y, 1f - (float)Mathf.Pow((dur1-timer)/dur1, 2) * endPotion)
             );
             yield return null;
+
+            if(isInCutScene) yield break;
         }
 
         
         onComplete?.Invoke();
     }
 
-
+#endregion
 
 }

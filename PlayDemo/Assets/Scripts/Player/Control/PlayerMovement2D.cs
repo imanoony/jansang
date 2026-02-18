@@ -88,7 +88,7 @@ public class PlayerMovement2D : MonoBehaviour
     {
         rawInput = context.ReadValue<Vector2>();
 
-        if (dashing || stunned) return;
+        if (dashing || stunned) { moveInput = 0f; return; }
 
         if (context.performed || context.canceled)
         {
