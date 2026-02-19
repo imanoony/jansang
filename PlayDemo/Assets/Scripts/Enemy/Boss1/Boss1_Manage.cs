@@ -38,6 +38,7 @@ public class Boss1_Manage : MonoBehaviour
     public float appearTime = 3f;
     public float handAppearTime = 3f;
     public float destroyTime = 3f; 
+    public float disappearTime = 1.5f;
     
     [Header("Cut Scene References")]
     public CameraFollow2D cameraFollow;
@@ -45,6 +46,7 @@ public class Boss1_Manage : MonoBehaviour
     public GameObject rewardSpirit;
     public ParticleSystem rewardParticle;
     public ParticleSystem destroyParticle;
+    public SpriteMask bodyMask;
 
     [Header("Movement")]
     [SerializeField] private Rigidbody2D bossRB;
@@ -124,7 +126,8 @@ public class Boss1_Manage : MonoBehaviour
         rightHandObject = transform.Find("RightHand").gameObject;
         rewardSpirit = transform.Find("Reward").gameObject;
         rewardParticle = rewardSpirit.transform.Find("Reward Particle").GetComponent<ParticleSystem>();    
-        destroyParticle = transform.Find("Destroy Particle").GetComponent<ParticleSystem>();
+        destroyParticle = bodyObject.transform.Find("Destroy Particle").GetComponent<ParticleSystem>();
+        bodyMask = bodyObject.transform.Find("Body Mask").GetComponent<SpriteMask>();
 
         bossBody = bodyObject.GetComponent<Boss1_Body>();
         bossLeftHand = leftHandObject.GetComponent<Boss1_LeftHand>();
@@ -233,7 +236,6 @@ public class Boss1_Manage : MonoBehaviour
         playerRigidbody.linearVelocity = Vector2.zero;
 
         isInCutScene = true;
-        cameraFollow.SetTransformMode(false);
         cameraFollow.SetTargetRoot(rewardSpirit.transform);
         float originalMouseInfluence = cameraFollow.mouseInfluence;
         cameraFollow.mouseInfluence = 0f;
@@ -241,48 +243,50 @@ public class Boss1_Manage : MonoBehaviour
         playerMovement.Stun(60f);
         playerMeleeController.AttackSilence(60f);
 
+        float originalExtraZoom = cameraFollow.extraZoom;
+        cameraFollow.extraZoom = -3f;
+
         destroyParticle.gameObject.SetActive(true);
         destroyParticle.Play();
         yield return new WaitForSeconds(destroyTime);
-        destroyParticle.gameObject.SetActive(false);
 
         rewardSpirit.SetActive(true);
 
         Color bodyOriginalColor = bodySprite.color;
         float timer = 0f;
-        while(timer < 0.5f)
+        while(timer < disappearTime)
         {
             timer += Time.deltaTime;
-            bodyObject.transform.localPosition = Vector2.Lerp(Vector2.zero, new Vector2(0f, 3f), timer / 0.5f);
-            bodySprite.color = new Vector4(bodyOriginalColor.r, bodyOriginalColor.g, bodyOriginalColor.b, Mathf.Lerp(1f, 0f, timer / 0.5f));
+            bodyObject.transform.localPosition = Vector2.Lerp(Vector2.zero, new Vector2(0f, 1f), timer / disappearTime);
+            bodyMask.transform.localPosition = Vector2.Lerp(Vector2.zero, new Vector2(0f, 4.3f), timer / disappearTime);
+            destroyParticle.transform.localPosition = Vector2.Lerp(Vector2.zero, new Vector2(0f, 3f), timer / disappearTime);
+            destroyParticle.Play();
+            bodySprite.color = new Vector4(bodyOriginalColor.r, bodyOriginalColor.g, bodyOriginalColor.b, Mathf.Lerp(1f, 0f, timer / disappearTime));
             yield return null;
         }
+        destroyParticle.gameObject.SetActive(false);
 
         timer = 0f;
-        bossRB.AddForce(new Vector2(0f, 2f), ForceMode2D.Impulse);
+        bossRB.AddForce(new Vector2(0f, 1f), ForceMode2D.Impulse);
         bossRB.constraints = RigidbodyConstraints2D.None;
         while(Vector2.Distance(transform.position, playerTransform.position) > 0.3f)
         {
-            Debug.Log("In While");
-
             timer += Time.deltaTime;
             Vector2 direction = (playerTransform.position - transform.position).normalized;
             bossRB.AddForce(direction * (timer > 2f ? 5f : 1f));
-            if(bossRB.linearVelocity.magnitude > 3f)
+            if(bossRB.linearVelocity.magnitude > 1f)
             {
-                bossRB.linearVelocity = bossRB.linearVelocity.normalized * 3f;
+                bossRB.linearVelocity = bossRB.linearVelocity.normalized * 1f;
             }
 
             Vector2 vDirection = bossRB.linearVelocity.normalized;
             rewardSpirit.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(vDirection.y, vDirection.x) * Mathf.Rad2Deg - 90f);
             yield return null;
-            Debug.Log("After Yield");
         }
+        cameraFollow.extraZoom = originalExtraZoom;
 
-        Debug.Log("Out of While");
         rewardParticle.gameObject.SetActive(true);
         rewardParticle.Play();
-        Debug.Log("Play Particle");
         SpriteRenderer rewardSR = rewardSpirit.GetComponent<SpriteRenderer>();
         rewardSR.color = new Vector4(rewardSR.color.r, rewardSR.color.g, rewardSR.color.b, 0f);
         bossRB.linearVelocity = Vector2.zero;
@@ -295,7 +299,6 @@ public class Boss1_Manage : MonoBehaviour
 
         gameObject.SetActive(false);
         isInCutScene = false;
-        cameraFollow.SetTransformMode(true);
         cameraFollow.SetTargetRoot(playerTransform);
         cameraFollow.mouseInfluence = originalMouseInfluence;
     }
