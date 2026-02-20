@@ -3,6 +3,7 @@ using System.Collections;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 public class EnemyBase : MonoBehaviour
@@ -331,11 +332,14 @@ public class EnemyBase : MonoBehaviour
         baseColor = color;
         if (!isFlashing && spriteRenderer != null) spriteRenderer.color = baseColor;
     }
+
+    protected UnityEvent onDeath = new UnityEvent();
     protected async UniTask ApplyDamageAsync(float damage)
     {
         this.HP -= damage;
         if (HP <= 0)
         {
+            onDeath.Invoke();
             Destroy(this.gameObject);
             return;
         }

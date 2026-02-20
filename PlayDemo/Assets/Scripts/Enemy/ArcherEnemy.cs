@@ -72,6 +72,7 @@ public class ArcherEnemy : EnemyBase
         lineRenderer = GetComponent<LineRenderer>();
         base.Start();
         onSergeantCommand = new UnityEvent();
+        onDeath.AddListener(PromoteOneSoldier);
 
         mySoldiers = new List<ArcherEnemy>();
     }
@@ -89,6 +90,13 @@ public class ArcherEnemy : EnemyBase
         }
     }
 
+    public void PromoteOneSoldier()
+    {
+        if (!isSergeant) return;
+        var archer = FindArcherByDistance(false);
+        if (archer != null) archer.isSergeant = true;
+    }
+
     public void CommandFromSergeant()
     {
         if (!isAttacking) canAttack = true;
@@ -99,6 +107,42 @@ public class ArcherEnemy : EnemyBase
         SetBaseColor(new Color(0f, 1f, 0f, 1f));
         currentState = State.Alert;
         await AlertedActionAsync(token);
+    }
+
+    [CanBeNull]
+    private ArcherEnemy FindArcherByDistance(bool findingSergeant)
+    {
+        var hits = Physics2D.OverlapCircleAll(transform.position, sergeantSearchRadius, enemyLayer);
+        float minDist = float.MaxValue;
+        ArcherEnemy tmp, final = null;
+        foreach (var hit in hits)
+        {
+            float dist = Vector3.Distance(transform.position, hit.transform.position);
+            if (minDist > dist && (tmp = hit.GetComponent<ArcherEnemy>()) != null && tmp.isSergeant == findingSergeant)
+            {
+                minDist = dist;
+                final = tmp;
+            }
+        }
+
+        return final;
+    }
+    private void GetReadyForAttack() 
+    {
+        if (isSergeant)
+        {
+            canAttack = true;
+            return;
+        }
+        
+        mySergeant = FindArcherByDistance(true);
+
+        if (mySergeant == null || !mySergeant.isSergeant) canAttack = true;
+        else
+        {
+            mySergeant.onSergeantCommand.AddListener(CommandFromSergeant);
+            mySergeant.mySoldiers.Add(this);
+        }
     }
 
     [SerializeField] private LayerMask enemyLayer;
@@ -142,30 +186,7 @@ public class ArcherEnemy : EnemyBase
                 }
                 else if (mySergeant == null)
                 {
-                    if (isSergeant)
-                    {
-                        canAttack = true;
-                        continue;
-                    }
-                    var hits = Physics2D.OverlapCircleAll(transform.position, sergeantSearchRadius, enemyLayer);
-                    float minDist = float.MaxValue;
-                    ArcherEnemy tmp;
-                    foreach (var hit in hits)
-                    {
-                        float dist = Vector3.Distance(transform.position, hit.transform.position);
-                        if (minDist > dist && (tmp = hit.GetComponent<ArcherEnemy>()) != null && tmp.isSergeant)
-                        {
-                            minDist = dist;
-                            mySergeant = tmp;
-                        }
-                    }
-
-                    if (mySergeant == null || !mySergeant.isSergeant) canAttack = true;
-                    else
-                    {
-                        mySergeant.onSergeantCommand.AddListener(CommandFromSergeant);
-                        mySergeant.mySoldiers.Add(this);
-                    }
+                    GetReadyForAttack();
                 }
                 else {
                     await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: token);
