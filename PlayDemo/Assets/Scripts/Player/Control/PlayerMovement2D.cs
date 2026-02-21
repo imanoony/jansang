@@ -35,9 +35,36 @@ public class PlayerMovement2D : MonoBehaviour
     public float dashDuration = 0.3f;
     public bool dashing = false;
 
+    [Header("Crowd Control")]
+    public bool silenced = false;
+    public void DashSilence(float time)
+    {
+        silenced = true;
+        StartCoroutine(SilenceTimer(time));
+    }
+    private IEnumerator SilenceTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        silenced = false;
+    }
+    public bool stunned = false;
+    public void Stun(float time)
+    {
+        stunned = true;
+        StartCoroutine(StunTimer(time));
+    }
+    IEnumerator StunTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        stunned = false;
+    }
+    
+
+
     Rigidbody2D rb;
     Collider2D col;
     MeleeController2D attack;
+    private PlayerGFXController playerGFX; 
 
     private float gravity = 1;
     float moveInput;
@@ -45,16 +72,26 @@ public class PlayerMovement2D : MonoBehaviour
     public bool IsGrouneded => isGrounded;
     bool airJumpUsed;
 
+
+
+
+
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         attack = GetComponent<MeleeController2D>();
+        playerGFX = GetComponent<PlayerGFXController>();
         gravity = -Physics.gravity.y * rb.gravityScale;
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
+        rawInput = context.ReadValue<Vector2>();
+
+        if (dashing || stunned) { moveInput = 0f; return; }
+
         if (context.performed || context.canceled)
         {
             Vector2 raw = context.ReadValue<Vector2>();
@@ -64,12 +101,15 @@ public class PlayerMovement2D : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (dashing || stunned) return;
+
         if (context.performed)
             TriggerJump();
     }
 
     public void OnDash(InputAction.CallbackContext context)
     {
+        if (silenced || stunned) return;
         if (context.performed)
             TriggerDash(Vector2.zero);
     }
@@ -97,15 +137,45 @@ public class PlayerMovement2D : MonoBehaviour
         Move();
     }
 
+    public float moveSpeedAccel = 5;
+    public float moveSpeedDeaccel = 5;
+    public float actualSpeed;
+    
+    private Vector2 movementVector;
+    
+
     void Move()
     {
 
-        if (dashing) return;
+        if (dashing || stunned) return;
 
-        rb.linearVelocity = new Vector2(moveInput * moveTile*tileHeight, rb.linearVelocity.y);
+        if (moveInput != 0)
+        {
+            actualSpeed += moveInput * moveSpeedAccel * Time.deltaTime;
+        }
+        else
+        {
+            if (Mathf.Abs(actualSpeed) > 0.1f)
+            {
+                actualSpeed -= (Time.deltaTime * moveSpeedDeaccel) * (actualSpeed / Mathf.Abs(actualSpeed));
+            }
+            else
+            {
+                actualSpeed = 0;
+            }
+        }
+
+        actualSpeed = Mathf.Clamp(actualSpeed, -moveTile, moveTile);
+
+        movementVector.x = actualSpeed;
+        movementVector.y = rb.linearVelocityY;
+        
+        rb.linearVelocity = movementVector;
 
         if (moveInput > 0) attack.isRight = true;
         else if (moveInput < 0) attack.isRight = false;
+        
+        playerGFX.Flip(attack.isRight);
     }
 
     public void ResetJump()
@@ -115,6 +185,8 @@ public class PlayerMovement2D : MonoBehaviour
     }
     void TryJump()
     {
+        
+
         if (isGrounded)
         {
             Jump();
@@ -132,7 +204,7 @@ public class PlayerMovement2D : MonoBehaviour
         float currentTileY = Mathf.Round(transform.position.y / tileHeight);
         float targetY = (currentTileY+jumpOffset + jumpTile)* tileHeight;
         float jumpForce = Mathf.Sqrt(2*(targetY - transform.position.y/tileHeight)*gravity);
-        Debug.Log(gravity);
+        playerGFX.Stretch();
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
 
@@ -156,7 +228,6 @@ public class PlayerMovement2D : MonoBehaviour
 
     IEnumerator DashCooldownRoutine(Vector2 dV)
     {
-        Debug.Log("Dash Start, Dash Direction: " + dV);
         float dashTime = 0.01f;
         dashing = true;
         float gS = rb.gravityScale;
@@ -176,7 +247,6 @@ public class PlayerMovement2D : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
 
-        Debug.Log("Dash End");
 
         dashing = false;
         rb.gravityScale = gS;
@@ -192,30 +262,41 @@ public class PlayerMovement2D : MonoBehaviour
     void CheckGround()
     {
         Bounds bounds = col.bounds;
-        var start = bounds.center + bounds.extents.y * Vector3.down;
+        Vector2 start = bounds.center + bounds.extents.y * Vector3.down;
 
-        RaycastHit2D hit = Physics2D.BoxCast(
-            bounds.center,
-            bounds.size,
-            0f,
+        // 발이 플랫폼 내부라면 땅으로 취급하지 않음 (PlatformerEffector 대응)
+        if (Physics2D.OverlapPoint(start, groundLayer) != null)
+        {
+            isGrounded = false;
+            return;
+        }
+
+        RaycastHit2D hit = Physics2D.Raycast(
+            start,
             Vector2.down,
             groundCheckDistance,
             groundLayer
         );
-
-        if (hit.collider != null && hit.collider.OverlapPoint(start))
+        
+        if (!isGrounded)
         {
-            // 발이 플랫폼 안에 있다면 ㄴㄴ
-            return;
+            // 노멀 체크 (옆면/벽 배제)
+            if (rb.linearVelocityY <= 0.1f && hit.collider != null && hit.normal.y > 0.7f)
+            {
+                isGrounded = true;
+                playerGFX.Squash();
+                airJumpUsed = false;
+
+                return;
+            }
+            else
+            {
+                return;
+            }
         }
         
-        // 노멀 체크 (옆면/벽 배제)
         isGrounded = hit.collider != null && hit.normal.y > 0.7f;
-
-        if (isGrounded)
-        {
-            airJumpUsed = false;
-        }
+        
     }
 
 #if UNITY_EDITOR
@@ -224,10 +305,8 @@ public class PlayerMovement2D : MonoBehaviour
         if (col == null) return;
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(
-            col.bounds.center + Vector3.down * groundCheckDistance,
-            col.bounds.size
-        );
+        Vector3 start = col.bounds.center + col.bounds.extents.y * Vector3.down;
+        Gizmos.DrawLine(start, start + Vector3.down * groundCheckDistance);
     }
 #endif
 }

@@ -1,233 +1,271 @@
-using System;
-using System.Collections;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
-
 public class ArcherEnemy : EnemyBase
 {
     #region  parameters
-    
     [Header("Detection!")]
     [SerializeField] private float detectionRadius = 3f;
     [SerializeField] private float combatRadius = 1.5f;
-    [SerializeField] private LayerMask sightMask;   // Player + Wall
-
+    [SerializeField] private LayerMask sightMask;   
     [Header("Aiming!")]
     [SerializeField] private float aimingTime = 2f;
-
     [Header("Attack!")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed = 5f;
+    [Header("Platform Finding")]
+    [SerializeField] private LayerMask platformLayer;
+
+    [Header("SERGEANT")]
+    [SerializeField] private bool isSergeant = false;
+
+    public List<ArcherEnemy> mySoldiers;
+
+    public bool AreMySoldiersReady()
+    {
+        foreach (var ae in mySoldiers)
+        {
+            if (!ae.NotAttacking()) return false;
+        }
+
+        return true;
+    }
+
+    public bool NotAttacking()
+    {
+        return !isAttacking;
+    }
     
+    [SerializeField] private float sergeantSearchRadius = 8f;
     #endregion
-    
     #region components
-
-    private SpriteRenderer spriteRenderer;
     private LineRenderer lineRenderer;
-    
     #endregion
-    
     #region status
-
-    
-    private bool found = false;
-    public GameObject player;
-    private Transform currentTarget;
-
     private Vector3? nextPlatform;
+    private bool canJump = false;
+    public bool canAttack = false;
+    private bool isAttacking = false;
+
+    public ArcherEnemy mySergeant;
+    private UnityEvent onSergeantCommand;
     
     #endregion
-    
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, combatRadius);
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(nextPlatform ?? transform.position, 1);
-        
+        // Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        // Gizmos.color = Color.red;
+        // Gizmos.DrawWireSphere(transform.position, combatRadius);
+        // Gizmos.color = Color.yellow;
+        // Gizmos.DrawWireSphere(nextPlatform ?? transform.position, 1);
     }
 #endif
-
     protected override void Start()
     {
-        base.Start();
-        
-        spriteRenderer = GetComponent<SpriteRenderer>();
         lineRenderer = GetComponent<LineRenderer>();
-        
-        player = GameObject.FindGameObjectWithTag("Player");
-        StartCoroutine(WaitForAlert());
-    }
+        base.Start();
+        onSergeantCommand = new UnityEvent();
+        onDeath.AddListener(PromoteOneSoldier);
 
+        mySoldiers = new List<ArcherEnemy>();
+    }
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
     }
-
     protected override void Update()
     {
-        if (!alerted) alerted = DetectPlayer(detectionRadius);
-        else found = DetectPlayer(combatRadius);
-    }
-
-    private IEnumerator WaitForAlert()
-    {
-        yield return new WaitUntil(() => alerted);
-
-        //TEST
-        spriteRenderer.color = new Color(0f, 1f, 0f, 1f);
-            
-        currentState = State.Alert;
-
-        StartCoroutine(AlertedAction());
-    }
-
-    private IEnumerator AlertedAction()
-    {
-        yield return new WaitForSeconds(0.5f);
-        while (true)
+        base.Update();
+        if (!alerted) alerted = DetectPlayer(detectionRadius, sightMask);
+        else
         {
-            if (found == false || TilemapPlatformIndex.Instance.AreOnSamePlatformByRay(player.transform, transform))
+            UpdateFound(combatRadius, sightMask);
+        }
+    }
+
+    public void PromoteOneSoldier()
+    {
+        if (!isSergeant) return;
+        var archer = FindArcherByDistance(false);
+        if (archer != null) archer.isSergeant = true;
+    }
+
+    public void CommandFromSergeant()
+    {
+        if (!isAttacking) canAttack = true;
+    }
+    protected override async UniTask RunAIAsync(CancellationToken token)
+    {
+        await UniTask.WaitUntil(() => alerted, cancellationToken: token);
+        SetBaseColor(new Color(0f, 1f, 0f, 1f));
+        currentState = State.Alert;
+        await AlertedActionAsync(token);
+    }
+
+    [CanBeNull]
+    private ArcherEnemy FindArcherByDistance(bool findingSergeant)
+    {
+        var hits = Physics2D.OverlapCircleAll(transform.position, sergeantSearchRadius, enemyLayer);
+        float minDist = float.MaxValue;
+        ArcherEnemy tmp, final = null;
+        foreach (var hit in hits)
+        {
+            float dist = Vector3.Distance(transform.position, hit.transform.position);
+            if (minDist > dist && (tmp = hit.GetComponent<ArcherEnemy>()) != null && tmp.isSergeant == findingSergeant)
             {
-                currentTarget = null;
-                //TEST
-                spriteRenderer.color = new Color(0f, 1f, 0f, 1f);
-                
-                yield return StartCoroutine(ChangePlatform());
-                
-                spriteRenderer.color = new Color(0f, 1f, 1f, 1f);
+                minDist = dist;
+                final = tmp;
+            }
+        }
+
+        return final;
+    }
+    private void GetReadyForAttack() 
+    {
+        if (isSergeant)
+        {
+            canAttack = true;
+            return;
+        }
+        
+        mySergeant = FindArcherByDistance(true);
+
+        if (mySergeant == null || !mySergeant.isSergeant) canAttack = true;
+        else
+        {
+            mySergeant.onSergeantCommand.AddListener(CommandFromSergeant);
+            mySergeant.mySoldiers.Add(this);
+        }
+    }
+
+    [SerializeField] private LayerMask enemyLayer;
+    private async UniTask AlertedActionAsync(CancellationToken token)
+    {
+        await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
+        while (!token.IsCancellationRequested)
+        {
+            if (canJump && TilemapPlatformIndex.Instance.AreOnSamePlatformByRay(Player, transform))
+            {
+                CurrentTarget = null;
+                SetBaseColor(new Color(0f, 1f, 0f, 1f));
+                await ChangePlatformAsync(token);
+                canJump = false;
+                SetBaseColor(new Color(0f, 1f, 1f, 1f));
+            }
+            else if (found)
+            {
+                if (canAttack)
+                {
+                    canJump = true;
+                    isAttacking = true;
+                    canAttack = false;
+                    CurrentTarget = Player;
+                    if (isSergeant)
+                    {
+                        UniTask.WaitUntil(AreMySoldiersReady, cancellationToken: token);
+                        onSergeantCommand?.Invoke();
+                    }
+                    SetBaseColor(new Color(1f, 0f, 0f, 1f));
+                    if (mySergeant != null)
+                    {
+                        mySergeant.onSergeantCommand.RemoveListener(CommandFromSergeant);
+                        mySergeant.mySoldiers.Remove(this);
+                    }
+                    await AttackRoutineAsync(token);
+                    isAttacking = false;
+                    mySergeant = null;
+                    
+                    if (isSergeant) await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: token);
+                }
+                else if (mySergeant == null)
+                {
+                    GetReadyForAttack();
+                }
+                else {
+                    await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: token);
+                }
             }
             else
             {
-                currentTarget = player.transform;
-                //TEST
-                spriteRenderer.color = new Color(1f, 0f, 0f, 1f);
-                
-                yield return StartCoroutine(AttackRoutine());
+                canJump = true;
+                await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: token);
             }
         }
     }
-    
-    private IEnumerator ChangePlatform()
+    private async UniTask ChangePlatformAsync(CancellationToken token)
     {
         Vector3 nextPos = FindNextPlatform() ?? transform.position;
-        
-        spriteRenderer.color = new Color(0f, 0f, 1f, 1f);
+        SetBaseColor(new Color(0f, 0f, 1f, 1f));
+        if ((nextPos - transform.position).sqrMagnitude < 0.1f) return;
 
-        if ((nextPos - transform.position).sqrMagnitude < 0.1f) yield break;
+        float targetspeed = 0f;
+        float jumpPower = 0f;
+        float xposDiff = nextPos.x - transform.position.x;
+        float calculatedTime = 0f;
+        float gravity = Mathf.Abs(Physics2D.gravity.y);
         
-        //TODO: 반복 줄이기 흠;;
         if (nextPos.y > transform.position.y)
         {
             ChangeDirection(0);
-
-            // 다음 위치 -> 점프력과 속도 계산
-            float xposDiff = nextPos.x - transform.position.x;
             float yposDiff = nextPos.y - transform.position.y;
-
-            float gravity = Mathf.Abs(Physics2D.gravity.y);
             
-            float calculatedJumpPower = CalculateJumpPower(1.5f, yposDiff);
-            float calculatedTime = calculatedJumpPower / gravity
+            jumpPower = CalculateJumpPower(1.5f, yposDiff);
+            calculatedTime = jumpPower / gravity
                                    + Mathf.Sqrt(2 * 0.5f * yposDiff / gravity);
-            float targetspeed = xposDiff / calculatedTime;
-            
-            while (!TryJump(calculatedJumpPower))
-            {
-                // 최대 try 횟수 제한?
-                yield return null;
-                if (found) yield break;
-            }
-            
-            int tmp = (int)(nextPos.x - transform.position.x);
-            if (tmp == 0) yield break;
-            
-            ChangeDirection(tmp / Math.Abs(tmp));
-            ChangeMoveSpeed(Math.Abs(targetspeed / moveSpeed));
-            
-            // 문제구간
-            yield return new WaitForSeconds(0.2f); // 땜빵
-            yield return new WaitUntil(() => isGrounded);
-            
-            ChangeDirection(0);
-            ChangeMoveSpeed(1);
         }
         else
         {
-            // 다음 위치 -> 점프력과 속도 계산
-            float xposDiff = nextPos.x - transform.position.x;
             float yposDiff = Mathf.Abs(nextPos.y - transform.position.y);
-            
-            float jumpPower = 3f;
-            float gravity = Mathf.Abs(Physics2D.gravity.y);
-            
+            jumpPower  = 3f;
             float additionalS = Mathf.Pow(jumpPower, 2) / (2 * gravity);
-
-            
-            float calculatedTime = jumpPower / gravity
+            calculatedTime = jumpPower / gravity
                                    + Mathf.Sqrt(2 * (yposDiff + additionalS) * yposDiff / gravity);
-            float targetspeed = xposDiff / calculatedTime;
-            
-            while (!TryJump(jumpPower))
-            {
-                // 최대 try 횟수 제한?
-                yield return null;
-                if (found) yield break;
-            }
-            
-            int tmp = (int)(nextPos.x - transform.position.x);
-            if (tmp == 0) yield break;
-            
-            ChangeDirection(tmp / Math.Abs(tmp));
-            ChangeMoveSpeed(Math.Abs(targetspeed / moveSpeed));
-            
-            // 문제구간
-            yield return new WaitForSeconds(0.2f); // 땜빵
-            yield return new WaitUntil(() => isGrounded);
-            
-            ChangeDirection(0);
-            ChangeMoveSpeed(1);
         }
-    }
+        targetspeed = xposDiff / calculatedTime;
+        
+        int jumpcnt = 0;
+        while (!TryJump(jumpPower))
+        {
+            Debug.Log("HERE3");
+            jumpcnt++;
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
+            if (found || jumpcnt>10) return;
+        }
 
+        canJump = false;
+        
+        int tmp = (int)(nextPos.x - transform.position.x);
+        if (tmp == 0) return;
+        ChangeDirection(tmp / Math.Abs(tmp));
+        ChangeMoveSpeed(Math.Abs(targetspeed / moveSpeed));
+        await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: token); 
+        await UniTask.WaitUntil(() => isGrounded, cancellationToken: token);
+        ChangeDirection(0);
+        ChangeMoveSpeed(1);
+    }
     float CalculateJumpPower(float rate, float s)
     {
         return Mathf.Sqrt(2 * rate * Mathf.Abs(Physics2D.gravity.y) * s);
     }
-    
-    private bool DetectPlayer(float range)
-    {
-        float dist = Vector2.Distance(transform.position, player.transform.position);
-        if (dist > range) return false;
-        
-        Vector2 dir = (player.transform.position - transform.position).normalized;
-
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, sightMask);
-
-        if (hit.collider != null && hit.collider.CompareTag("Player"))
-            return true;
-
-        return false;
-    }
-
     [SerializeField] private float platformFindingHeight = 3f;
     [SerializeField] private int platformFindingSampleCount = 5;
-    
     [CanBeNull]
     private Vector3? FindNextPlatform()
     {
         for (int i = 1; i <= 3; i++)
         {
             Vector3 sampleStart = transform.position + Vector3.up * (platformFindingHeight * i);
-
             for (int j = 0; j < platformFindingSampleCount; j++)
             {
                 var tmp = sampleStart + Vector3.right * Random.Range(-5f, 5f);
-                RaycastHit2D hit = Physics2D.Raycast(tmp, Vector3.down, platformFindingHeight * 2f, groundLayer);
+                RaycastHit2D hit = Physics2D.Raycast(tmp, Vector3.down, platformFindingHeight * 2f, platformLayer);
                 if (hit.collider != null && !hit.collider.OverlapPoint(tmp))
                 {
                     if (Mathf.Abs(hit.point.y - transform.position.y + col.bounds.extents.y) < 0.1f) continue;
@@ -236,43 +274,55 @@ public class ArcherEnemy : EnemyBase
                 }
             }
         }
-        
         return null;
     }
-
-    private IEnumerator AttackRoutine()
+    private async UniTask AttackRoutineAsync(CancellationToken token)
     {
-        // 조준; 레이저 형태 보이기
+        if (lineRenderer == null) return;
         float elapsed = 0f;
-        
         lineRenderer.enabled = true;
         lineRenderer.positionCount = 2; 
-        
         lineRenderer.startColor = Color.black;
         lineRenderer.endColor = Color.black;
-        
-        while (elapsed < aimingTime)
+
+        Vector3 finalTarget = Vector3.zero;
+        bool goodtogo = false;
+        while (elapsed < aimingTime && !token.IsCancellationRequested)
         {
-            lineRenderer.startWidth = 0.05f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
-            lineRenderer.endWidth = 0.05f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
-            
+            lineRenderer.startWidth = 0.1f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
+            lineRenderer.endWidth = 0.1f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
             lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, currentTarget?.position ?? transform.position);
+            
+            if (elapsed < aimingTime / 2)
+            {
+                finalTarget = CurrentTarget?.position ?? transform.position;
+                lineRenderer.SetPosition(1, finalTarget);
+            }
+            else 
+            {
+                lineRenderer.startColor = Color.red;
+                Color c = Color.red;
+                c.a = 0;
+                lineRenderer.endColor = c;
+                
+                Vector3 dirgo = (finalTarget - transform.position).normalized;
+                lineRenderer.SetPosition(1, transform.position + dirgo * 20);
+            }
+            
             
             elapsed += Time.deltaTime;
-            yield return null;
-            
-        }
 
-        lineRenderer.enabled = false;
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
+        }
         
-        Vector2 dir = (currentTarget?.position ?? transform.position) - transform.position;
+        
+        lineRenderer.enabled = false;
+        Vector2 dir = finalTarget - transform.position;
         dir.Normalize();
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        // Fire!
         GameObject bullet = Instantiate(
             bulletPrefab,
-            transform.position,
+            transform.position + (Vector3)dir ,
             Quaternion.Euler(0, 0, angle)
         );
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();

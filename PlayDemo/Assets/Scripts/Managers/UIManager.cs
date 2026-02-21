@@ -159,6 +159,11 @@ public class UIManager : MonoBehaviour
         cam.StopFocus();
     }
     #endregion
+    
+    #region Damage
+    public GameObject damageUI;
+    #endregion
+    
     #region Observers
     public void Init()
     {
