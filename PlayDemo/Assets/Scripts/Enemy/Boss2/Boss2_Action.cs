@@ -12,6 +12,14 @@ public class Boss2_Action : MonoBehaviour
     public Boss2_Laser bossLaser;
     public SpriteRenderer bossSR;
 
+    [Header("Sprites")]
+    public Sprite idleSprite;
+    public Sprite dashSprite;
+    public Sprite slashSprite;
+    public Sprite counterSprite;
+    public Sprite laserSprite;
+    public Vector3 originalScale;
+
     [Header("Dash")]
     public bool dashing = false;
     public float dashSpeed = 20f;
@@ -25,6 +33,7 @@ public class Boss2_Action : MonoBehaviour
 
     [Header("Laser")]
     public float laserDuration = 0.4f;
+    
 
     void Awake()
     {
@@ -39,14 +48,18 @@ public class Boss2_Action : MonoBehaviour
         bossSlash.gameObject.SetActive(false);
         bossCounter.gameObject.SetActive(false);
         bossLaser.gameObject.SetActive(false);
+
+        originalScale = gameObject.transform.localScale;
     }
 
-    public IEnumerator Boss2_Charge<T>(float chargeTime, bool isRight, System.Func<T, IEnumerator> skill, T parameter)
+    public IEnumerator Boss2_Charge<T>(float chargeTime, bool isRight, Sprite sprite, System.Func<T, IEnumerator> skill, T parameter)
     {
-        bossSR.flipX = !isRight;
+        gameObject.transform.localScale = new Vector3(isRight ? originalScale.x : -originalScale.x, originalScale.y, originalScale.z);
+        
+        bossSR.sprite = sprite;
 
         // Charge Animation
-        Color color = Color.blue;
+        Color color = bossSR.color;
         bossSR.color = color * 0.5f;
         yield return new WaitForSeconds(chargeTime);
         bossSR.color = color;
@@ -54,12 +67,13 @@ public class Boss2_Action : MonoBehaviour
         StartCoroutine(skill(parameter));
     }
 
-    public IEnumerator Boss2_Charge(float chargeTime, bool isRight, System.Func<IEnumerator> skill)
+    public IEnumerator Boss2_Charge(float chargeTime, bool isRight, Sprite sprite, System.Func<IEnumerator> skill)
     {
-        bossSR.flipX = !isRight;
+        gameObject.transform.localScale = new Vector3(isRight ? originalScale.x : -originalScale.x, originalScale.y, originalScale.z);
+        bossSR.sprite = sprite;
 
         // Charge Animation
-        Color color = Color.blue;
+        Color color = bossSR.color;
         bossSR.color = color * 0.5f;
         yield return new WaitForSeconds(chargeTime);
         bossSR.color = color;
@@ -82,6 +96,7 @@ public class Boss2_Action : MonoBehaviour
         bossManage.bossRB.linearVelocity = Vector2.zero;
         dashing = false;
 
+        bossSR.sprite = idleSprite;
         bossManage.patternTimer = bossManage.patternCooldown;
         bossManage.currentPattern = Boss2_Pattern.Idle;
     }
@@ -111,11 +126,11 @@ public class Boss2_Action : MonoBehaviour
 #region Slash
     public IEnumerator Boss2_SlashAction(bool isRight)
     {
-        bossSlash.FlipSlash(isRight);
         bossSlash.gameObject.SetActive(true);
         yield return new WaitForSeconds(0.5f);
         bossSlash.gameObject.SetActive(false);
 
+        bossSR.sprite = idleSprite;
         bossManage.patternTimer = bossManage.patternCooldown;
         bossManage.currentPattern = Boss2_Pattern.Idle;
     }
@@ -141,7 +156,7 @@ public class Boss2_Action : MonoBehaviour
         bossCounter.explodeEffect.SetActive(false);
         bossCounter.gameObject.SetActive(false);
 
-
+        bossSR.sprite = idleSprite;
         bossManage.patternTimer = bossManage.patternCooldown;
         bossManage.currentPattern = Boss2_Pattern.Idle;
 
@@ -157,7 +172,7 @@ public class Boss2_Action : MonoBehaviour
         yield return new WaitForSeconds(laserDuration);
         bossLaser.gameObject.SetActive(false);
 
-
+        bossSR.sprite = idleSprite;
         bossManage.patternTimer = bossManage.patternCooldown;
         bossManage.currentPattern = Boss2_Pattern.Idle;
     }

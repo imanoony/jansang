@@ -221,8 +221,14 @@ public class Boss2_Manage : MonoBehaviour
         }
         
 
-        if(xDiff > 0.1f) { isRight = true; bossSR.flipX = false; }
-        else if(xDiff < -0.1f) { isRight = false; bossSR.flipX = true; }
+        if(xDiff > 0.1f) { 
+            isRight = true;
+            bossObject.transform.localScale = new Vector3(bossAction.originalScale.x, bossAction.originalScale.y, bossAction.originalScale.z);
+        }
+        else if(xDiff < -0.1f) { 
+            isRight = false;
+            bossObject.transform.localScale = new Vector3(-bossAction.originalScale.x, bossAction.originalScale.y, bossAction.originalScale.z);
+        }
 
         // 앞에 밟을게 없으면 점프
         RaycastHit2D hit = Physics2D.BoxCast(
@@ -290,6 +296,8 @@ public class Boss2_Manage : MonoBehaviour
         }
         else{ currentPattern = Boss2_Pattern.Dash; }
 
+        // Test
+        if(testingPattern != Boss2_Pattern.Idle) currentPattern = testingPattern;
 
         isRight = playerTransform.position.x > gameObject.transform.position.x ? true : false;
 
@@ -299,6 +307,7 @@ public class Boss2_Manage : MonoBehaviour
                 StartCoroutine(bossAction.Boss2_Charge<bool>(
                     1.0f,
                     isRight,
+                    bossAction.dashSprite,
                     bossAction.Boss2_DashAction,
                     isRight
                 ));
@@ -307,6 +316,7 @@ public class Boss2_Manage : MonoBehaviour
                 StartCoroutine(bossAction.Boss2_Charge<bool>(
                     1.0f,
                     isRight,
+                    bossAction.slashSprite,
                     bossAction.Boss2_SlashAction,
                     isRight
                 ));
@@ -315,6 +325,7 @@ public class Boss2_Manage : MonoBehaviour
                 StartCoroutine(bossAction.Boss2_Charge(
                     0.0f,
                     isRight,
+                    bossAction.counterSprite,
                     bossAction.Boss2_CounterAction
                 ));
                 break;
@@ -326,6 +337,7 @@ public class Boss2_Manage : MonoBehaviour
                 StartCoroutine(bossAction.Boss2_Charge<float>(
                     1.0f,
                     isRight,
+                    bossAction.laserSprite,
                     bossAction.Boss2_LaserAction,
                     angle
                 ));

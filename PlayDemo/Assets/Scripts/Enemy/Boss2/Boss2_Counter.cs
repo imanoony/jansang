@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -30,12 +31,21 @@ public class Boss2_Counter : MonoBehaviour
 
         parryEffect.SetActive(false);
     }
-    
+
+    private void Update()
+    {
+        if (bossAction.exploded)
+        {
+            parryEffect.SetActive(false);
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D col)
     {
         if (!bossAction.exploded && ((1 << col.gameObject.layer) & bossManage.attackLayer.value) != 0)
         {
             Vector2 playerDir = (bossManage.playerTransform.position - transform.position).normalized;
+            playerDir.x = bossAction.gameObject.transform.localScale.x < 0f ? -playerDir.x : playerDir.x;
             parryEffect.transform.localPosition = playerDir * counterRadius;
             StartCoroutine(ParryEffect());
 
@@ -51,7 +61,7 @@ public class Boss2_Counter : MonoBehaviour
             bossManage.playerHitCheck.TakeDamage(1);
 
             Vector2 playerDir = (bossManage.playerTransform.position - transform.position).normalized;
-
+            playerDir.x = bossAction.gameObject.transform.localScale.x < 0f ? -playerDir.x : playerDir.x;
             StartCoroutine(bossAction.KnockbackCoroutine(
                 playerDir,
                 bossAction.knockbackForce * 2f,

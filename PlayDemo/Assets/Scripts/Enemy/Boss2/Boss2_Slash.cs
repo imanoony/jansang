@@ -27,9 +27,4 @@ public class Boss2_Slash : MonoBehaviour
         }
     }
 
-    public void FlipSlash(bool isRight)
-    {
-        transform.localPosition = new Vector2(isRight ? 0.1f : -0.1f, 0.1f);
-        slashSR.flipX = !isRight;
-    }
 }
