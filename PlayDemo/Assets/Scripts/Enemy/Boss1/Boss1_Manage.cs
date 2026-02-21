@@ -48,6 +48,10 @@ public class Boss1_Manage : MonoBehaviour
     public ParticleSystem destroyParticle;
     public SpriteMask bodyMask;
 
+    [Header("UI")]
+    public Boss1_UI bossUI;
+
+
     [Header("Movement")]
     [SerializeField] private Rigidbody2D bossRB;
     [SerializeField] private float moveSpeed = 2.5f;
@@ -80,7 +84,6 @@ public class Boss1_Manage : MonoBehaviour
     [Header("Object References")]
     public List<GameObject> altarObjects;
     public List<GameObject> spawnPoints;
-    public Boss1_UI bossUI;
 
     [Header("Map Enemy Spawn")]
     public GameObject enemyRoot;
