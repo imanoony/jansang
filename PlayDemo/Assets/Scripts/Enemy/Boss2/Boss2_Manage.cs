@@ -92,6 +92,8 @@ public class Boss2_Manage : MonoBehaviour
     public SpriteRenderer eyesSR;
     public SpriteRenderer headSR;
     public SpriteRenderer bodySR;
+    public Vector2 originalEyePos;
+    public Vector2 originalHeadPos;
     public Color dashEyeColor;
     public Color slashEyeColor;
     public Color counterEyeColor;
@@ -141,6 +143,31 @@ public class Boss2_Manage : MonoBehaviour
 
     private void Update()
     {
+        if(currentPattern == Boss2_Pattern.Moving)
+        {
+            eyesSR.gameObject.transform.localPosition = new Vector3(
+                0.05f, 0.25f, 0f
+            );
+            headSR.gameObject.transform.localPosition = new Vector3(
+                0.05f, 0.25f, 0f
+            );
+            bodySR.gameObject.transform.localRotation = Quaternion.Euler(
+                0f, 0f, -15f
+            );
+        }
+        else
+        {
+            eyesSR.gameObject.transform.localPosition = new Vector3(
+                0.0f, 0.25f, 0f
+            );
+            headSR.gameObject.transform.localPosition = new Vector3(
+                0.0f, 0.25f, 0f
+            );
+            bodySR.gameObject.transform.localRotation = Quaternion.Euler(
+                0f, 0f, 0f
+            );
+        }
+
         if(isInCutScene || !bossObject.gameObject.activeSelf){ return; }
 
         bossUI.UpdateHealthBar((float)health / maxHealth);
@@ -194,6 +221,7 @@ public class Boss2_Manage : MonoBehaviour
     public IEnumerator Boss2_AppearScene()
     {
         bossObject.SetActive(false);
+        currentPattern = Boss2_Pattern.Moving;
 
         float originalMouseInfluence = cameraFollow.mouseInfluence;
         float originalExtraZoom = cameraFollow.extraZoom;
@@ -336,7 +364,7 @@ public class Boss2_Manage : MonoBehaviour
             bounds.size,
             0f,
             Vector2.down,
-            tileSize*0.7f,
+            tileSize*0.2f,
             groundLayer
         );
 
@@ -548,9 +576,9 @@ public class Boss2_Manage : MonoBehaviour
                 break;
             case Boss2_Pattern.Laser:
                 float angle = Mathf.Atan2(
-                    playerTransform.position.y - transform.position.y,
+                    playerTransform.position.y - 0.2f - transform.position.y,
                     playerTransform.position.x - transform.position.x
-                ) * Mathf.Rad2Deg + 90f;
+                ) * Mathf.Rad2Deg + 90f + bossAction.laserAngleOffset * (isRight ? 1f : -1f);
                 StartCoroutine(bossAction.Boss2_Charge<float>(
                     1.0f,
                     isRight,

@@ -34,6 +34,7 @@ public class Boss2_Action : MonoBehaviour
 
     [Header("Laser")]
     public float laserDuration = 0.4f;
+    public float laserAngleOffset = 15f;
     
 
     void Awake()
@@ -54,7 +55,7 @@ public class Boss2_Action : MonoBehaviour
 
     void Start()
     {
-        originalEyeColor = bossManage.eyesSR.color;
+        
     }
 
     public IEnumerator Boss2_Charge<T>(float chargeTime, bool isRight, Color eyeColor, System.Func<T, IEnumerator> skill, T parameter)
