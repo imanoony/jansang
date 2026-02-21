@@ -138,7 +138,7 @@ public class MeleeController2D : MonoBehaviour
     
     private bool CanAttack()
     {
-        return !isReloading && !isAttacking && !isCharging;
+        return !isReloading && !isAttacking && !isCharging && !attackSilenced;
     }
 
     public float attackRadius;
