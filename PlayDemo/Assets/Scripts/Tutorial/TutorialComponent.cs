@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "TutorialComponent", menuName = "Scriptable Objects/TutorialComponent")]
 public class TutorialComponent : ScriptableObject
@@ -18,6 +19,9 @@ public class TutorialComponent : ScriptableObject
 
     public Vector2 tutorialTextPos;
     public string tutorialText;
+
+    public int nextCameraClamperId;
+    public int wallToBeGone;
     
     public Vector2 tutorialImagePos;
     public bool isUsingImage;

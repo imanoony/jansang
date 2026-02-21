@@ -333,7 +333,7 @@ public class EnemyBase : MonoBehaviour
         if (!isFlashing && spriteRenderer != null) spriteRenderer.color = baseColor;
     }
 
-    protected UnityEvent onDeath = new UnityEvent();
+    public UnityEvent onDeath = new UnityEvent();
     protected async UniTask ApplyDamageAsync(float damage)
     {
         this.HP -= damage;

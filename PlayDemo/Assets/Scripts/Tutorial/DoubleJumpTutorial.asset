@@ -22,6 +22,8 @@ MonoBehaviour:
   actionPhase: 2
   tutorialTextPos: {x: 0, y: 300}
   tutorialText: You can... Double Jump
+  nextCameraClamperId: 1
+  wallToBeGone: 0
   tutorialImagePos: {x: 0, y: 0}
   isUsingImage: 0
   tutorialImage: {fileID: 0}
