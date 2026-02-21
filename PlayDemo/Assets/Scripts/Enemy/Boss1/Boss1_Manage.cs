@@ -148,6 +148,7 @@ public class Boss1_Manage : MonoBehaviour
     private void Start()
     {
         // For Cut Scene Test
+        isInCutScene = true;
         StartCoroutine(Boss1_AppearScene());
 
         altarObjects = FindObjectsByType<Transform>(FindObjectsSortMode.None)

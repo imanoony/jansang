@@ -16,6 +16,19 @@ public enum Boss2_Pattern
 
 public class Boss2_Manage : MonoBehaviour
 {
+    [Header("Cut Scene Settings")]
+    public float appearDashTime = 2f;
+    public float appearDashDistance = 4f;
+    public Vector3 bossStartPosition = new Vector3(6f, 2f, 0f);
+    
+    [Header("Cut Scene References")]
+    public CameraFollow2D cameraFollow;
+    public bool isInCutScene = false;
+    public GameObject particleParent;
+    public ParticleSystem destroyParticle;
+    public ParticleSystem boomParticle;
+    
+
     [Header("Movement")]
     public Rigidbody2D bossRB;
     public bool isRight = true;
@@ -39,6 +52,7 @@ public class Boss2_Manage : MonoBehaviour
     public Transform playerTransform;
     public PlayerHitCheck playerHitCheck;
     public PlayerMovement2D playerMovement;
+    public MeleeController2D playerMeleeController;
     public Rigidbody2D playerRigidbody;
     public LayerMask attackLayer;
     
@@ -66,8 +80,16 @@ public class Boss2_Manage : MonoBehaviour
     private Collider2D bossCol;
     private Boss2_Action bossAction;
 
+    [Header("Boss Health")]
+    public int health = 10;
+    public float invincibleTime = 1f;
+    public bool isInvincible = false;
+
+#region Get References
     private void Awake()
     {
+        cameraFollow = Camera.main.GetComponent<CameraFollow2D>();
+
         bossRB = GetComponent<Rigidbody2D>();
         bossObject = gameObject.transform.GetChild(0).gameObject;
         bossSR = bossObject.GetComponent<SpriteRenderer>();
@@ -79,11 +101,24 @@ public class Boss2_Manage : MonoBehaviour
         playerMovement = playerObject.GetComponent<PlayerMovement2D>();
         playerRigidbody = playerObject.GetComponent<Rigidbody2D>();
         playerHitCheck = playerObject.GetComponent<PlayerHitCheck>();
-    }
+        playerMeleeController = playerObject.GetComponent<MeleeController2D>();
 
+        particleParent = GameObject.Find("Particle");
+        destroyParticle = particleParent.transform.Find("Destroy").GetComponent<ParticleSystem>();
+        boomParticle = particleParent.transform.Find("Boom").GetComponent<ParticleSystem>();
+    }
+#endregion
+
+    private void Start()
+    {
+        isInCutScene = true;
+        StartCoroutine(Boss2_AppearScene());
+    }
 
     private void Update()
     {
+        if(isInCutScene || !bossObject.gameObject.activeSelf){ return; }
+
         CheckPlayer();
         CheckGround();
         MoveManage();
@@ -91,10 +126,136 @@ public class Boss2_Manage : MonoBehaviour
         JumpManage();
     }
 
+#region Damage
     public void TakeDamage(int damage)
     {
-        
+        if (isInvincible){ return; }
+
+        health -= damage;
+
+        if(health <= 0)
+        {
+            health = 0;
+            StartCoroutine(Boss2_DestoryScene());
+            return;
+        }
+
+        StartCoroutine(DamageEffect());
     }
+
+    IEnumerator DamageEffect()
+    {
+        isInvincible = true;
+        Color originalColor = bossSR.color;
+        bossSR.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.3f);
+        yield return new WaitForSeconds(invincibleTime);
+        bossSR.color = originalColor;
+        isInvincible = false;
+    }
+#endregion
+
+#region Cut Scene
+
+    public IEnumerator Boss2_AppearScene()
+    {
+        bossObject.SetActive(false);
+
+        float originalMouseInfluence = cameraFollow.mouseInfluence;
+        float originalExtraZoom = cameraFollow.extraZoom;
+
+        isInCutScene = true;
+        playerRigidbody.linearVelocity = Vector2.zero;
+        playerMovement.Stun(99f);
+        playerMeleeController.AttackSilence(99f);
+        cameraFollow.SetTargetRoot(playerTransform);
+        cameraFollow.mouseInfluence = 0f;
+        cameraFollow.extraZoom = -3f;
+
+        yield return new WaitForSeconds(1f);
+
+        bossObject.SetActive(true);
+
+        Vector3 originalScale = transform.localScale;
+        Color originColor = bossSR.color;
+        bossSR.color = new Color(originColor.r, originColor.g, originColor.b, 0.3f);
+        transform.position = playerTransform.position + new Vector3(7f, 0f, 0f);
+        transform.localScale = new Vector3(-originalScale.x, originalScale.y, originalScale.z);
+
+        float timer = 0f;
+        while(timer < appearDashTime)
+        {
+            timer += Time.deltaTime;
+            transform.position = Vector3.Lerp(
+                playerTransform.position + new Vector3(appearDashDistance, 0f, 0f),
+                playerTransform.position + new Vector3(-appearDashDistance, 0f, 0f),
+                timer / appearDashTime
+            );
+            yield return null;
+        }
+        yield return new WaitForSeconds(1f);
+        timer = 0f;
+        transform.localScale = originalScale;
+        while(timer < appearDashTime)
+        {
+            timer += Time.deltaTime;
+            transform.position = Vector3.Lerp(
+                playerTransform.position + new Vector3(-appearDashDistance, 0f, 0f),
+                playerTransform.position + new Vector3(appearDashDistance, 0f, 0f),
+                timer / appearDashTime
+            );
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        bossSR.color = originColor;
+        transform.position = bossStartPosition;
+
+        playerMovement.stunned = false;
+        playerMeleeController.attackSilenced = false;
+
+        isInCutScene = false;
+        cameraFollow.extraZoom = originalExtraZoom;
+        cameraFollow.mouseInfluence = originalMouseInfluence;
+    }
+
+    public IEnumerator Boss2_DestoryScene()
+    {
+        isInCutScene = true;
+        bossRB.linearVelocity = Vector2.zero;
+        bossRB.gravityScale = 0f;
+        float originalMouseInfluence = cameraFollow.mouseInfluence;
+        float originalExtraZoom = cameraFollow.extraZoom;
+
+        playerRigidbody.linearVelocity = Vector2.zero;
+        playerMovement.Stun(99f);
+        playerMeleeController.AttackSilence(99f);
+
+        cameraFollow.SetTargetRoot(transform);
+        cameraFollow.mouseInfluence = 0f;
+        cameraFollow.extraZoom = -3f;
+
+        destroyParticle.gameObject.SetActive(true);
+        destroyParticle.Play();
+        yield return new WaitForSeconds(4f);
+        destroyParticle.gameObject.SetActive(false);
+
+        bossObject.SetActive(false);
+
+        boomParticle.gameObject.SetActive(true);
+        boomParticle.Play();
+        yield return new WaitForSeconds(2f);
+        boomParticle.gameObject.SetActive(false);
+
+        isInCutScene = false;
+        playerMovement.stunned = false;
+        playerMeleeController.attackSilenced = false;
+        cameraFollow.SetTargetRoot(playerTransform);
+        cameraFollow.extraZoom = originalExtraZoom;
+        cameraFollow.mouseInfluence = originalMouseInfluence;
+    }
+
+#endregion
 
 #region Jump
     public void Jump()
