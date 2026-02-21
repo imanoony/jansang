@@ -26,7 +26,7 @@ public class Boss1_LeftHand : MonoBehaviour
     private Coroutine graspCoroutine;
 
 
-    private void Awake()
+    private void Start()
     {   
         bossManage = GetComponentInParent<Boss1_Manage>();
         spriteRenderer = GetComponent<SpriteRenderer>();

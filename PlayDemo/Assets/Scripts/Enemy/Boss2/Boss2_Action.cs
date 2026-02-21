@@ -150,7 +150,7 @@ public class Boss2_Action : MonoBehaviour
         bossCounter.explodeEffect.SetActive(true);
 
         exploded = true;
-        bossCounter.gameObject.transform.localScale = new Vector3(1f, 1f, 1f);
+        bossCounter.gameObject.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
         yield return new WaitForSeconds(0.2f);
 
         bossCounter.explodeEffect.SetActive(false);

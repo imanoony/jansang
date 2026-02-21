@@ -14,15 +14,16 @@ public class Boss2_Collision : MonoBehaviour
     
     private void OnTriggerEnter2D(Collider2D col)
     {
-        if(bossManage.currentPattern != Boss2_Pattern.Counter && 
-        ((1 << col.gameObject.layer) & bossManage.attackLayer.value) != 0)
-        {
-            // 데미지 처리
-        }
-
         if(bossAction.dashing && col.gameObject.CompareTag("Player"))
         {
             bossAction.DashKnockBack(col);
+            return;
+        }
+
+        if(bossManage.currentPattern != Boss2_Pattern.Counter && 
+        ((1 << col.gameObject.layer) & bossManage.attackLayer.value) != 0)
+        {
+            bossManage.TakeDamage(1);
         }
     }
 }

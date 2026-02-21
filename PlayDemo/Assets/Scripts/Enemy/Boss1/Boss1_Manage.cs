@@ -136,6 +136,7 @@ public class Boss1_Manage : MonoBehaviour
         leftHandSprite = leftHandObject.GetComponent<SpriteRenderer>();
         rightHandSprite = rightHandObject.GetComponent<SpriteRenderer>();
         bodySprite = bodyObject.GetComponent<SpriteRenderer>();
+        
         playerObject = GameObject.FindGameObjectWithTag("Player");
         playerTransform = playerObject.GetComponent<Transform>();
         playerMovement = playerObject.GetComponent<PlayerMovement2D>();
@@ -147,6 +148,7 @@ public class Boss1_Manage : MonoBehaviour
     private void Start()
     {
         // For Cut Scene Test
+        isInCutScene = true;
         StartCoroutine(Boss1_AppearScene());
 
         altarObjects = FindObjectsByType<Transform>(FindObjectsSortMode.None)
