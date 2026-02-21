@@ -60,11 +60,11 @@ public class ArcherEnemy : EnemyBase
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        // Gizmos.DrawWireSphere(transform.position, detectionRadius);
-        // Gizmos.color = Color.red;
-        // Gizmos.DrawWireSphere(transform.position, combatRadius);
-        // Gizmos.color = Color.yellow;
-        // Gizmos.DrawWireSphere(nextPlatform ?? transform.position, 1);
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, combatRadius);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(nextPlatform ?? transform.position, 1);
     }
 #endif
     protected override void Start()

@@ -18,6 +18,7 @@ MonoBehaviour:
   highlightPixel: 150
   actionmapname: Player
   actionname: Jump
+  actionPhase: 2
   tutorialTextPos: {x: 0, y: 300}
   tutorialText: 'Spacebar to Jump '
   tutorialImagePos: {x: 0, y: 0}

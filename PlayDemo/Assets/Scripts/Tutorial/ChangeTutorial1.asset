@@ -10,16 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 16dfd3bf46c544b02b68235f41255fc9, type: 3}
-  m_Name: Change
+  m_Name: ChangeTutorial1
   m_EditorClassIdentifier: Assembly-CSharp::TutorialComponent
   isHighlighting: 1
   highlightPosition: {x: 0, y: 0, z: 0}
-  highlightTransformId: 0
+  highlightTransformId: 2
   highlightPixel: 150
   actionmapname: Player
-  actionname: Move
+  actionname: TimeSlow
+  actionPhase: 2
   tutorialTextPos: {x: 0, y: 300}
-  tutorialText: 'MOVE : A to Left, D to Right'
+  tutorialText: Hold RightClick To Find...
   tutorialImagePos: {x: 0, y: 0}
   isUsingImage: 0
   tutorialImage: {fileID: 0}
