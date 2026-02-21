@@ -60,6 +60,8 @@ public class TutorialManager : MonoBehaviour
         tutorialText.text = tc.tutorialText;
 
         canGotoNext = false;
+        
+        if (tc.playerDisabled) GameObject.FindWithTag("Player").GetComponent<PlayerMovement2D>().disable = false;
 
         InputAction action = InputSystem.actions.FindActionMap(tc.actionmapname).FindAction(tc.actionname);
         if (tc.specialConditionForNextTutorial == 0)

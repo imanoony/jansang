@@ -22,6 +22,9 @@ MonoBehaviour:
   actionPhase: 4
   tutorialTextPos: {x: 0, y: 300}
   tutorialText: Release To Change with mouse cursor on target
+  nextCameraClamperId: 0
+  wallToBeGone: 0
   tutorialImagePos: {x: 0, y: 0}
   isUsingImage: 0
   tutorialImage: {fileID: 0}
+  playerDisabled: 0

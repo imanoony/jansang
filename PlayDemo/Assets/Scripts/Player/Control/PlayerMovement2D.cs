@@ -90,7 +90,7 @@ public class PlayerMovement2D : MonoBehaviour
     {
         rawInput = context.ReadValue<Vector2>();
 
-        if (dashing || stunned) { moveInput = 0f; return; }
+        if (!CanMove()) { moveInput = 0f; return; }
 
         if (context.performed || context.canceled)
         {
@@ -101,7 +101,7 @@ public class PlayerMovement2D : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (dashing || stunned) return;
+        if (!CanMove()) return;
 
         if (context.performed)
             TriggerJump();
@@ -142,13 +142,15 @@ public class PlayerMovement2D : MonoBehaviour
     public float actualSpeed;
     
     private Vector2 movementVector;
+    public bool disable = false;
+    public bool CanMove()
+    {
+        return !dashing && !stunned && !disable;
+    }
     
-
     void Move()
     {
-
-        if (dashing || stunned) return;
-
+        if (!CanMove()) moveInput = 0;
         if (moveInput != 0)
         {
             actualSpeed += moveInput * moveSpeedAccel * Time.deltaTime;

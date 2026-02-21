@@ -26,4 +26,6 @@ public class TutorialComponent : ScriptableObject
     public Vector2 tutorialImagePos;
     public bool isUsingImage;
     public Sprite tutorialImage;
+
+    public bool playerDisabled = false;
 }
