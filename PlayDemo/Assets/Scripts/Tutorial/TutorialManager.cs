@@ -14,8 +14,10 @@ public class TutorialManager : MonoBehaviour
     
     private int timeStopId;
     public Transform[] tutorialTransforms;
+    public RectTransform[] tutorialUiElements;
     public Collider2D[] cameraClampers;
     public GameObject[] wallsToNextSection;
+    public GameObject[] tutorialTriggers;
     public bool isTutorialActive;
 
     private SpotlightHighlighter spotlightHighlighter;
@@ -40,9 +42,12 @@ public class TutorialManager : MonoBehaviour
         Instance = this;
     }
 
+    public Transform playerTransform;
+    
     private void Start()
     {
         spotlightHighlighter = GetComponent<SpotlightHighlighter>();
+        playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
     }
     
 
@@ -50,9 +55,10 @@ public class TutorialManager : MonoBehaviour
     {
         isTutorialActive = true;
         
-        if (tc.isHighlighting)
+        if (tc.isHighlighting )
         {
-            spotlightHighlighter.HighlightWorld(tutorialTransforms[tc.highlightTransformId], tc.highlightPixel);
+            if (tc.worldObjectHighlight) spotlightHighlighter.HighlightWorld(tutorialTransforms[tc.highlightTransformId], tc.highlightPixel);
+            else  spotlightHighlighter.HighlightUI(tutorialUiElements[tc.highlightTransformId], tc.highlightPixel);
         }
         
         tutorialText.gameObject.SetActive(true);
@@ -100,6 +106,9 @@ public class TutorialManager : MonoBehaviour
 
         if (tc.nextCameraClamperId != 0) tutorialCamera.boundsCollider = cameraClampers[tc.nextCameraClamperId];
         if (tc.wallToBeGone != 0) wallsToNextSection[tc.wallToBeGone].SetActive(false);
+        if (tc.nextTutorialTriggerId != 0) tutorialTriggers[tc.nextTutorialTriggerId].SetActive(true);
+
+        if (tc.thenFocusPlayer) tutorialCamera.SetTargetRoot(playerTransform);
         
         isTutorialActive = false;
     }
@@ -110,9 +119,30 @@ public class TutorialManager : MonoBehaviour
         canGotoNext = true;
     }
 
-    public void PlayerActualliySwap()
+
+    private bool swapGood = false;
+    public TutorialComponent swapGoodComponent;
+    public int swappedMonsterDieHighlightIndex = 4;
+    public void PlayerActualliySwap(Transform target)
     {
-        if (currentTc.specialConditionForNextTutorial == 1) canGotoNext = true;
+        if (swapGood) return;
+        if (currentTc.specialConditionForNextTutorial == 1)
+        {
+            tutorialCamera.targetRoot = target;
+            target.GetComponent<EnemyBase>().onDeath.AddListener(SwappedMonsterDie);
+            canGotoNext = true;
+            swapGood = true;
+            tutorialTransforms[swappedMonsterDieHighlightIndex] = target;
+        }
+    }
+
+    public void SwappedMonsterDie()
+    {
+        GameObject tf = new GameObject("TMP");
+        tf.transform.position = tutorialTransforms[swappedMonsterDieHighlightIndex].position;
+        tutorialTransforms[swappedMonsterDieHighlightIndex] = tf.transform;
+        tutorialCamera.SetTargetRoot(tf.transform);
+        ShowTutorial(swapGoodComponent).Forget();
     }
 
     public int attackTutorialClamper;
@@ -139,4 +169,8 @@ public class TutorialManager : MonoBehaviour
             wallsToNextSection[section2Wall].SetActive(false);
         }
     }
+
+    private bool firstSwapHitMonster;
+
+
 }

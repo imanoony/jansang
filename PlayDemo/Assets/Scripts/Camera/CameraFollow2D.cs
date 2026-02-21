@@ -8,7 +8,7 @@ public class CameraFollow2D : MonoBehaviour
 
     [Header("Target")]
     public Transform targetRoot;
-    private Transform target;
+    public Transform target;
 
     [Header("Move")]
     public float followLerpSpeed = 10f;
@@ -112,7 +112,7 @@ public class CameraFollow2D : MonoBehaviour
             transform.position = Vector3.Lerp(
                 transform.position,
                 desiredPos,
-                Time.deltaTime * followLerpSpeed
+                Time.unscaledDeltaTime * followLerpSpeed
             );
         }
 
@@ -121,7 +121,7 @@ public class CameraFollow2D : MonoBehaviour
         cam.orthographicSize = Mathf.Lerp(
             cam.orthographicSize,
             targetZoom,
-            Time.deltaTime * zoomLerpSpeed
+            Time.unscaledDeltaTime * zoomLerpSpeed
         );
 
         if (useBounds)
@@ -470,6 +470,7 @@ public class CameraFollow2D : MonoBehaviour
     public void SetTargetRoot(Transform newRoot)
     {
         targetRoot = newRoot;
-        target = targetRoot.GetChild(0);
+        if (targetRoot.childCount > 0) target = targetRoot.GetChild(0);
+        else target = targetRoot;
     }
 }

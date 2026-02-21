@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 16dfd3bf46c544b02b68235f41255fc9, type: 3}
-  m_Name: ChangeTutorial2
+  m_Name: SwappedEnemyHitTutorial
   m_EditorClassIdentifier: Assembly-CSharp::TutorialComponent
   worldObjectHighlight: 1
-  specialConditionForNextTutorial: 1
+  specialConditionForNextTutorial: 0
   isHighlighting: 1
   highlightPosition: {x: 0, y: 0, z: 0}
-  highlightTransformId: 3
+  highlightTransformId: 4
   highlightPixel: 150
   actionmapname: Player
-  actionname: TimeSlow
-  actionPhase: 4
+  actionname: Attack
+  actionPhase: 2
   tutorialTextPos: {x: 0, y: 300}
-  tutorialText: Release To Change with mouse cursor on target
+  tutorialText: Swapped Enemy can be hit by other enemies a while
   nextCameraClamperId: 0
   wallToBeGone: 0
   tutorialImagePos: {x: 0, y: 0}
   isUsingImage: 0
   tutorialImage: {fileID: 0}
-  thenFocusPlayer: 0
+  thenFocusPlayer: 1
   playerDisabled: 0
-  nextTutorialTriggerId: 1
+  nextTutorialTriggerId: 0

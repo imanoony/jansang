@@ -41,12 +41,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Aspect: 1
     - _EnableExternalAlpha: 0
-    - _Radius: 0.05
+    - _Radius: 0.17
     - _Softness: 0.005
     - _ZWrite: 0
     m_Colors:
-    - _Center: {r: 0.5, g: 0.5, b: 0, a: 0}
+    - _Center: {r: 0.15, g: 0.93, b: 0, a: 0}
     - _Color: {r: 0, g: 0, b: 0, a: 0.72156864}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

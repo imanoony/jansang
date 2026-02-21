@@ -180,7 +180,7 @@ public class SwapSkill : MonoBehaviour
 
         if (TutorialManager.Instance != null)
         {
-            TutorialManager.Instance.PlayerActualliySwap();
+            TutorialManager.Instance.PlayerActualliySwap(target);
         }
     }
 
