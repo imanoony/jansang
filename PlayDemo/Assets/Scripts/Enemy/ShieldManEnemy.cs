@@ -20,6 +20,7 @@ public class ShieldManEnemy : EnemyBase
     [SerializeField] private float thrustRadius = 1.3f;
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private LayerMask enemyHittableLayer;
+    public bool isWandering = true;
     #endregion
     #region components
     [SerializeField] private Collider2D attackArea;
@@ -70,7 +71,8 @@ public class ShieldManEnemy : EnemyBase
             else
             {
                 directionTimeChangeElapsed = directionTimeChange;
-                int dir = Random.Range(-1, 2);
+                int dir = 0;
+                if (isWandering) dir = Random.Range(-1, 2);
                 ChangeDirection(dir);
                 FlipByDirection(dir);
             }
