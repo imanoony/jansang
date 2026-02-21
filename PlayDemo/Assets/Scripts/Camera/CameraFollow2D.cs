@@ -385,7 +385,7 @@ public class CameraFollow2D : MonoBehaviour
         shakeRequests.Clear();
         zoomRequests.Clear();
     }
-}
+
     public void SetTargetRoot(Transform newRoot)
     {
         targetRoot = newRoot;
