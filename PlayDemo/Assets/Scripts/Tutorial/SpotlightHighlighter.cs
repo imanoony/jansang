@@ -46,6 +46,9 @@ public class SpotlightHighlighter : MonoBehaviour
             _mat = Instantiate(overlayImage.material);
             overlayImage.material = _mat;
         }
+        
+        float aspect = overlayRect.rect.width / overlayRect.rect.height;
+        _mat.SetFloat("_Aspect", aspect);
 
         // 시작은 꺼둔다고 가정
         if (overlayRoot != null) overlayRoot.SetActive(false);
@@ -157,9 +160,11 @@ public class SpotlightHighlighter : MonoBehaviour
         float radiusUV = radiusPixels / minSize;
         float softUV   = softnessPixels / minSize;
 
+        
         _mat.SetVector(CenterId, new Vector4(uv.x, uv.y, 0, 0));
-        _mat.SetFloat(RadiusId, radiusUV);
-        _mat.SetFloat(SoftId, softUV);
+        float h = overlayRect.rect.height;
+        _mat.SetFloat(RadiusId, radiusPixels / h);
+        _mat.SetFloat(SoftId, softnessPixels / h);
     }
 
     private bool TryScreenPointToOverlayUV(Vector2 screenPt, out Vector2 uv)

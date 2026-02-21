@@ -8,6 +8,8 @@ public class TutorialComponent : ScriptableObject
     public Vector3 highlightPosition;
     public int highlightTransformId;
 
+    public float highlightPixel = 10;
+
     public string actionmapname;
     public string actionname;
 

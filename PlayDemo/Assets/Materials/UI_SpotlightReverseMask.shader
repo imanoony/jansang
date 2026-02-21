@@ -6,6 +6,7 @@ Shader "UI/SpotlightReverseMask"
         _Center("Center (UV)", Vector) = (0.5, 0.5, 0, 0)
         _Radius("Radius (UV)", Float) = 0.15
         _Softness("Softness (UV)", Float) = 0.02
+        _Aspect("Aspect (W/H)", Float) = 1
 
         // UI 기본 텍스처(사실상 흰색이면 됨)
         [PerRendererData]_MainTex("Sprite Texture", 2D) = "white" {}
@@ -53,6 +54,7 @@ Shader "UI/SpotlightReverseMask"
             float4 _Center;
             float _Radius;
             float _Softness;
+            float _Aspect;
 
             v2f vert(appdata_t v)
             {
@@ -70,6 +72,7 @@ Shader "UI/SpotlightReverseMask"
 
                 // 원형 거리(uv space)
                 float2 d = i.uv - _Center.xy;
+                d.x *= _Aspect;          // ✅ 가로 비율 보정
                 float dist = length(d);
 
                 // dist <= radius => 구멍(투명)

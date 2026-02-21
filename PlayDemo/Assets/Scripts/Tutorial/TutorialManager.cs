@@ -41,7 +41,7 @@ public class TutorialManager : MonoBehaviour
         
         if (tc.isHighlighting)
         {
-            spotlightHighlighter.HighlightWorld(tutorialTransforms[tc.highlightTransformId], 1);
+            spotlightHighlighter.HighlightWorld(tutorialTransforms[tc.highlightTransformId], tc.highlightPixel);
         }
         
         tutorialText.gameObject.SetActive(true);
