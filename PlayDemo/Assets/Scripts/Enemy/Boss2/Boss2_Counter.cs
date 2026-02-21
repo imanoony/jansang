@@ -40,7 +40,7 @@ public class Boss2_Counter : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D col)
+    private void OnTriggerStay2D(Collider2D col)
     {
         if (!bossAction.exploded && ((1 << col.gameObject.layer) & bossManage.attackLayer.value) != 0)
         {

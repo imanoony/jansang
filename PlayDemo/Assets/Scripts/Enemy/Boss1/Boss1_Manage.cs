@@ -48,6 +48,10 @@ public class Boss1_Manage : MonoBehaviour
     public ParticleSystem destroyParticle;
     public SpriteMask bodyMask;
 
+    [Header("UI")]
+    public Boss1_UI bossUI;
+
+
     [Header("Movement")]
     [SerializeField] private Rigidbody2D bossRB;
     [SerializeField] private float moveSpeed = 2.5f;
@@ -59,6 +63,7 @@ public class Boss1_Manage : MonoBehaviour
     [SerializeField] private GameObject rightHandObject;
     public Vector2 lHandOrigin = new Vector2(-2.4f, 0f);
     public Vector2 rHandOrigin = new Vector2(2.4f, 0f);
+    public Vector2 handScale = new Vector2(1.3f, 1.3f);
     private Boss1_Body bossBody;
     private Boss1_LeftHand bossLeftHand;
     private Boss1_RightHand bossRightHand;
@@ -110,9 +115,11 @@ public class Boss1_Manage : MonoBehaviour
     private float rHandPatternMaxTime = 6f;
 
     [Header("Boss Health")]
-    [SerializeField] private int lHandHealth = 10;
-    [SerializeField] private int rHandHealth = 10;
-    [SerializeField] private int bodyHealth = 20;
+    public int maxHealth = 40;
+    public int totalHealth = 40;
+    public int lHandHealth = 10;
+    public int rHandHealth = 10;
+    public int bodyHealth = 20;
 
 #region Get Components
     private void Awake()
@@ -143,13 +150,15 @@ public class Boss1_Manage : MonoBehaviour
         playerRigidbody = playerObject.GetComponent<Rigidbody2D>();
         playerHitCheck = playerObject.GetComponent<PlayerHitCheck>();
         playerMeleeController = playerObject.GetComponent<MeleeController2D>();
+    
+        bossUI = GameObject.Find("Boss UI").GetComponent<Boss1_UI>();
     }
 
     private void Start()
     {
         // For Cut Scene Test
         isInCutScene = true;
-        StartCoroutine(Boss1_AppearScene());
+        StartBoss1Fight();
 
         altarObjects = FindObjectsByType<Transform>(FindObjectsSortMode.None)
         .Where(t => t.gameObject.name == "Altar")
@@ -167,6 +176,12 @@ public class Boss1_Manage : MonoBehaviour
     {
         if(currentBodyPattern == Boss1_BodyPattern.Destroyed || isInCutScene) return;
 
+        lHandHealth = Mathf.Max(lHandHealth, 0);
+        rHandHealth = Mathf.Max(rHandHealth, 0);
+        bodyHealth = Mathf.Max(bodyHealth, 0);
+        totalHealth = lHandHealth + rHandHealth + bodyHealth;
+        bossUI.UpdateHealthBar((float)totalHealth / maxHealth);
+
         MapPatternManage();
         BossMoveManage();
         BodyPatternManage();
@@ -174,10 +189,19 @@ public class Boss1_Manage : MonoBehaviour
         RHandPatternManage();
     }
 
+    public void StartBoss1Fight()
+    {
+        maxHealth = bodyHealth + lHandHealth + rHandHealth;
+        totalHealth = maxHealth;
+        StartCoroutine(Boss1_AppearScene());
+    }
+
 #region Cut Scene
 
     public IEnumerator Boss1_AppearScene()
     {
+        bossUI.UI_Disappear();
+
         rewardSpirit.SetActive(false);
 
         isInCutScene = true;
@@ -214,12 +238,14 @@ public class Boss1_Manage : MonoBehaviour
         {
             timer += Time.deltaTime;
             
-            leftHandObject.transform.localScale = Vector2.Lerp(Vector2.one * 0.5f, Vector2.one, timer / handAppearTime);
+            leftHandObject.transform.localScale = Vector2.Lerp(Vector2.one * 0.5f, handScale, timer / handAppearTime);
             leftHandSprite.color = new Vector4(originLHandColor.r, originLHandColor.g, originLHandColor.b, Mathf.Lerp(0f, originLHandColor.a, timer / handAppearTime));
-            rightHandObject.transform.localScale = Vector2.Lerp(Vector2.one * 0.5f, Vector2.one, timer / handAppearTime);
+            rightHandObject.transform.localScale = Vector2.Lerp(Vector2.one * 0.5f, handScale, timer / handAppearTime);
             rightHandSprite.color = new Vector4(originRHandColor.r, originRHandColor.g, originRHandColor.b, Mathf.Lerp(0f, originRHandColor.a, timer / handAppearTime));
             yield return null;
         }
+
+        StartCoroutine(bossUI.UI_Appear());
 
         cameraFollow.SetTransformMode(true);
         cameraFollow.SetTargetRoot(playerTransform);
@@ -231,6 +257,8 @@ public class Boss1_Manage : MonoBehaviour
 
     public IEnumerator Boss1_DestroyScene()
     {
+        bossUI.UI_Disappear();
+
         StopCoroutine("ObjectMoveControl");
         StopCoroutine("ObjectMoveControlLocalPos");
 

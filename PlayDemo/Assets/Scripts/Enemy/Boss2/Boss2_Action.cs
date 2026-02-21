@@ -10,7 +10,6 @@ public class Boss2_Action : MonoBehaviour
     public Boss2_Slash bossSlash;
     public Boss2_Counter bossCounter;
     public Boss2_Laser bossLaser;
-    public SpriteRenderer bossSR;
 
     [Header("Sprites")]
     public Sprite idleSprite;
@@ -19,6 +18,8 @@ public class Boss2_Action : MonoBehaviour
     public Sprite counterSprite;
     public Sprite laserSprite;
     public Vector3 originalScale;
+    public Color originalEyeColor;
+    public Color originalColor;
 
     [Header("Dash")]
     public bool dashing = false;
@@ -33,6 +34,7 @@ public class Boss2_Action : MonoBehaviour
 
     [Header("Laser")]
     public float laserDuration = 0.4f;
+    public float laserAngleOffset = 15f;
     
 
     void Awake()
@@ -43,7 +45,6 @@ public class Boss2_Action : MonoBehaviour
         bossCounter = GetComponentInChildren<Boss2_Counter>(includeInactive: true);
         bossLaser = GetComponentInChildren<Boss2_Laser>(includeInactive: true);
         
-        bossSR = GetComponent<SpriteRenderer>();
 
         bossSlash.gameObject.SetActive(false);
         bossCounter.gameObject.SetActive(false);
@@ -52,31 +53,31 @@ public class Boss2_Action : MonoBehaviour
         originalScale = gameObject.transform.localScale;
     }
 
-    public IEnumerator Boss2_Charge<T>(float chargeTime, bool isRight, Sprite sprite, System.Func<T, IEnumerator> skill, T parameter)
+    void Start()
+    {
+        
+    }
+
+    public IEnumerator Boss2_Charge<T>(float chargeTime, bool isRight, Color eyeColor, System.Func<T, IEnumerator> skill, T parameter)
     {
         gameObject.transform.localScale = new Vector3(isRight ? originalScale.x : -originalScale.x, originalScale.y, originalScale.z);
-        
-        bossSR.sprite = sprite;
 
         // Charge Animation
-        Color color = bossSR.color;
-        bossSR.color = color * 0.5f;
+        bossManage.SetBossColor(new Color(originalColor.r, originalColor.g, originalColor.b, 0.3f), eyeColor);
         yield return new WaitForSeconds(chargeTime);
-        bossSR.color = color;
+        bossManage.SetBossColor(originalColor, originalEyeColor);
 
         StartCoroutine(skill(parameter));
     }
 
-    public IEnumerator Boss2_Charge(float chargeTime, bool isRight, Sprite sprite, System.Func<IEnumerator> skill)
+    public IEnumerator Boss2_Charge(float chargeTime, bool isRight, Color eyeColor, System.Func<IEnumerator> skill)
     {
         gameObject.transform.localScale = new Vector3(isRight ? originalScale.x : -originalScale.x, originalScale.y, originalScale.z);
-        bossSR.sprite = sprite;
 
         // Charge Animation
-        Color color = bossSR.color;
-        bossSR.color = color * 0.5f;
+        bossManage.SetBossColor(new Color(originalColor.r, originalColor.g, originalColor.b, 0.3f), eyeColor);
         yield return new WaitForSeconds(chargeTime);
-        bossSR.color = color;
+        bossManage.SetBossColor(originalColor, originalEyeColor);
 
         StartCoroutine(skill());
     }
@@ -96,7 +97,7 @@ public class Boss2_Action : MonoBehaviour
         bossManage.bossRB.linearVelocity = Vector2.zero;
         dashing = false;
 
-        bossSR.sprite = idleSprite;
+        bossManage.SetBossColor(originalColor, originalEyeColor);
         bossManage.patternTimer = bossManage.patternCooldown;
         bossManage.currentPattern = Boss2_Pattern.Idle;
     }
@@ -130,7 +131,7 @@ public class Boss2_Action : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         bossSlash.gameObject.SetActive(false);
 
-        bossSR.sprite = idleSprite;
+        bossManage.SetBossColor(originalColor, originalEyeColor);
         bossManage.patternTimer = bossManage.patternCooldown;
         bossManage.currentPattern = Boss2_Pattern.Idle;
     }
@@ -147,16 +148,17 @@ public class Boss2_Action : MonoBehaviour
         yield return new WaitForSeconds(counterDuration);
 
         bossCounter.counterEffect.SetActive(false);
+        
+        exploded = true;
         bossCounter.explodeEffect.SetActive(true);
 
-        exploded = true;
         bossCounter.gameObject.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
         yield return new WaitForSeconds(0.2f);
 
         bossCounter.explodeEffect.SetActive(false);
         bossCounter.gameObject.SetActive(false);
 
-        bossSR.sprite = idleSprite;
+        bossManage.SetBossColor(originalColor, originalEyeColor);
         bossManage.patternTimer = bossManage.patternCooldown;
         bossManage.currentPattern = Boss2_Pattern.Idle;
 
@@ -172,7 +174,7 @@ public class Boss2_Action : MonoBehaviour
         yield return new WaitForSeconds(laserDuration);
         bossLaser.gameObject.SetActive(false);
 
-        bossSR.sprite = idleSprite;
+        bossManage.SetBossColor(originalColor, originalEyeColor);
         bossManage.patternTimer = bossManage.patternCooldown;
         bossManage.currentPattern = Boss2_Pattern.Idle;
     }

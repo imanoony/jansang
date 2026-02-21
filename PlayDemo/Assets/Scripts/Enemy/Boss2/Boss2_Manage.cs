@@ -27,7 +27,9 @@ public class Boss2_Manage : MonoBehaviour
     public GameObject particleParent;
     public ParticleSystem destroyParticle;
     public ParticleSystem boomParticle;
-    
+
+    [Header("UI")]
+    public Boss2_UI bossUI;
 
     [Header("Movement")]
     public Rigidbody2D bossRB;
@@ -36,7 +38,6 @@ public class Boss2_Manage : MonoBehaviour
     public float moveAccel = 0.5f;
     public float breakAccel = 4f;
     public GameObject bossObject;
-    private SpriteRenderer bossSR;
 
     [Header("Jump")]
     public bool isJumped = false;
@@ -63,6 +64,7 @@ public class Boss2_Manage : MonoBehaviour
     public float patternCooldown = 6f;
     public float moveTimer = 0f;
     public float moveCooldown = 1.5f;
+    public bool fireOn = false;
 
     [Header("Pattern Settings")]
     public float laserDistance = 8f;
@@ -81,9 +83,22 @@ public class Boss2_Manage : MonoBehaviour
     private Boss2_Action bossAction;
 
     [Header("Boss Health")]
+    public int maxHealth = 10;
     public int health = 10;
     public float invincibleTime = 1f;
     public bool isInvincible = false;
+
+    [Header("Sprites")]
+    public GameObject spriteParent;
+    public SpriteRenderer eyesSR;
+    public SpriteRenderer headSR;
+    public SpriteRenderer bodySR;
+    public Vector2 originalEyePos;
+    public Vector2 originalHeadPos;
+    public Color dashEyeColor;
+    public Color slashEyeColor;
+    public Color counterEyeColor;
+    public Color laserEyeColor;
 
 #region Get References
     private void Awake()
@@ -92,7 +107,6 @@ public class Boss2_Manage : MonoBehaviour
 
         bossRB = GetComponent<Rigidbody2D>();
         bossObject = gameObject.transform.GetChild(0).gameObject;
-        bossSR = bossObject.GetComponent<SpriteRenderer>();
         bossCol = bossObject.GetComponent<Collider2D>();
         bossAction = bossObject.GetComponentInChildren<Boss2_Action>();
 
@@ -103,27 +117,74 @@ public class Boss2_Manage : MonoBehaviour
         playerHitCheck = playerObject.GetComponent<PlayerHitCheck>();
         playerMeleeController = playerObject.GetComponent<MeleeController2D>();
 
-        particleParent = GameObject.Find("Particle");
+        spriteParent = bossObject.transform.Find("Sprite").gameObject;
+        particleParent = gameObject.transform.Find("Particle").gameObject;
         destroyParticle = particleParent.transform.Find("Destroy").GetComponent<ParticleSystem>();
         boomParticle = particleParent.transform.Find("Boom").GetComponent<ParticleSystem>();
+        
+        eyesSR = spriteParent.transform.Find("Eyes").GetComponent<SpriteRenderer>();
+        headSR = spriteParent.transform.Find("Head").GetComponent<SpriteRenderer>();
+        bodySR = spriteParent.transform.Find("Body").GetComponent<SpriteRenderer>();
+
+        bossUI = GameObject.Find("Boss UI").GetComponent<Boss2_UI>();
     }
 #endregion
 
     private void Start()
     {
         isInCutScene = true;
+        StartBossFight();
+    }
+    
+    public void StartBossFight()
+    {
+        health = maxHealth;
         StartCoroutine(Boss2_AppearScene());
     }
 
     private void Update()
     {
+        if(currentPattern == Boss2_Pattern.Moving)
+        {
+            eyesSR.gameObject.transform.localPosition = new Vector3(
+                0.05f, 0.25f, 0f
+            );
+            headSR.gameObject.transform.localPosition = new Vector3(
+                0.05f, 0.25f, 0f
+            );
+            bodySR.gameObject.transform.localRotation = Quaternion.Euler(
+                0f, 0f, -15f
+            );
+        }
+        else
+        {
+            eyesSR.gameObject.transform.localPosition = new Vector3(
+                0.0f, 0.25f, 0f
+            );
+            headSR.gameObject.transform.localPosition = new Vector3(
+                0.0f, 0.25f, 0f
+            );
+            bodySR.gameObject.transform.localRotation = Quaternion.Euler(
+                0f, 0f, 0f
+            );
+        }
+
         if(isInCutScene || !bossObject.gameObject.activeSelf){ return; }
+
+        bossUI.UpdateHealthBar((float)health / maxHealth);
 
         CheckPlayer();
         CheckGround();
         MoveManage();
         PatternManage();
         JumpManage();
+    }
+
+    public void SetBossColor(Color color, Color eyeColor)
+    {
+        eyesSR.color = eyeColor;
+        headSR.color = color;
+        bodySR.color = color;
     }
 
 #region Damage
@@ -146,10 +207,12 @@ public class Boss2_Manage : MonoBehaviour
     IEnumerator DamageEffect()
     {
         isInvincible = true;
-        Color originalColor = bossSR.color;
-        bossSR.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.3f);
+        Color eyeOriginalColor = bossAction.originalEyeColor;
+        Color originalColor = bossAction.originalColor;
+        SetBossColor(new Color(originalColor.r, originalColor.g, originalColor.b, 0.3f), 
+                    new Color(eyeOriginalColor.r, eyeOriginalColor.g, eyeOriginalColor.b, 0.3f));
         yield return new WaitForSeconds(invincibleTime);
-        bossSR.color = originalColor;
+        SetBossColor(originalColor, eyeOriginalColor);
         isInvincible = false;
     }
 #endregion
@@ -159,6 +222,7 @@ public class Boss2_Manage : MonoBehaviour
     public IEnumerator Boss2_AppearScene()
     {
         bossObject.SetActive(false);
+        currentPattern = Boss2_Pattern.Moving;
 
         float originalMouseInfluence = cameraFollow.mouseInfluence;
         float originalExtraZoom = cameraFollow.extraZoom;
@@ -176,8 +240,10 @@ public class Boss2_Manage : MonoBehaviour
         bossObject.SetActive(true);
 
         Vector3 originalScale = transform.localScale;
-        Color originColor = bossSR.color;
-        bossSR.color = new Color(originColor.r, originColor.g, originColor.b, 0.3f);
+        Color eyeOriginalColor = eyesSR.color;
+        Color originalColor = bodySR.color;
+        SetBossColor(new Color(originalColor.r, originalColor.g, originalColor.b, 0.3f), 
+                    new Color(eyeOriginalColor.r, eyeOriginalColor.g, eyeOriginalColor.b, 0.3f));
         transform.position = playerTransform.position + new Vector3(7f, 0f, 0f);
         transform.localScale = new Vector3(-originalScale.x, originalScale.y, originalScale.z);
 
@@ -208,19 +274,25 @@ public class Boss2_Manage : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        bossSR.color = originColor;
+        SetBossColor(originalColor, eyeOriginalColor);
+        bossRB.linearVelocity = Vector2.zero;
         transform.position = bossStartPosition;
 
         playerMovement.stunned = false;
         playerMeleeController.attackSilenced = false;
 
+        bossUI.StartCoroutine(bossUI.UI_Appear());
         isInCutScene = false;
+        fireOn = true;
         cameraFollow.extraZoom = originalExtraZoom;
         cameraFollow.mouseInfluence = originalMouseInfluence;
     }
 
     public IEnumerator Boss2_DestoryScene()
     {
+        bossUI.UI_Disappear();
+        fireOn = false;
+
         isInCutScene = true;
         bossRB.linearVelocity = Vector2.zero;
         bossRB.gravityScale = 0f;
@@ -295,7 +367,7 @@ public class Boss2_Manage : MonoBehaviour
             bounds.size,
             0f,
             Vector2.down,
-            tileSize*0.7f,
+            tileSize*0.2f,
             groundLayer
         );
 
@@ -483,7 +555,7 @@ public class Boss2_Manage : MonoBehaviour
                 StartCoroutine(bossAction.Boss2_Charge<bool>(
                     1.0f,
                     isRight,
-                    bossAction.dashSprite,
+                    dashEyeColor,
                     bossAction.Boss2_DashAction,
                     isRight
                 ));
@@ -492,7 +564,7 @@ public class Boss2_Manage : MonoBehaviour
                 StartCoroutine(bossAction.Boss2_Charge<bool>(
                     1.0f,
                     isRight,
-                    bossAction.slashSprite,
+                    slashEyeColor,
                     bossAction.Boss2_SlashAction,
                     isRight
                 ));
@@ -501,19 +573,19 @@ public class Boss2_Manage : MonoBehaviour
                 StartCoroutine(bossAction.Boss2_Charge(
                     0.0f,
                     isRight,
-                    bossAction.counterSprite,
+                    counterEyeColor,
                     bossAction.Boss2_CounterAction
                 ));
                 break;
             case Boss2_Pattern.Laser:
                 float angle = Mathf.Atan2(
-                    playerTransform.position.y - transform.position.y,
+                    playerTransform.position.y - 0.2f - transform.position.y,
                     playerTransform.position.x - transform.position.x
-                ) * Mathf.Rad2Deg + 90f;
+                ) * Mathf.Rad2Deg + 90f + bossAction.laserAngleOffset * (isRight ? 1f : -1f);
                 StartCoroutine(bossAction.Boss2_Charge<float>(
                     1.0f,
                     isRight,
-                    bossAction.laserSprite,
+                    laserEyeColor,
                     bossAction.Boss2_LaserAction,
                     angle
                 ));
