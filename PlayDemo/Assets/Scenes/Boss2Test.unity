@@ -1388,6 +1388,55 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &964277269
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 964277270}
+  - component: {fileID: 964277271}
+  m_Layer: 0
+  m_Name: Fox Fire Spawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &964277270
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 964277269}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 7, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &964277271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 964277269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc6fd4c68f89a1845a4d3478817dbd9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Boss2_FoxFireSpawn
+  foxFirePrefab: {fileID: 1141351098499917541, guid: c02f4be71678e3e4b8bc36a33513037c, type: 3}
+  bossManage: {fileID: 1349950447}
+  activeFoxFires: []
+  spawnTimer: 0
+  spawnInterval: 1
 --- !u!1 &994971647
 GameObject:
   m_ObjectHideFlags: 0
@@ -6825,11 +6874,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1024
   currentPattern: 0
-  testingPattern: 5
+  testingPattern: 0
   patternTimer: 2
   patternCooldown: 4
   moveTimer: 0
   moveCooldown: 1.5
+  fireOn: 0
   laserDistance: 5
   closeDistance: 2
   xDiff: 0
@@ -15139,6 +15189,7 @@ SceneRoots:
   - {fileID: 1285456044}
   - {fileID: 1349950446}
   - {fileID: 1239078758}
+  - {fileID: 964277270}
   - {fileID: 2007426762}
   - {fileID: 2133277428}
   - {fileID: 461361505}

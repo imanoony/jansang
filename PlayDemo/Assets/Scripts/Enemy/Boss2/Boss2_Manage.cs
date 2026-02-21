@@ -64,6 +64,7 @@ public class Boss2_Manage : MonoBehaviour
     public float patternCooldown = 6f;
     public float moveTimer = 0f;
     public float moveCooldown = 1.5f;
+    public bool fireOn = false;
 
     [Header("Pattern Settings")]
     public float laserDistance = 8f;
@@ -282,6 +283,7 @@ public class Boss2_Manage : MonoBehaviour
 
         bossUI.StartCoroutine(bossUI.UI_Appear());
         isInCutScene = false;
+        fireOn = true;
         cameraFollow.extraZoom = originalExtraZoom;
         cameraFollow.mouseInfluence = originalMouseInfluence;
     }
@@ -289,6 +291,7 @@ public class Boss2_Manage : MonoBehaviour
     public IEnumerator Boss2_DestoryScene()
     {
         bossUI.UI_Disappear();
+        fireOn = false;
 
         isInCutScene = true;
         bossRB.linearVelocity = Vector2.zero;
