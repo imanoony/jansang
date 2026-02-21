@@ -14,6 +14,21 @@ public class MeleeController2D : MonoBehaviour
     public Transform shootPos;
     public HitBox hitBox;
 
+
+    public bool attackSilenced = false;
+    public void AttackSilence(float time)
+    {
+        attackSilenced = true;
+        StartCoroutine(AttackSilenceTimer(time));
+    }
+    IEnumerator AttackSilenceTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        attackSilenced = false;
+    }
+
+
+
     void Start()
     {
         anim.gameObject.SetActive(false);
@@ -30,7 +45,7 @@ public class MeleeController2D : MonoBehaviour
 
     void TryAttack()
     {
-        if (isReloading || isAttacking) return;
+        if (isReloading || isAttacking || attackSilenced) return;
         StartCoroutine(Attack());
     }
 
