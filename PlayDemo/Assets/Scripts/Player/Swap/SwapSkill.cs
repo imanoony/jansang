@@ -79,9 +79,20 @@ public class SwapSkill : MonoBehaviour
     }
     public void OnTimeSlow(InputAction.CallbackContext ctx)
     {
+        if (ctx.started)
+        {
+            if (manager.CheckGauge(0))
+            {
+                if(silenced) return;
+                ActivateSkill();
+            }
+        }
+        
+
         if (ctx.canceled)
         {
             CheckClick();
+            DeactivateSkill();
         }
     }
 

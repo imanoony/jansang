@@ -37,8 +37,7 @@ public class CameraFollow2D : MonoBehaviour
     public bool zoomFxStack = false;
     public float zoomFxMinSize = 0f;
     public float zoomFxMaxSize = 0f;
-
-    bool isTransforming = true; // transform state
+    
     private Vector3 currentShakeOffset;
     private float currentZoomOffset;
 
@@ -79,6 +78,13 @@ public class CameraFollow2D : MonoBehaviour
         if (targetRoot != null && targetRoot.childCount > 0) target = targetRoot.GetChild(0);
         else target = targetRoot;
     }
+
+    public void StartFocus(Vector3 position)
+    {
+        
+    }
+    
+    public void StopFocus() {}
 
     void LateUpdate()
     {
