@@ -20,7 +20,7 @@ public class Bullet : MonoBehaviour
     {
         yield return new WaitForSeconds(lifeTime);
         
-        Destroy(this);
+        Destroy(gameObject);
     }
     
     void OnTriggerEnter2D(Collider2D other)

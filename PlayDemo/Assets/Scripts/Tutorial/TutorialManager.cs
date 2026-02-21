@@ -41,6 +41,7 @@ public class TutorialManager : MonoBehaviour
         
         Instance = this;
     }
+    
 
     public Transform playerTransform;
     
@@ -48,6 +49,18 @@ public class TutorialManager : MonoBehaviour
     {
         spotlightHighlighter = GetComponent<SpotlightHighlighter>();
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        
+        StartTutorial().Forget();
+    }
+
+    public GameObject startTutorialTrigger;
+
+    private async UniTask StartTutorial()
+    {
+        playerTransform.GetComponent<PlayerMovement2D>().disable = true;
+        await UniTask.Delay(TimeSpan.FromSeconds(2f), cancellationToken:this.GetCancellationTokenOnDestroy());
+        playerTransform.GetComponent<PlayerMovement2D>().disable = false;
+        startTutorialTrigger.SetActive(true);
     }
     
 
@@ -120,6 +133,7 @@ public class TutorialManager : MonoBehaviour
     }
 
 
+    [Header("Section 1 - Swap tutorial")]
     private bool swapGood = false;
     public TutorialComponent swapGoodComponent;
     public int swappedMonsterDieHighlightIndex = 4;
@@ -154,6 +168,7 @@ public class TutorialManager : MonoBehaviour
         wallsToNextSection[attackTutorialWall].SetActive(false);
     }
 
+    [Header("Section 2")]
     public int section2Monsters = 4;
     private int section2MonsterDead = 0;
     public int section2Clamper;
@@ -170,7 +185,23 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
-    private bool firstSwapHitMonster;
+    [Header("Section 3")]
+    public int section3Monsters = 8;
+    private int section3MonsterDead = 0;
+    public int section3Clamper;
+    public int section3Wall;
 
+    public void KillSection3Monsters()
+    {
+        section3MonsterDead++;
+
+        if (section3MonsterDead >= section3Monsters)
+        {
+            tutorialCamera.boundsCollider = cameraClampers[section3Clamper];
+            wallsToNextSection[section3Wall].SetActive(false);
+        }
+    }
+
+    private bool firstSwapHitMonster;
 
 }
