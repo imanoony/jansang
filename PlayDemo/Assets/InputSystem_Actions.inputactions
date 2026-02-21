@@ -49,7 +49,7 @@
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": true
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Throw",
@@ -75,7 +75,7 @@
                     "id": "852140f2-7766-474d-8707-702459ba45f3",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Hold",
                     "initialStateCheck": false
                 },
                 {
@@ -124,9 +124,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "UseTimeSlow",
+                    "name": "AnyKey",
                     "type": "Button",
-                    "id": "1d3f3c5f-87c7-4f0d-bb25-4ed4ce696175",
+                    "id": "633d82f3-b72d-40a5-9f45-b7ad48c947c7",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -478,7 +478,7 @@
                 {
                     "name": "",
                     "id": "1c04ea5f-b012-41d1-a6f7-02e963b52893",
-                    "path": "<Keyboard>/f",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -532,17 +532,6 @@
                 },
                 {
                     "name": "",
-                    "id": "d5fae532-e1cf-4076-ba2b-8249a028ba0d",
-                    "path": "<Touchscreen>/Press",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Touch",
-                    "action": "TimeSlow",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "f59aff2c-8dc8-4c58-9797-653908a776fb",
                     "path": "<Keyboard>/e",
                     "interactions": "",
@@ -576,12 +565,12 @@
                 },
                 {
                     "name": "",
-                    "id": "6944841f-63d5-4740-a8c7-a2a735dfb327",
-                    "path": "<Keyboard>/r",
+                    "id": "ca085ac4-5a77-446e-bc98-ec91cc15aad9",
+                    "path": "<Keyboard>/anyKey",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "UseTimeSlow",
+                    "groups": "",
+                    "action": "AnyKey",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

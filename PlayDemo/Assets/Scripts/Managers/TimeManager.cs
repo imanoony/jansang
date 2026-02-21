@@ -43,7 +43,7 @@ public class TimeManager : MonoBehaviour
 
     public int EnterBulletTime(float slowScale)
     {
-        slowScale = Mathf.Clamp(slowScale, 0.01f, 1f);
+        slowScale = Mathf.Clamp(slowScale, 0.00f, 1f);
         int id = ++nextRequestId;
         activeRequests[id] = slowScale;
         ApplySlowestScale();

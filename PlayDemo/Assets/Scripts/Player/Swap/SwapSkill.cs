@@ -36,12 +36,13 @@ public class SwapSkill : MonoBehaviour
     }
     
 
-
+    private InputActionMap myPlayerActionMap;
     void Start()
     {
         cam = Camera.main;
         manager = GameManager.Instance.Char;
         rb = GetComponent<Rigidbody2D>();
+        myPlayerActionMap = InputSystem.actions.FindActionMap("Player");
     }
 
     private void Update()
@@ -77,6 +78,9 @@ public class SwapSkill : MonoBehaviour
             ActivateSkill();
         }
     }
+
+    
+    
     public void OnTimeSlow(InputAction.CallbackContext ctx)
     {
         if (ctx.started)
@@ -168,6 +172,11 @@ public class SwapSkill : MonoBehaviour
         rb.linearVelocityY = 0;
         GameManager.Instance.Char.CancelTry();
         TryApplyEnemyHittable(target);
+
+        if (TutorialManager.Instance != null)
+        {
+            TutorialManager.Instance.PlayerActualliySwap();
+        }
     }
 
     // =============================

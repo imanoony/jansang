@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [SerializeField] private LayerMask enemyHittableLayer;
@@ -6,6 +8,20 @@ public class Bullet : MonoBehaviour
     Collider2D bulletCol;
     Collider2D ownerCol;
     [SerializeField] private int attackDamage = 3;
+
+    public float lifeTime = 7f;
+
+    private void Start()
+    {
+        StartCoroutine(LifeTimeRoutine());
+    }
+
+    IEnumerator LifeTimeRoutine()
+    {
+        yield return new WaitForSeconds(lifeTime);
+        
+        Destroy(this);
+    }
     
     void OnTriggerEnter2D(Collider2D other)
     {
