@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,16 @@ public class HitBox : MonoBehaviour
     public LayerMask enemyLayer;
 
     HashSet<Collider2D> hitTargets = new HashSet<Collider2D>();
+
+    public MeleeController2D.AttackState attackState;
+
+    private Transform playerTransform;
+    
+    private void Start()
+    {
+        playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+    }
+
 
     void OnEnable()
     {
@@ -34,7 +45,37 @@ public class HitBox : MonoBehaviour
     {
         if (!hitTargets.Add(other)) return;
 
-        other.GetComponent<EnemyTurretAI>()?.gameObject.SetActive(false);
-        other.GetComponent<EnemyBase>()?.Hit();
+        bool hitEnemy = false;
+        var turret = other.GetComponent<EnemyTurretAI>();
+        if (turret != null)
+        {
+            turret.gameObject.SetActive(false);
+            hitEnemy = true;
+        }
+
+        var enemy = other.GetComponent<EnemyBase>();
+        if (enemy != null)
+        {
+            switch (attackState)
+            {
+                case MeleeController2D.AttackState.Weak:
+                    enemy.Hit(1, playerTransform.position);
+                    break;
+                case MeleeController2D.AttackState.Middle:
+                    enemy.Hit(2, playerTransform.position);
+                    break;
+                case MeleeController2D.AttackState.Strong:
+                    enemy.Hit(5, playerTransform.position);
+                    break;
+                default:
+                    break;
+            }
+            
+            hitEnemy = true;
+        }
+
+        if (hitEnemy)
+        {
+        }
     }
 }

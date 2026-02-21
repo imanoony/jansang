@@ -1,31 +1,39 @@
-using UnityEngine;
-
+﻿using UnityEngine;
 public class Bullet : MonoBehaviour
 {
+    [SerializeField] private LayerMask enemyHittableLayer;
+    [SerializeField] private LayerMask playerLayer;
     Collider2D bulletCol;
     Collider2D ownerCol;
+    [SerializeField] private int attackDamage = 3;
+    
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))
         {
             Destroy(gameObject);
+            return;
+        }
+
+        if ((enemyHittableLayer.value & (1 << other.gameObject.layer)) != 0)
+        {
+            EnemyBase enemy = other.GetComponentInParent<EnemyBase>();
+            if (enemy != null)
+            {
+                enemy.Hit(attackDamage, transform.position);
+            }
+            Destroy(gameObject);
+            return;
+        }
+        
+        if ((playerLayer.value & (1 << other.gameObject.layer)) != 0)
+        {
+            PlayerHitCheck enemy = other.GetComponent<PlayerHitCheck>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(attackDamage);
+            }
+            Destroy(gameObject);
         }
     }
-    /*
-    public void Init(GameObject owner)
-    {
-        bulletCol = GetComponent<Collider2D>();
-        ownerCol = owner.GetComponent<Collider2D>();
-
-        if (bulletCol && ownerCol)
-            Physics2D.IgnoreCollision(bulletCol, ownerCol, true);
-
-        Invoke(nameof(EnableCollision), 0.1f);
-    }
-    void EnableCollision()
-    {
-        if (bulletCol && ownerCol)
-            Physics2D.IgnoreCollision(bulletCol, ownerCol, false);
-    }
-    */
 }

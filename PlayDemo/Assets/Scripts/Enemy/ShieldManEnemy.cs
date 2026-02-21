@@ -1,63 +1,66 @@
-using System;
-using System.Collections;
-using JetBrains.Annotations;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Random = UnityEngine.Random;
-
 public class ShieldManEnemy : EnemyBase
 {
     #region  parameters
-    
     [Header("Detection!")]
     [SerializeField] private float detectionRadius = 3f;
     [SerializeField] private float combatRadius = 1.5f;
-    [SerializeField] private LayerMask sightMask;   // Player + Wall
+    [SerializeField] private LayerMask sightMask;   
     [SerializeField] private LayerMask playerMask;
     [SerializeField] private LayerMask wallLayer;
-
     [Header("Movement!")] 
     [SerializeField] private float directionTimeChange = 2f;
     [SerializeField] private float flipTimeChange = 2f;
-
     [Header("Combat")] 
     [SerializeField] private float thrustRadius = 1.3f;
-    
+    [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private LayerMask enemyHittableLayer;
     #endregion
-    
     #region components
-
-    private SpriteRenderer spriteRenderer;
     [SerializeField] private Collider2D attackArea;
+    private LineRenderer lineRenderer;
     #endregion
-    
     #region status
-    
-    private bool found = false;
-    
     private float directionTimeChangeElapsed;
     private float flipTimeChangeElapsed;
-    
-    public GameObject player;
-    private Transform currentTarget;
-    
+    private bool rushStart;
+    private bool canThrust;
+    private bool automaticFlip = false;
+    private readonly HashSet<Collider2D> damageAreaHitTargets = new HashSet<Collider2D>();
+    private readonly Collider2D[] damageAreaHitResults = new Collider2D[8];
+    private ContactFilter2D enemyHittableFilter;
+    private ContactFilter2D playerFilter;
     #endregion
     protected override void Start()
     {
-        base.Start();
-        
-        spriteRenderer = GetComponent<SpriteRenderer>();
         attackArea.enabled = false;
-        player = GameObject.FindGameObjectWithTag("Player");
-        StartCoroutine(WaitForAlert());
+        base.Start();
+        lineRenderer = GetComponent<LineRenderer>();
+        enemyHittableFilter = new ContactFilter2D
+        {
+            useLayerMask = true,
+            layerMask = enemyHittableLayer,
+            useTriggers = true
+        };
+        playerFilter = new ContactFilter2D
+        {
+            useLayerMask = true,
+            layerMask = playerMask,
+            useTriggers = true
+        };
     }
-
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
     }
-
     protected override void Update()
     {
+        base.Update();
         if (!alerted)
         {
             if (directionTimeChangeElapsed > 0)
@@ -69,202 +72,234 @@ public class ShieldManEnemy : EnemyBase
                 directionTimeChangeElapsed = directionTimeChange;
                 int dir = Random.Range(-1, 2);
                 ChangeDirection(dir);
-                Flip(dir);
+                FlipByDirection(dir);
             }
-            
-            alerted = DetectPlayer(detectionRadius);
+            alerted = DetectPlayer(detectionRadius, sightMask);
         }
         else
         {
-            if (automaticFlip)
+            if (automaticFlip && Player != null)
             {
                 flipTimeChangeElapsed -= Time.deltaTime;
                 if (flipTimeChangeElapsed <= 0)
                 {
                     flipTimeChangeElapsed = flipTimeChange;
-                    
-                    if (player.transform.position.x > transform.position.x) Flip(1);
-                    else if (player.transform.position.x < transform.position.x) Flip(-1);
+                    if (Player.position.x > transform.position.x) FlipByDirection(1);
+                    else if (Player.position.x < transform.position.x) FlipByDirection(-1);
                 }
             }
             if (rushStart)
             {
-                if (DetectCliff() ||
-                    Physics2D.OverlapBox(transform.position, col.bounds.size, 0, playerMask) ||
+                if (DetectWall(wallLayer) ||
                     MoveDirection == 0)
                 {
                     rushStart = false;
                     canThrust = true;
                 }
-            } 
-            found = DetectPlayer(combatRadius); // 같은 플랫폼에 있는거로 바꾸기
+            }
+
+            UpdateFound(combatRadius, sightMask);
         }
         
-        if (DetectCliff()) ChangeDirection(0);
-    }
-
-    private void Flip(int direction)
-    {
-        //TODO: 좀 이상한데 급하게 하느라 이렇게 됨... 이거 수정해야함
-
-        var x = Mathf.Abs(transform.localScale.x);
-        if (direction == -1) transform.localScale = new Vector3(-x, transform.localScale.y, transform.localScale.z);
-        else if (direction == 1) transform.localScale = new Vector3(x, transform.localScale.y, transform.localScale.z);
-    }
-    
-    private bool DetectCliff()
-    {
-        if (MoveDirection == 0) return true;
-        
-        Vector3 start = transform.position + Vector3.right * (MoveDirection * col.bounds.extents.x * 1.2f);
-        RaycastHit2D hit = Physics2D.Raycast(start, Vector3.down, 1, groundLayer);
-        RaycastHit2D hit2 = Physics2D.Raycast(transform.position, Vector3.right * MoveDirection, col.bounds.extents.x * 1.2f, wallLayer);
-        
-        if (hit.collider == null || hit2)
+        if (!rushStart)
         {
-            return true;
+            if (DetectWall(wallLayer) || DetectCliff()) ChangeDirection(0);
         }
 
-        return false;
+        if (attackArea.enabled)
+        {
+            ApplyDamageAreaHits();
+        }
     }
-
-    private IEnumerator WaitForAlert()
+    protected override async UniTask RunAIAsync(CancellationToken token)
     {
-        yield return new WaitUntil(() => alerted);
-        
+        await UniTask.WaitUntil(() => alerted, cancellationToken: token);
         ChangeDirection(0);
-        //TEST
-        spriteRenderer.color = new Color(0f, 1f, 0f, 1f);
-            
+        SetBaseColor(new Color(0f, 1f, 0f, 1f));
         currentState = State.Alert;
         automaticFlip = true;
-
-        StartCoroutine(AlertedAction());
+        await AlertedActionAsync(token);
     }
-
-    private IEnumerator AlertedAction()
+    private async UniTask AlertedActionAsync(CancellationToken token)
     {
-        yield return new WaitForSeconds(0.5f);
-        while (true)
+        await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
+        while (!token.IsCancellationRequested)
         {
-            if (found == false || !TilemapPlatformIndex.Instance.AreOnSamePlatformByRay(player.transform, transform))
+            if (found == false || !TilemapPlatformIndex.Instance.AreOnSamePlatformByRay(Player, transform))
             {
-                currentTarget = null;
-                
-                yield return StartCoroutine(Wander());
+                CurrentTarget = null;
+                await WanderAsync(token);
             }
             else
             {
-                currentTarget = player.transform;
-                yield return StartCoroutine(AttackRoutine());
+                CurrentTarget = Player;
+                await AttackRoutineAsync(token);
             }
         }
     }
-    
-    private bool DetectPlayer(float range)
+    private async UniTask WanderAsync(CancellationToken token)
     {
-        float dist = Vector2.Distance(transform.position, player.transform.position);
-        if (dist > range) return false;
-        
-        Vector2 dir = (player.transform.position - transform.position).normalized;
-
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, sightMask);
-
-        if (hit.collider != null && hit.collider.CompareTag("Player"))
-            return true;
-
-        return false;
-    }
-
-    private bool rushStart;
-    private bool canThrust;
-
-    private bool automaticFlip = false;
-
-    private IEnumerator Wander()
-    {
-        //TEST
-        spriteRenderer.color = new Color(0f, 1f, 0f, 1f);
+        SetBaseColor(new Color(0f, 1f, 0f, 1f));
         int dir = Random.Range(-1, 2);
-
         ChangeDirection(dir);
-        yield return new WaitForSeconds(2f);
+        await UniTask.Delay(TimeSpan.FromSeconds(2f), cancellationToken: token);
         ChangeDirection(0);
     }
-    
-    private IEnumerator AttackRoutine()
-    {
-        if (currentTarget == null) yield break;
-        
-        //TEST
-        spriteRenderer.color = new Color(1f, 0f, 0f, 1f);
-        
-        // 돌진!
-        int dir;
-        if (currentTarget.transform.position.x < transform.position.x) dir = -1;
-        else dir = 1;
 
+    public float rushSpeedRate = 5;
+    
+    private async UniTask AttackRoutineAsync(CancellationToken token)
+    {
+        if (CurrentTarget == null) return;
+        SetBaseColor(new Color(1f, 0f, 0f, 1f));
+        int dir;
+        if (CurrentTarget.transform.position.x < transform.position.x) dir = -1;
+        else dir = 1;
         automaticFlip = false;
-        
         ChangeDirection(dir);
-        ChangeMoveSpeed(2);
-        Flip(dir);
+        // 1: 돌진 전에 알려주기
+        if (lineRenderer != null)
+        {
+            ChangeMoveSpeed(0);
+
+            lineRenderer.enabled = true;
+            lineRenderer.positionCount = 2;
+
+            
+            lineRenderer.SetPosition(1, transform.position);
+
+            lineRenderer.startWidth = 4f;
+            lineRenderer.endWidth = 4f;
+
+            Color c = Color.yellow;
+            c.a = 0;
+            lineRenderer.startColor = Color.yellow;
+            lineRenderer.endColor = c;
+
+            float elapsed = 0f;
+            bool aiming = true;
+            while (true)
+            {
+                elapsed += Time.deltaTime;
+                lineRenderer.SetPosition(0, transform.position);
+                if (elapsed < 0.7f) lineRenderer.SetPosition(1, transform.position + dir * elapsed * 5 * Vector3.right);
+                else if (aiming)
+                {
+                    c = Color.red;
+                    c.a = 0;
+                    lineRenderer.startColor = Color.red;
+                    lineRenderer.endColor = c;
+                    aiming = false;
+                }
+
+                if (elapsed > 1) break;
+
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken: token);
+            }
+        }
+
+        // 2: 돌진해버리기
+        lineRenderer.enabled = false;
+        ChangeMoveSpeed(rushSpeedRate);
+        FlipByDirection(dir);
         attackArea.enabled = true;
+        damageAreaHitTargets.Clear();
         rushStart = true;
         canThrust = false;
-        yield return new WaitUntil(() => canThrust);
+        await UniTask.WaitUntil(() => canThrust, cancellationToken: token);
+        
         attackArea.enabled = false;
         ChangeDirection(0);
         ChangeMoveSpeed(1f);
-        
         GetComponent<Rigidbody2D>().linearVelocityY = 3; 
-        
-        // 기절
-        spriteRenderer.color = new Color(0.4f, 0.4f, 0.4f, 1f);
-        
-        yield return new WaitForSeconds(2f);
+        SetBaseColor(new Color(0.4f, 0.4f, 0.4f, 1f));
+        await UniTask.Delay(TimeSpan.FromSeconds(2f), cancellationToken: token);
         
         automaticFlip = true;
     }
-
-    public override void Hit()
+    public override void Hit(int damage)
     {
-        if (player.transform.position.x < transform.position.x && transform.localScale.x > 0) 
-            StartCoroutine(HitRoutine());
-        
-        else if (player.transform.position.x > transform.position.x && transform.localScale.x < 0) 
-            StartCoroutine(HitRoutine());
-        
-        else 
-            StartCoroutine(GuardRoutine());
-    }
-    
-    IEnumerator HitRoutine()
-    {
-        HP -= 1;
-        if (HP < 0)
+        if (Player == null)
         {
-            Destroy(this.gameObject);
+            base.Hit(damage);
+            return;
         }
-        var sprite = GetComponent<SpriteRenderer>();
-        var c = sprite.color;
-        
-        sprite.color = Color.red;
-        
-        yield return new WaitForSeconds(0.5f);
-
-        sprite.color = c;
+        if (Player.transform.position.x < transform.position.x && transform.localScale.x > 0) 
+            base.Hit(damage);
+        else if (Player.transform.position.x > transform.position.x && transform.localScale.x < 0) 
+            base.Hit(damage);
+        else 
+            FlashColorAsync(Color.yellow, 0.5f, this.GetCancellationTokenOnDestroy()).Forget();
     }
     
-    IEnumerator GuardRoutine()
+    public override void Hit(int damage, Vector3 pos)
     {
-        var sprite = GetComponent<SpriteRenderer>();
-        var c = sprite.color;
-        
-        sprite.color = Color.yellow;
-        
-        yield return new WaitForSeconds(0.5f);
+        if (Player == null)
+        {
+            base.Hit(damage);
+            return;
+        }
+        if (pos.x < transform.position.x && transform.localScale.x > 0) 
+            base.Hit(damage);
+        else if (pos.x > transform.position.x && transform.localScale.x < 0) 
+            base.Hit(damage);
+        else 
+            FlashColorAsync(Color.yellow, 0.5f, this.GetCancellationTokenOnDestroy()).Forget();
+    }
 
-        sprite.color = c;
+    private void ApplyDamageAreaHits()
+    {
+        ApplyPlayerDamage();
+        ApplyEnemyHittableDamage();
+    }
+
+    private void ApplyPlayerDamage()
+    {
+        if (playerMask.value == 0) return;
+
+        int count = attackArea.Overlap(playerFilter, damageAreaHitResults);
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D col = damageAreaHitResults[i];
+            if (col == null) continue;
+            if (col.transform.IsChildOf(transform)) continue;
+            if (!damageAreaHitTargets.Add(col)) continue;
+
+            PlayerHitCheck player = col.GetComponentInParent<PlayerHitCheck>();
+            if (player != null)
+            {
+                rushStart = false;
+                canThrust = true;
+                player.TakeDamage(8);
+            }
+        }
+    }
+
+    private void ApplyEnemyHittableDamage()
+    {
+        if (enemyHittableLayer.value == 0) return;
+
+        LayerMask mask = enemyHittableLayer;
+        if ((enemyHittableLayer.value & (1 << gameObject.layer)) != 0)
+        {
+            mask |= enemyLayer;
+        }
+        enemyHittableFilter.layerMask = mask;
+        int count = attackArea.Overlap(enemyHittableFilter, damageAreaHitResults);
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D col = damageAreaHitResults[i];
+            if (col == null) continue;
+            if (col.transform.IsChildOf(transform)) continue;
+            if (!damageAreaHitTargets.Add(col)) continue;
+
+            EnemyBase enemy = col.GetComponentInParent<EnemyBase>();
+            if (enemy != null)
+            {
+                rushStart = false;
+                canThrust = true;
+                enemy.Hit(8, transform.position);
+            }
+        }
     }
 }

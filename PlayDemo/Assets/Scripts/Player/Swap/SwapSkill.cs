@@ -9,10 +9,14 @@ public class SwapSkill : MonoBehaviour
     public LayerMask targetLayer;
     public LayerMask wallLayer;
     [SerializeField] private BulletTimeController bulletTimeController;
+    [Header("Swap Hittable")]
+    [SerializeField] private string enemyHittableLayerName = "enemyHittable";
+    [SerializeField] private float enemyHittableDuration = 1f;
     private List<SwapTarget> visibleTargets = new List<SwapTarget>();
     private Camera cam;
     private bool skillActive = false;
     private CharacterManager manager;
+    private readonly Dictionary<GameObject, int> layerSwapVersion = new Dictionary<GameObject, int>();
 
     [Header("Silenced")]
     [SerializeField] private bool silenced = false;
@@ -142,6 +146,7 @@ public class SwapSkill : MonoBehaviour
         (transform.position, target.position) = (target.position, transform.position);
 
         GameManager.Instance.Char.CancelTry();
+        TryApplyEnemyHittable(target);
     }
 
     // =============================
@@ -159,5 +164,80 @@ public class SwapSkill : MonoBehaviour
         );
 
         return hit.collider == null;
+    }
+
+    private void TryApplyEnemyHittable(Transform target)
+    {
+        if (target == null) return;
+        if (target.GetComponent<EnemyBase>() == null) return;
+
+        int hittableLayer = LayerMask.NameToLayer(enemyHittableLayerName);
+        if (hittableLayer < 0)
+        {
+            Debug.LogWarning($"SwapSkill: layer '{enemyHittableLayerName}' not found.");
+            return;
+        }
+
+        ApplyTemporaryLayer(target.gameObject, hittableLayer, enemyHittableDuration);
+    }
+
+    private void ApplyTemporaryLayer(GameObject root, int layer, float duration)
+    {
+        if (root == null) return;
+        if (duration <= 0f)
+        {
+            return;
+        }
+
+        int version = 0;
+        if (layerSwapVersion.TryGetValue(root, out int current))
+        {
+            version = current + 1;
+            layerSwapVersion[root] = version;
+        }
+        else
+        {
+            version = 1;
+            layerSwapVersion.Add(root, version);
+        }
+
+        Transform[] transforms = root.GetComponentsInChildren<Transform>(true);
+        int[] originalLayers = new int[transforms.Length];
+        for (int i = 0; i < transforms.Length; i++)
+        {
+            originalLayers[i] = transforms[i].gameObject.layer;
+            transforms[i].gameObject.layer = layer;
+        }
+
+        StartCoroutine(RestoreLayerAfter(root, transforms, originalLayers, version, duration));
+    }
+
+    private IEnumerator RestoreLayerAfter(
+        GameObject root,
+        Transform[] transforms,
+        int[] originalLayers,
+        int version,
+        float duration
+    )
+    {
+        yield return new WaitForSeconds(duration);
+
+        if (root == null) yield break;
+        if (!layerSwapVersion.TryGetValue(root, out int current) || current != version) yield break;
+
+        for (int i = 0; i < transforms.Length; i++)
+        {
+            if (transforms[i] == null) continue;
+            transforms[i].gameObject.layer = originalLayers[i];
+        }
+    }
+
+    private void SetLayerRecursive(GameObject root, int layer)
+    {
+        Transform[] transforms = root.GetComponentsInChildren<Transform>(true);
+        for (int i = 0; i < transforms.Length; i++)
+        {
+            transforms[i].gameObject.layer = layer;
+        }
     }
 }
