@@ -19,6 +19,11 @@ public class CameraFollow2D : MonoBehaviour
     public float extraZoom = 2f;
     public float zoomLerpSpeed = 5f;
 
+    bool isTransforming = true; // 변환 상태
+    [Header("Interaction")] 
+    public float desiredZoom = 3f;
+    private bool isZooming = false;
+    private Vector3 interactPos;
     [Header("Shake FX")]
     public float shakeDefaultDuration = 0.08f;
     public float shakeDefaultAmplitude = 0.2f;

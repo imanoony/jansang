@@ -16,6 +16,7 @@ public class SwapSkill : MonoBehaviour
     private Camera cam;
     private bool skillActive = false;
     private CharacterManager manager;
+    private Rigidbody2D rb;
     private readonly Dictionary<GameObject, int> layerSwapVersion = new Dictionary<GameObject, int>();
 
     [Header("Silenced")]
@@ -40,6 +41,7 @@ public class SwapSkill : MonoBehaviour
     {
         cam = Camera.main;
         manager = GameManager.Instance.Char;
+        rb = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
@@ -57,20 +59,29 @@ public class SwapSkill : MonoBehaviour
         }
     }
 
-    public void OnTimeSlow(InputAction.CallbackContext ctx)
+    public void TrySkillByKey(InputAction.CallbackContext ctx)
     {
         if (ctx.started)
         {
-            if (manager.CheckGauge(0))
-            {
-                if(silenced) return;
-                ActivateSkill();
-            }
+            TryUseSkill();
         }
+    }
+    public void TryUseSkill()
+    {
+        if (skillActive)
+        {
+            DeactivateSkill();
+        }
+        else if (manager.CheckGauge(0))
+        {
+            ActivateSkill();
+        }
+    }
+    public void OnTimeSlow(InputAction.CallbackContext ctx)
+    {
         if (ctx.canceled)
         {
             CheckClick();
-            DeactivateSkill();
         }
     }
 
@@ -88,7 +99,6 @@ public class SwapSkill : MonoBehaviour
         bulletTimeController.ExitBulletTime();
         foreach (var t in visibleTargets)
             t.SetHighlight(false);
-
         visibleTargets.Clear();
     }
 
@@ -99,6 +109,7 @@ public class SwapSkill : MonoBehaviour
         foreach (var t in allTargets)
         {
             if (t.gameObject == gameObject) continue;
+            if (!t.enabled) continue;
             bool visible = HasLineOfSight(transform.position, t.transform.position);
             // [comment]
             // 아래 HasLineOfSight() 에서 적은대로 땅에 의한 막힘을 생각해서
@@ -132,19 +143,18 @@ public class SwapSkill : MonoBehaviour
 
         SwapTarget target = hit.GetComponent<SwapTarget>();
         if (target == null) return;
-
+        if(!target.enabled) return;
         if (!visibleTargets.Contains(target)) return;
 
         manager.UseGauge(Vector2.SqrMagnitude(transform.position - target.transform.position));
         SwapPosition(target.transform);
-        DeactivateSkill();
     }
 
     // =============================
     void SwapPosition(Transform target)
     {
         (transform.position, target.position) = (target.position, transform.position);
-
+        rb.linearVelocityY = 0;
         GameManager.Instance.Char.CancelTry();
         TryApplyEnemyHittable(target);
     }

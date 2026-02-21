@@ -140,6 +140,25 @@ public class UIManager : MonoBehaviour
         Tried.sizeDelta = vec;
     }
     #endregion
+
+    #region CheckPoint
+
+    public GameObject gameUI;
+    public GameObject checkpointUI;
+    public CameraFollow2D cam;
+    public void ShowCheckPoint()
+    {
+        gameUI.SetActive(false);
+        checkpointUI.SetActive(true);
+    }
+
+    public void EndCheckPoint()
+    {
+        gameUI.SetActive(true);
+        checkpointUI.SetActive(false);
+        cam.StopFocus();
+    }
+    #endregion
     
     #region Damage
     public GameObject damageUI;

@@ -77,7 +77,59 @@ public class CharacterManager : MonoBehaviour
         OnTried?.Invoke(Tried);
     }
     #endregion
+    
+    #region Resources
 
+    public int LightMaterial = 3000;
+    public int UsedMaterial = 0;
+    public int HPLevel = 0;
+    public int GaugeLevel = 0;
+    public bool canUse(int Amount)
+    {
+        if (Amount <= LightMaterial)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public int HPUpMaterial()
+    {
+        return 100 + HPLevel * 50;
+    }
+
+    public void UpgradeHP()
+    {
+        LightMaterial -= HPUpMaterial();
+        UsedMaterial += HPUpMaterial();
+        HPLevel += 1;
+        MaxHP += 1;
+    }
+    public int GaugeUpMaterial()
+    {
+        return 200 + GaugeLevel * 100;
+    }
+    public void UpgradeGauge()
+    {
+        LightMaterial -= GaugeUpMaterial();
+        UsedMaterial += GaugeUpMaterial();
+        GaugeLevel += 1;
+        MaxGauge += 50;
+    }
+
+    public void ResetUpgrade()
+    {
+        LightMaterial += UsedMaterial;
+        UsedMaterial = 0;
+        MaxGauge -= GaugeLevel * 50;
+        MaxHP -= HPLevel;
+        HP = Mathf.Min(HP, MaxHP);
+        Gauge = Mathf.Min(Gauge, MaxGauge);
+        HPLevel = 0;
+        GaugeLevel = 0;
+    }
+    #endregion
     private bool initialized = false;
     public void Init()
     {
