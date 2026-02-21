@@ -45,7 +45,7 @@ public class HitBox : MonoBehaviour
     void Damage(Collider2D other)
     {
         if (!hitTargets.Add(other)) return;
-        if (playerTransform) playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        if (playerTransform == null) playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
 
         bool hitEnemy = false;
         var turret = other.GetComponent<EnemyTurretAI>();

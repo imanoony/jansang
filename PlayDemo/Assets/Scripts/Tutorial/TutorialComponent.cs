@@ -1,9 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "TutorialComponent", menuName = "Scriptable Objects/TutorialComponent")]
 public class TutorialComponent : ScriptableObject
 {
+    public bool worldObjectHighlight = true;
     public int specialConditionForNextTutorial;
     public bool isHighlighting;
     public Vector3 highlightPosition;
@@ -18,8 +20,16 @@ public class TutorialComponent : ScriptableObject
 
     public Vector2 tutorialTextPos;
     public string tutorialText;
+
+    public int nextCameraClamperId;
+    public int wallToBeGone;
     
     public Vector2 tutorialImagePos;
     public bool isUsingImage;
     public Sprite tutorialImage;
+
+    public bool thenFocusPlayer = false;
+    public bool playerDisabled = false;
+
+    public int nextTutorialTriggerId;
 }

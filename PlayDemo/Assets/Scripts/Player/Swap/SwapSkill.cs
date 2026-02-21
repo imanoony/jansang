@@ -19,6 +19,8 @@ public class SwapSkill : MonoBehaviour
     private Rigidbody2D rb;
     private readonly Dictionary<GameObject, int> layerSwapVersion = new Dictionary<GameObject, int>();
 
+    private PlayerMovement2D player;
+    
     [Header("Silenced")]
     [SerializeField] private bool silenced = false;
     public void SwapSilence(float time)
@@ -43,6 +45,7 @@ public class SwapSkill : MonoBehaviour
         manager = GameManager.Instance.Char;
         rb = GetComponent<Rigidbody2D>();
         myPlayerActionMap = InputSystem.actions.FindActionMap("Player");
+        player = GetComponent<PlayerMovement2D>();
     }
 
     private void Update()
@@ -83,8 +86,10 @@ public class SwapSkill : MonoBehaviour
     
     public void OnTimeSlow(InputAction.CallbackContext ctx)
     {
+        if (!player.CanMove()) return;
         if (ctx.started)
         {
+           
             if (manager.CheckGauge(0))
             {
                 if(silenced) return;
@@ -175,7 +180,7 @@ public class SwapSkill : MonoBehaviour
 
         if (TutorialManager.Instance != null)
         {
-            TutorialManager.Instance.PlayerActualliySwap();
+            TutorialManager.Instance.PlayerActualliySwap(target);
         }
     }
 

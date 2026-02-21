@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16dfd3bf46c544b02b68235f41255fc9, type: 3}
   m_Name: ChangeTutorial2
   m_EditorClassIdentifier: Assembly-CSharp::TutorialComponent
+  worldObjectHighlight: 1
   specialConditionForNextTutorial: 1
   isHighlighting: 1
   highlightPosition: {x: 0, y: 0, z: 0}
@@ -22,6 +23,11 @@ MonoBehaviour:
   actionPhase: 4
   tutorialTextPos: {x: 0, y: 300}
   tutorialText: Release To Change with mouse cursor on target
+  nextCameraClamperId: 0
+  wallToBeGone: 0
   tutorialImagePos: {x: 0, y: 0}
   isUsingImage: 0
   tutorialImage: {fileID: 0}
+  thenFocusPlayer: 0
+  playerDisabled: 0
+  nextTutorialTriggerId: 1

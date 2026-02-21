@@ -38,6 +38,7 @@ public class MeleeController2D : MonoBehaviour
     void Start()
     {
         anim.gameObject.SetActive(false);
+        playerMovement = GetComponent<PlayerMovement2D>();
         //hitBox.enabled = false;
     }
 
@@ -89,9 +90,10 @@ public class MeleeController2D : MonoBehaviour
         }
     }
     
-
+    private PlayerMovement2D playerMovement;
     private void StartCharging()
     {
+        if (!playerMovement.CanMove()) return;
         isCharging = true;
         chargingTimeElapsed = 0f;
         
