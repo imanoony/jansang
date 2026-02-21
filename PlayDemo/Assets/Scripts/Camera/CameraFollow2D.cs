@@ -19,6 +19,12 @@ public class CameraFollow2D : MonoBehaviour
     public float extraZoom = 2f;
     public float zoomLerpSpeed = 5f;
 
+    [Header("Bounds")]
+    public bool useBounds = false;
+    public Collider2D boundsCollider;
+    public Vector2 minBound;
+    public Vector2 maxBound;
+
     bool isTransforming = true; // 변환 상태
     [Header("Interaction")] 
     public float desiredZoom = 3f;
@@ -117,6 +123,11 @@ public class CameraFollow2D : MonoBehaviour
             targetZoom,
             Time.deltaTime * zoomLerpSpeed
         );
+
+        if (useBounds)
+        {
+            transform.position = ClampToBounds(transform.position);
+        }
 
         UpdateShake();
         UpdateZoomFx();
@@ -386,6 +397,54 @@ public class CameraFollow2D : MonoBehaviour
         currentZoomOffset = target - baseSize;
     }
 
+    private Vector3 ClampToBounds(Vector3 pos)
+    {
+        if (!TryGetBounds(out Vector2 min, out Vector2 max)) return pos;
+
+        float vertExtent = cam.orthographicSize;
+        float horzExtent = vertExtent * cam.aspect;
+
+        float minX = min.x + horzExtent;
+        float maxX = max.x - horzExtent;
+        float minY = min.y + vertExtent;
+        float maxY = max.y - vertExtent;
+
+        if (minX > maxX)
+            pos.x = (min.x + max.x) * 0.5f;
+        else
+            pos.x = Mathf.Clamp(pos.x, minX, maxX);
+
+        if (minY > maxY)
+            pos.y = (min.y + max.y) * 0.5f;
+        else
+            pos.y = Mathf.Clamp(pos.y, minY, maxY);
+
+        pos.z = transform.position.z;
+        return pos;
+    }
+
+    private bool TryGetBounds(out Vector2 min, out Vector2 max)
+    {
+        if (!useBounds)
+        {
+            min = Vector2.zero;
+            max = Vector2.zero;
+            return false;
+        }
+
+        if (boundsCollider != null)
+        {
+            Bounds b = boundsCollider.bounds;
+            min = b.min;
+            max = b.max;
+            return true;
+        }
+
+        min = minBound;
+        max = maxBound;
+        return true;
+    }
+
     private void OnDisable()
     {
         if (cam == null) return;
@@ -395,6 +454,17 @@ public class CameraFollow2D : MonoBehaviour
         currentZoomOffset = 0f;
         shakeRequests.Clear();
         zoomRequests.Clear();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (!useBounds) return;
+        if (!TryGetBounds(out Vector2 min, out Vector2 max)) return;
+
+        Gizmos.color = Color.yellow;
+        Vector3 center = (min + max) * 0.5f;
+        Vector3 size = max - min;
+        Gizmos.DrawWireCube(center, size);
     }
 
     public void SetTargetRoot(Transform newRoot)
