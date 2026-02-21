@@ -35,6 +35,32 @@ public class PlayerMovement2D : MonoBehaviour
     public float dashDuration = 0.3f;
     public bool dashing = false;
 
+    [Header("Crowd Control")]
+    public bool silenced = false;
+    public void DashSilence(float time)
+    {
+        silenced = true;
+        StartCoroutine(SilenceTimer(time));
+    }
+    private IEnumerator SilenceTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        silenced = false;
+    }
+    public bool stunned = false;
+    public void Stun(float time)
+    {
+        stunned = true;
+        StartCoroutine(StunTimer(time));
+    }
+    IEnumerator StunTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        stunned = false;
+    }
+    
+
+
     Rigidbody2D rb;
     Collider2D col;
     MeleeController2D attack;
@@ -44,6 +70,11 @@ public class PlayerMovement2D : MonoBehaviour
     bool isGrounded;
     public bool IsGrouneded => isGrounded;
     bool airJumpUsed;
+
+
+
+
+
 
     void Start()
     {
@@ -57,7 +88,7 @@ public class PlayerMovement2D : MonoBehaviour
     {
         rawInput = context.ReadValue<Vector2>();
 
-        if (dashing) return;
+        if (dashing || stunned) { moveInput = 0f; return; }
 
         if (context.performed || context.canceled)
         {
@@ -67,7 +98,7 @@ public class PlayerMovement2D : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (dashing) return;
+        if (dashing || stunned) return;
 
         if (context.performed)
         {
@@ -77,6 +108,7 @@ public class PlayerMovement2D : MonoBehaviour
     
     public void OnDash(InputAction.CallbackContext context)
     {
+        if (silenced || stunned) return;
         if (context.performed)
         {
             TryDash();
@@ -92,7 +124,7 @@ public class PlayerMovement2D : MonoBehaviour
     void Move()
     {
 
-        if (dashing) return;
+        if (dashing || stunned) return;
 
         rb.linearVelocity = new Vector2(moveInput * moveTile*tileHeight, rb.linearVelocity.y);
 
@@ -107,6 +139,8 @@ public class PlayerMovement2D : MonoBehaviour
     }
     void TryJump()
     {
+        
+
         if (isGrounded)
         {
             Jump();
@@ -148,7 +182,6 @@ public class PlayerMovement2D : MonoBehaviour
 
     IEnumerator DashCooldownRoutine(Vector2 dV)
     {
-        Debug.Log("Dash Start, Dash Direction: " + dV);
         float dashTime = 0.01f;
         dashing = true;
         float gS = rb.gravityScale;
@@ -168,7 +201,6 @@ public class PlayerMovement2D : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
 
-        Debug.Log("Dash End");
 
         dashing = false;
         rb.gravityScale = gS;

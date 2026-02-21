@@ -1,25 +1,22 @@
 fileFormatVersion: 2
-guid: 7fe6289ab199b6f4bbf8e4fecccc3df3
+guid: 22fec7db4cbc28748a24e80924b043a9
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4801227835787818748
-    second: enemy1_0
+      213: 5210030530655707262
+    second: Boss2_Sprite_0
   - first:
-      213: -1675025149711837622
-    second: enemy1_1
+      213: 4052728545538581436
+    second: Boss2_Sprite_1
   - first:
-      213: 6657046128381406734
-    second: enemy1_2
+      213: 7894814472566150676
+    second: Boss2_Sprite_2
   - first:
-      213: 8656708432784021538
-    second: enemy1_3
+      213: 5032210652557477790
+    second: Boss2_Sprite_3
   - first:
-      213: 8214522916810776661
-    second: enemy1_4
-  - first:
-      213: -1898664606808446418
-    second: enemy1_5
+      213: -8743908624426447648
+    second: Boss2_Sprite_4
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -115,13 +112,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: enemy1_0
+      name: Boss2_Sprite_0
       rect:
         serializedVersion: 2
-        x: 23
-        y: 0
-        width: 15
-        height: 24
+        x: 7
+        y: 1
+        width: 44
+        height: 59
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -130,20 +127,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: cf6b9d5574361a240800000000000000
-      internalID: 4801227835787818748
+      spriteID: e706ca8e92fbd4840800000000000000
+      internalID: 5210030530655707262
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: enemy1_1
+      name: Boss2_Sprite_1
       rect:
         serializedVersion: 2
-        x: 87
-        y: 0
-        width: 15
-        height: 25
+        x: 71
+        y: 1
+        width: 44
+        height: 59
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -152,20 +149,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a469491408d11c8e0800000000000000
-      internalID: -1675025149711837622
+      spriteID: cb3a9efc32f2e3830800000000000000
+      internalID: 4052728545538581436
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: enemy1_2
+      name: Boss2_Sprite_2
       rect:
         serializedVersion: 2
-        x: 151
-        y: 0
-        width: 15
-        height: 25
+        x: 135
+        y: 1
+        width: 44
+        height: 59
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -174,20 +171,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e0e2097ee24926c50800000000000000
-      internalID: 6657046128381406734
+      spriteID: 4161bec2fe3009d60800000000000000
+      internalID: 7894814472566150676
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: enemy1_3
+      name: Boss2_Sprite_3
       rect:
         serializedVersion: 2
-        x: 215
-        y: 0
-        width: 15
-        height: 25
+        x: 199
+        y: 1
+        width: 44
+        height: 59
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -196,20 +193,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2285834547ec22870800000000000000
-      internalID: 8656708432784021538
+      spriteID: e9700ac3de006d540800000000000000
+      internalID: 5032210652557477790
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: enemy1_4
+      name: Boss2_Sprite_4
       rect:
         serializedVersion: 2
-        x: 279
-        y: 0
-        width: 15
-        height: 25
+        x: 263
+        y: 1
+        width: 44
+        height: 59
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -218,30 +215,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 550efc70219dff170800000000000000
-      internalID: 8214522916810776661
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: enemy1_5
-      rect:
-        serializedVersion: 2
-        x: 343
-        y: 0
-        width: 15
-        height: 24
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e2a6393899696a5e0800000000000000
-      internalID: -1898664606808446418
+      spriteID: 0ec469cee6567a680800000000000000
+      internalID: -8743908624426447648
       vertices: []
       indices: 
       edges: []
@@ -250,7 +225,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: df137d19dd6ff90438c384a163e8993e
+    spriteID: de0dd75bc65d88a4e83104967773b997
     internalID: 0
     vertices: []
     indices: 
@@ -260,12 +235,11 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      enemy1_0: 4801227835787818748
-      enemy1_1: -1675025149711837622
-      enemy1_2: 6657046128381406734
-      enemy1_3: 8656708432784021538
-      enemy1_4: 8214522916810776661
-      enemy1_5: -1898664606808446418
+      Boss2_Sprite_0: 5210030530655707262
+      Boss2_Sprite_1: 4052728545538581436
+      Boss2_Sprite_2: 7894814472566150676
+      Boss2_Sprite_3: 5032210652557477790
+      Boss2_Sprite_4: -8743908624426447648
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -62,4 +62,10 @@ public class CameraFollow2D : MonoBehaviour
     {
         isTransforming = active;
     }
+
+    public void SetTargetRoot(Transform newRoot)
+    {
+        targetRoot = newRoot;
+        target = targetRoot.GetChild(0);
+    }
 }
