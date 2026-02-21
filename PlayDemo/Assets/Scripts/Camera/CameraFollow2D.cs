@@ -386,3 +386,9 @@ public class CameraFollow2D : MonoBehaviour
         zoomRequests.Clear();
     }
 }
+    public void SetTargetRoot(Transform newRoot)
+    {
+        targetRoot = newRoot;
+        target = targetRoot.GetChild(0);
+    }
+}

@@ -17,6 +17,25 @@ public class SwapSkill : MonoBehaviour
     private bool skillActive = false;
     private CharacterManager manager;
     private readonly Dictionary<GameObject, int> layerSwapVersion = new Dictionary<GameObject, int>();
+
+    [Header("Silenced")]
+    [SerializeField] private bool silenced = false;
+    public void SwapSilence(float time)
+    {
+        silenced = true;
+        if (skillActive) DeactivateSkill();
+
+        StartCoroutine(SilenceTimer(time));
+    }
+
+    private IEnumerator SilenceTimer(float time)
+    {
+        yield return new WaitForSeconds(time);
+        silenced = false;
+    }
+    
+
+
     void Start()
     {
         cam = Camera.main;
@@ -25,6 +44,8 @@ public class SwapSkill : MonoBehaviour
 
     private void Update()
     {
+        if (silenced) return;
+
         if (skillActive)
         {
             UpdateTargets();
@@ -42,6 +63,7 @@ public class SwapSkill : MonoBehaviour
         {
             if (manager.CheckGauge(0))
             {
+                if(silenced) return;
                 ActivateSkill();
             }
         }
@@ -73,7 +95,7 @@ public class SwapSkill : MonoBehaviour
     // =============================
     void UpdateTargets()
     {
-        SwapTarget[] allTargets = FindObjectsOfType<SwapTarget>();
+        SwapTarget[] allTargets = FindObjectsByType<SwapTarget>(FindObjectsSortMode.None);
         foreach (var t in allTargets)
         {
             if (t.gameObject == gameObject) continue;
