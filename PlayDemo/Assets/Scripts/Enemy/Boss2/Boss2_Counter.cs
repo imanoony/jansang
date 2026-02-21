@@ -45,15 +45,15 @@ public class Boss2_Counter : MonoBehaviour
         if (!bossAction.exploded && ((1 << col.gameObject.layer) & bossManage.attackLayer.value) != 0)
         {
             Vector2 playerDir = (bossManage.playerTransform.position - transform.position).normalized;
-            playerDir.x = bossAction.gameObject.transform.localScale.x < 0f ? -playerDir.x : playerDir.x;
-            parryEffect.transform.localPosition = playerDir * counterRadius;
-            StartCoroutine(ParryEffect());
-
             StartCoroutine(bossAction.KnockbackCoroutine(
                 playerDir,
                 bossAction.knockbackForce,
                 bossAction.knockbackDuration / 5f
             ));  
+
+            playerDir.x = bossAction.gameObject.transform.localScale.x < 0f ? -playerDir.x : playerDir.x;
+            parryEffect.transform.localPosition = playerDir * counterRadius;
+            StartCoroutine(ParryEffect());
         }
 
         if (bossAction.exploded && col.gameObject.CompareTag("Player"))
@@ -61,7 +61,6 @@ public class Boss2_Counter : MonoBehaviour
             bossManage.playerHitCheck.TakeDamage(1);
 
             Vector2 playerDir = (bossManage.playerTransform.position - transform.position).normalized;
-            playerDir.x = bossAction.gameObject.transform.localScale.x < 0f ? -playerDir.x : playerDir.x;
             StartCoroutine(bossAction.KnockbackCoroutine(
                 playerDir,
                 bossAction.knockbackForce * 2f,

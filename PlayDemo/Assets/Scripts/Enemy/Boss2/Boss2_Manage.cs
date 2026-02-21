@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -30,6 +31,7 @@ public class Boss2_Manage : MonoBehaviour
     public float jumpForce = 12f;
     public float doubleJumpWaitTime = 0.5f;
     public float waitForDoubleJump = 0.5f;
+    public bool downJumping = false;
 
 
     [Header("Player References")]
@@ -121,6 +123,9 @@ public class Boss2_Manage : MonoBehaviour
 
     private bool CheckGround()
     {
+        if(downJumping){ return false; }
+
+
         Bounds bounds = bossCol.bounds;
         var start = bounds.center + bounds.extents.y * Vector3.down;
 
@@ -129,13 +134,14 @@ public class Boss2_Manage : MonoBehaviour
             bounds.size,
             0f,
             Vector2.down,
-            0.2f,
+            tileSize*0.7f,
             groundLayer
         );
 
         if (hit.collider != null && hit.collider.OverlapPoint(start)){ return false; }
         if (hit.collider != null && hit.normal.y > 0.7f && bossRB.linearVelocity.y <= 0f)
         {
+            if(downJumping){ return true; }
             isJumped = false;
             isDoubleJumped = false;
             return true;
@@ -267,11 +273,20 @@ public class Boss2_Manage : MonoBehaviour
 
         if (Math.Abs(xDiff) < tileSize*2f && yDiff < -0.5f && CheckGround())
         {
-            transform.position = new Vector2(
-                transform.position.x,
-                transform.position.y - tileSize*0.1f
-            );
+            StartCoroutine(DownJump());
         }
+    }
+
+    IEnumerator DownJump()
+    {
+        isJumped = true;
+        isDoubleJumped = true;
+        bossCol.isTrigger = true;
+        downJumping = true;
+        yield return new WaitForSeconds(0.1f);
+        downJumping = false;
+        yield return new WaitUntil(() => CheckGround());
+        bossCol.isTrigger = false;
     }
 #endregion
 
