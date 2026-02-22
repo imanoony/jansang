@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -178,6 +179,8 @@ public class CharacterManager : MonoBehaviour
     {
         InputSystem.actions.FindActionMap("Player").Disable();
         int bulletTimeid = GameManager.Instance.TimeManager.EnterBulletTime(0.2f);
+
+        GameManager.Instance.Audio.StopBgm(1);
         
         fadePanel.gameObject.SetActive(true);
         Color c = Color.black;

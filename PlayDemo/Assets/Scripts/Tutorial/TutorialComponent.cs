@@ -19,6 +19,7 @@ public class TutorialComponent : ScriptableObject
     public InputActionPhase actionPhase;
 
     public Vector2 tutorialTextPos;
+    [Multiline]
     public string tutorialText;
 
     public int nextCameraClamperId;

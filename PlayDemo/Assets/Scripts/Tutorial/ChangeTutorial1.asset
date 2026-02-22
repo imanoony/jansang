@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16dfd3bf46c544b02b68235f41255fc9, type: 3}
   m_Name: ChangeTutorial1
   m_EditorClassIdentifier: Assembly-CSharp::TutorialComponent
+  worldObjectHighlight: 1
   specialConditionForNextTutorial: 0
   isHighlighting: 1
   highlightPosition: {x: 0, y: 0, z: 0}
@@ -21,10 +22,13 @@ MonoBehaviour:
   actionname: TimeSlow
   actionPhase: 2
   tutorialTextPos: {x: 0, y: 300}
-  tutorialText: Hold RightClick To Find...
+  tutorialText: "\uC6B0\uD074\uB9AD\uC744 \uD1B5\uD574\uC11C \uC704\uCE58 \uBCC0\uD658
+    \uB300\uC0C1\uB4E4\uC744 \uD655\uC778\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
   nextCameraClamperId: 0
   wallToBeGone: 0
   tutorialImagePos: {x: 0, y: 0}
   isUsingImage: 0
   tutorialImage: {fileID: 0}
+  thenFocusPlayer: 0
   playerDisabled: 1
+  nextTutorialTriggerId: 0

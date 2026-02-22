@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16dfd3bf46c544b02b68235f41255fc9, type: 3}
   m_Name: MoveTutorial
   m_EditorClassIdentifier: Assembly-CSharp::TutorialComponent
+  worldObjectHighlight: 1
+  specialConditionForNextTutorial: 0
   isHighlighting: 1
   highlightPosition: {x: 0, y: 0, z: 0}
   highlightTransformId: 0
@@ -20,7 +22,13 @@ MonoBehaviour:
   actionname: Move
   actionPhase: 2
   tutorialTextPos: {x: 0, y: 300}
-  tutorialText: 'MOVE : A to Left, D to Right'
+  tutorialText: "A\uD0A4\uC640 D\uD0A4\uB97C \uD1B5\uD574 \uC774\uB3D9\uD560 \uC218
+    \uC788\uC2B5\uB2C8\uB2E4."
+  nextCameraClamperId: 0
+  wallToBeGone: 0
   tutorialImagePos: {x: 0, y: 0}
   isUsingImage: 0
   tutorialImage: {fileID: 0}
+  thenFocusPlayer: 0
+  playerDisabled: 0
+  nextTutorialTriggerId: 0

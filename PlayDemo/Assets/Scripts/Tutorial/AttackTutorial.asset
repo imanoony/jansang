@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16dfd3bf46c544b02b68235f41255fc9, type: 3}
   m_Name: AttackTutorial
   m_EditorClassIdentifier: Assembly-CSharp::TutorialComponent
+  worldObjectHighlight: 1
+  specialConditionForNextTutorial: 0
   isHighlighting: 1
   highlightPosition: {x: 0, y: 0, z: 0}
   highlightTransformId: 1
@@ -19,8 +21,15 @@ MonoBehaviour:
   actionmapname: Player
   actionname: Attack
   actionPhase: 2
-  tutorialTextPos: {x: 0, y: 0}
-  tutorialText: Left Moust... You can Charge attack!!
+  tutorialTextPos: {x: 0, y: 300}
+  tutorialText: "\uC88C\uD074\uB9AD\uC744 \uD1B5\uD574 \uACF5\uACA9\uD560 \uC218
+    \uC788\uC2B5\uB2C8\uB2E4. \n\uAFB9 \uB20C\uB7EC\uC11C \uAC15\uB825\uD55C \uACF5\uACA9\uC744
+    \uCDA9\uC804 \uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  nextCameraClamperId: 0
+  wallToBeGone: 0
   tutorialImagePos: {x: 0, y: 0}
   isUsingImage: 0
   tutorialImage: {fileID: 0}
+  thenFocusPlayer: 0
+  playerDisabled: 0
+  nextTutorialTriggerId: 0

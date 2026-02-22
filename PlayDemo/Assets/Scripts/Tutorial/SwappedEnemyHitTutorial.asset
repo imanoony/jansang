@@ -22,7 +22,8 @@ MonoBehaviour:
   actionname: Attack
   actionPhase: 2
   tutorialTextPos: {x: 0, y: 300}
-  tutorialText: Swapped Enemy can be hit by other enemies a while
+  tutorialText: "\uC704\uCE58 \uBCC0\uD658\uACFC \uC801\uB4E4\uC758 \uACF5\uACA9\uC744
+    \uC798 \uC774\uC6A9\uD558\uC5EC \uC804\uD22C\uB97C \uD574\uBCF4\uC138\uC694."
   nextCameraClamperId: 0
   wallToBeGone: 0
   tutorialImagePos: {x: 0, y: 0}

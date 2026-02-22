@@ -33,8 +33,6 @@ public class AudioManager : MonoBehaviour
     {
         EnsureSources();
         EnsureLowPassFilters();
-        
-        PlayBgm(bgmClips[0], 1, true, 1);
     }
 
     public void PlaySfx(AudioClip clip, float volume = 1f, float pitch = 1f)

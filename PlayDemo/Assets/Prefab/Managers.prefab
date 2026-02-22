@@ -243,6 +243,7 @@ MonoBehaviour:
   lowPassFadeDuration: 0.12
   bgmClips:
   - {fileID: 8300000, guid: 588b067dc2f18a64682da9fa324aa07e, type: 3}
+  - {fileID: 8300000, guid: 6057cc33a4e41a94580bfcf4fd4edd26, type: 3}
 --- !u!82 &5040743541857418090
 AudioSource:
   m_ObjectHideFlags: 0
@@ -815,6 +816,26 @@ PrefabInstance:
     - target: {fileID: 712159681968945664, guid: dca6e737034c246b4b51a178b0109869, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2241280733329880987, guid: dca6e737034c246b4b51a178b0109869, type: 3}
+      propertyPath: m_text
+      value: "\uC774\uAC70 \uC798 \uB418\uB0D0\n"
+      objectReference: {fileID: 0}
+    - target: {fileID: 2241280733329880987, guid: dca6e737034c246b4b51a178b0109869, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 1323a2b474e72624e914bccc0c1d8423, type: 2}
+    - target: {fileID: 2241280733329880987, guid: dca6e737034c246b4b51a178b0109869, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -246549435401604540, guid: 1323a2b474e72624e914bccc0c1d8423, type: 2}
+    - target: {fileID: 2241280733329880987, guid: dca6e737034c246b4b51a178b0109869, type: 3}
+      propertyPath: m_TextWrappingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2241280733329880987, guid: dca6e737034c246b4b51a178b0109869, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2293100628191718439, guid: dca6e737034c246b4b51a178b0109869, type: 3}
       propertyPath: m_AnchorMax.y

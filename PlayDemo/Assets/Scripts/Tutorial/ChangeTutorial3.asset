@@ -22,7 +22,9 @@ MonoBehaviour:
   actionname: Attack
   actionPhase: 2
   tutorialTextPos: {x: 0, y: 300}
-  tutorialText: Guage check..
+  tutorialText: "\uAC70\uB9AC\uC5D0 \uB530\uB77C \uC694\uAD6C\uD558\uB294 \uC704\uCE58
+    \uBCC0\uD658 \uAC8C\uC774\uC9C0 \uC591\uC774 \uB2EC\uB77C\uC9D1\uB2C8\uB2E4.\n(\uACC4\uC18D\uD558\uB824\uBA74
+    \uC88C\uD074\uB9AD)"
   nextCameraClamperId: 0
   wallToBeGone: 0
   tutorialImagePos: {x: 0, y: 0}
@@ -30,4 +32,4 @@ MonoBehaviour:
   tutorialImage: {fileID: 0}
   thenFocusPlayer: 0
   playerDisabled: 0
-  nextTutorialTriggerId: 0
+  nextTutorialTriggerId: 2
