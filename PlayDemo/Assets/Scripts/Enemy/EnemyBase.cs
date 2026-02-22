@@ -66,7 +66,6 @@ public class EnemyBase : MonoBehaviour
     private CancellationTokenSource hitFlashCts;
     private int flashVersion;
     private Color baseColor = Color.white;
-    private bool isFlashing;
     public void TryTalk()
     {
         if (canTalkTime > Time.time) return;
@@ -80,8 +79,7 @@ public class EnemyBase : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         col = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>(true);
         if (spriteRenderer != null) baseColor = spriteRenderer.color;
         CacheCameraFx();
         Player = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -223,29 +221,16 @@ public class EnemyBase : MonoBehaviour
     }
 
     private int _detectionSeq = 0;
-    private async UniTask UpdateDetectionStatusRenderer(CancellationToken token, Color color, Sprite status)
+    private async UniTask UpdateDetectionStatusRenderer(CancellationToken token, Sprite status)
     {
         int myid = _detectionSeq++;
         
         detectionStatusRenderer.gameObject.SetActive(true);
-        detectionStatusRenderer.color = color;
-
         detectionStatusRenderer.sprite = status;
 
         try
         {
             await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
-        
-            float a = 1f;
-            Color c = detectionStatusRenderer.color;
-            while (!token.IsCancellationRequested && a > 0)
-            {
-                a -= Time.deltaTime;
-                c.a = a;
-                detectionStatusRenderer.color = c;
-                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken: token);
-            }
-        
         }
         finally
         {
@@ -255,7 +240,7 @@ public class EnemyBase : MonoBehaviour
 
     private CancellationTokenSource _detectionStatusCTS;
     
-    private async UniTaskVoid RunDetectionStatusAsync(Color color, Sprite status, CancellationTokenSource localCts)
+    private async UniTaskVoid RunDetectionStatusAsync(Sprite status, CancellationTokenSource localCts)
     {
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(
             localCts.Token,
@@ -263,7 +248,7 @@ public class EnemyBase : MonoBehaviour
 
         try
         {
-            await UpdateDetectionStatusRenderer(linked.Token, color, status);
+            await UpdateDetectionStatusRenderer(linked.Token, status);
         }
         catch (OperationCanceledException)
         {
@@ -294,7 +279,7 @@ public class EnemyBase : MonoBehaviour
         _detectionStatusCTS?.Dispose();
         
         _detectionStatusCTS = new CancellationTokenSource();
-        RunDetectionStatusAsync(Color.yellow, detectionStatusSprites[0], _detectionStatusCTS).Forget();
+        RunDetectionStatusAsync(detectionStatusSprites[0], _detectionStatusCTS).Forget();
     }
     
     protected void FoundTarget()
@@ -303,7 +288,7 @@ public class EnemyBase : MonoBehaviour
         _detectionStatusCTS?.Dispose();
         
         _detectionStatusCTS = new CancellationTokenSource();
-        RunDetectionStatusAsync(Color.red, detectionStatusSprites[1], _detectionStatusCTS).Forget();
+        RunDetectionStatusAsync(detectionStatusSprites[1], _detectionStatusCTS).Forget();
     }
     protected bool DetectCliff()
     {
@@ -327,12 +312,6 @@ public class EnemyBase : MonoBehaviour
 
         return false;
     }
-    protected void SetBaseColor(Color color)
-    {
-        baseColor = color;
-        if (!isFlashing && spriteRenderer != null) spriteRenderer.color = baseColor;
-    }
-
     public UnityEvent onDeath = new UnityEvent();
     protected async UniTask ApplyDamageAsync(float damage)
     {
@@ -353,7 +332,6 @@ public class EnemyBase : MonoBehaviour
         hitFlashCts = CancellationTokenSource.CreateLinkedTokenSource(token);
         var linkedToken = hitFlashCts.Token;
         int version = ++flashVersion;
-        isFlashing = true;
         spriteRenderer.color = flashColor;
         try
         {
@@ -366,7 +344,6 @@ public class EnemyBase : MonoBehaviour
         {
             if (flashVersion == version)
             {
-                isFlashing = false;
                 if (spriteRenderer != null) spriteRenderer.color = baseColor;
             }
         }

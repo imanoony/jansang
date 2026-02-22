@@ -104,7 +104,6 @@ public class ArcherEnemy : EnemyBase
     protected override async UniTask RunAIAsync(CancellationToken token)
     {
         await UniTask.WaitUntil(() => alerted, cancellationToken: token);
-        SetBaseColor(new Color(0f, 1f, 0f, 1f));
         currentState = State.Alert;
         await AlertedActionAsync(token);
     }
@@ -154,10 +153,8 @@ public class ArcherEnemy : EnemyBase
             if (canJump && TilemapPlatformIndex.Instance.AreOnSamePlatformByRay(Player, transform))
             {
                 CurrentTarget = null;
-                SetBaseColor(new Color(0f, 1f, 0f, 1f));
                 await ChangePlatformAsync(token);
                 canJump = false;
-                SetBaseColor(new Color(0f, 1f, 1f, 1f));
             }
             else if (found)
             {
@@ -172,7 +169,6 @@ public class ArcherEnemy : EnemyBase
                         UniTask.WaitUntil(AreMySoldiersReady, cancellationToken: token);
                         onSergeantCommand?.Invoke();
                     }
-                    SetBaseColor(new Color(1f, 0f, 0f, 1f));
                     if (mySergeant != null)
                     {
                         mySergeant.onSergeantCommand.RemoveListener(CommandFromSergeant);
@@ -202,7 +198,6 @@ public class ArcherEnemy : EnemyBase
     private async UniTask ChangePlatformAsync(CancellationToken token)
     {
         Vector3 nextPos = FindNextPlatform() ?? transform.position;
-        SetBaseColor(new Color(0f, 0f, 1f, 1f));
         if ((nextPos - transform.position).sqrMagnitude < 0.1f) return;
 
         float targetspeed = 0f;

@@ -204,8 +204,7 @@ public class CharacterManager : MonoBehaviour
         
         action.Enable();
         action.started += HitRestart;
-
-        Debug.Log(action.name + " " + action.enabled);
+        
         
         yield return new WaitUntil(() => hitRestart);
         restartGuideText.gameObject.SetActive(false);
