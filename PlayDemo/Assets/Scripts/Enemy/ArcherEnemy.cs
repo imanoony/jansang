@@ -20,6 +20,10 @@ public class ArcherEnemy : EnemyBase
     [Header("Attack!")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed = 5f;
+    [Header("SFX")]
+    [SerializeField] private AudioClip shootSfx;
+    [SerializeField, Range(0f, 1f)] private float shootSfxVolume = 1f;
+    private AudioManager audioManager;
     [Header("Platform Finding")]
     [SerializeField] private LayerMask platformLayer;
 
@@ -72,6 +76,7 @@ public class ArcherEnemy : EnemyBase
     {
         lineRenderer = GetComponent<LineRenderer>();
         base.Start();
+        audioManager = GameManager.Instance != null ? GameManager.Instance.Audio : null;
         onSergeantCommand = new UnityEvent();
         onDeath.AddListener(PromoteOneSoldier);
 
@@ -329,6 +334,7 @@ public class ArcherEnemy : EnemyBase
         Vector2 dir = finalTarget - transform.position;
         dir.Normalize();
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        if (audioManager != null) audioManager.PlaySfx(shootSfx, shootSfxVolume);
         GameObject bullet = Instantiate(
             bulletPrefab,
             transform.position + (Vector3)dir ,

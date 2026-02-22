@@ -276,7 +276,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a792494b7be13942bb4f1543a49f771, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpearManEnemy
-  MaxHP: 12
+  MaxHP: 8
   groundLayer:
     serializedVersion: 2
     m_Bits: 4160
@@ -293,6 +293,10 @@ MonoBehaviour:
   hitZoomOutDuration: 0.08
   hitSlowScale: 0.2
   hitSlowDuration: 0.2
+  hitSfx: {fileID: 8300000, guid: 493c39e1de5f97946bf4e8e3771ddcb3, type: 3}
+  deathSfx: {fileID: 8300000, guid: 493c39e1de5f97946bf4e8e3771ddcb3, type: 3}
+  hitSfxVolume: 1
+  deathSfxVolume: 1
   detectionStatusRenderer: {fileID: 5634325942441367201}
   detectionStatusSprites:
   - {fileID: 21300000, guid: 9d511afaed0da4ed9a79aa0ce649a61f, type: 3}
@@ -324,6 +328,8 @@ MonoBehaviour:
   enemyHittableLayer:
     serializedVersion: 2
     m_Bits: 262144
+  attackSfx: {fileID: 8300000, guid: f016f0ee897dc61409346755722b88c5, type: 3}
+  attackSfxVolume: 1
   isWandering: 1
   damageArea: {fileID: 1176785323935155784}
   rushStart: 0

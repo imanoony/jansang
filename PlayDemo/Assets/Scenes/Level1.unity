@@ -144,6 +144,10 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
+      propertyPath: sergeantSearchRadius
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
       propertyPath: onDeath.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -5142,7 +5146,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
       propertyPath: isSergeant
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
       propertyPath: combatRadius
@@ -6084,7 +6088,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
       propertyPath: isSergeant
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
       propertyPath: combatRadius
@@ -6093,6 +6097,10 @@ PrefabInstance:
     - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
       propertyPath: detectionRadius
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
+      propertyPath: sergeantSearchRadius
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
       propertyPath: onDeath.m_PersistentCalls.m_Calls.Array.size
@@ -8044,7 +8052,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7905641795392696356, guid: eb90b9fd6947aec4cbf33db793731f5b, type: 3}
       propertyPath: nextSceneName
-      value: Level0
+      value: Level2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9328,6 +9336,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
+      propertyPath: isSergeant
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
       propertyPath: combatRadius
       value: 8
       objectReference: {fileID: 0}
@@ -10091,6 +10103,10 @@ PrefabInstance:
     - target: {fileID: 2824361930925301053, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
+      propertyPath: isSergeant
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5546350437457768758, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
       propertyPath: combatRadius

@@ -12,7 +12,7 @@ public class MeleeController2D : MonoBehaviour
 {
     [Header("Attack")]
     public float attackCooldown = 0.5f;
-    public float reloadTime = 1.2f; // 연속 공격 후 딜레이
+    public float reloadTime = 1.2f; // ?�속 공격 ???�레??
     bool isReloading;
     bool isAttacking;
     public bool isRight = true;
@@ -20,6 +20,14 @@ public class MeleeController2D : MonoBehaviour
     public Transform shootPos;
     public HitBox hitBox;
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip chargeSfx;
+    [SerializeField, Range(0f, 1f)] private float chargeSfxVolume = 1f;
+    [SerializeField] private AudioClip weakAttackSfx;
+    [SerializeField] private AudioClip middleAttackSfx;
+    [SerializeField] private AudioClip strongAttackSfx;
+    [SerializeField, Range(0f, 1f)] private float attackSfxVolume = 1f;
+    private AudioManager audioManager;
 
     public bool attackSilenced = false;
     public void AttackSilence(float time)
@@ -40,6 +48,7 @@ public class MeleeController2D : MonoBehaviour
         anim.gameObject.SetActive(false);
         playerMovement = GetComponent<PlayerMovement2D>();
         //hitBox.enabled = false;
+        audioManager = GameManager.Instance != null ? GameManager.Instance.Audio : null;
     }
 
     private void Update()
@@ -74,7 +83,7 @@ public class MeleeController2D : MonoBehaviour
         {
             attackButtonPressed = true;
             if (!CanAttack()) return;
-            // 차징 시작
+            // 차징 ?�작
             
             StartCharging();
         }
@@ -82,9 +91,9 @@ public class MeleeController2D : MonoBehaviour
         if (context.canceled)
         {
             attackButtonPressed = false;
-            // 차징이 아니라면 리턴
+            // 차징???�니?�면 리턴
             if (!isCharging) return; 
-            // 차징 끝
+            // 차징 ??
             
             FinishCharging();
         }
@@ -96,6 +105,7 @@ public class MeleeController2D : MonoBehaviour
         if (!playerMovement.CanMove()) return;
         isCharging = true;
         chargingTimeElapsed = 0f;
+        if (audioManager != null) audioManager.PlaySfx(chargeSfx, chargeSfxVolume);
         
         ChargingLevel(this.GetCancellationTokenOnDestroy()).Forget();
     }
@@ -117,11 +127,13 @@ public class MeleeController2D : MonoBehaviour
             attackState = AttackState.Middle;
             hitBox.attackState = attackState;
             chargingEffect.color = Color.yellow;
+            if (audioManager != null) audioManager.PlaySfx(chargeSfx, chargeSfxVolume);
 
             await UniTask.WaitUntil(() => chargingTimeElapsed > chargingTime[1], cancellationToken: linkedCts.Token);
             attackState = AttackState.Strong;
             hitBox.attackState = attackState;
             chargingEffect.color = Color.red;
+            if (audioManager != null) audioManager.PlaySfx(chargeSfx, chargeSfxVolume);
         }
         finally
         {
@@ -167,12 +179,13 @@ public class MeleeController2D : MonoBehaviour
     private void Attack()
     {
         isAttacking = true;
+        PlayAttackSfx();
 
-        // 일단 주변에 적 있는지 체크
+        // ?�단 주�??????�는지 체크
         var hits = Physics2D.OverlapCircleAll(transform.position, attackRadius, enemyLayerMask);
 
-        // 적이 있다면 가장 가까운 적에 타겟팅
-        // 적이 없다면 마우스 방향으로
+        // ?�이 ?�다�?가??가까운 ?�에 ?�겟팅
+        // ?�이 ?�다�?마우??방향?�로
         if (hits.Length > 0)
         {
             var least = hits[0];
@@ -191,7 +204,7 @@ public class MeleeController2D : MonoBehaviour
         }
         else
         {
-            // === 마우스 방향으로 회전 ===
+            // === 마우??방향?�로 ?�전 ===
             Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             AttackAsync(this.GetCancellationTokenOnDestroy(), mouseWorld).Forget();
         }
@@ -204,7 +217,7 @@ public class MeleeController2D : MonoBehaviour
         isReloading = false;
     }
 
-    // 애니메이션 이벤트에서 호출
+    // ?�니메이???�벤?�에???�출
     public void EnableHitBox()
     {
         hitBox.gameObject.SetActive(true);
@@ -214,4 +227,24 @@ public class MeleeController2D : MonoBehaviour
     {
         hitBox.gameObject.SetActive(false);
     }
+
+    private void PlayAttackSfx()
+    {
+        if (audioManager == null) return;
+        AudioClip clip = null;
+        switch (attackState)
+        {
+            case AttackState.Weak:
+                clip = weakAttackSfx;
+                break;
+            case AttackState.Middle:
+                clip = middleAttackSfx;
+                break;
+            case AttackState.Strong:
+                clip = strongAttackSfx;
+                break;
+        }
+        if (clip != null) audioManager.PlaySfx(clip, attackSfxVolume);
+    }
 }
+
