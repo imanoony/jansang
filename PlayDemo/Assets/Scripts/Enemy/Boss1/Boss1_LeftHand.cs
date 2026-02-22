@@ -48,8 +48,8 @@ public class Boss1_LeftHand : MonoBehaviour
             gameObject,
             transform.localPosition,
             bossManage.lHandOrigin,
-            0.5f,
-            0.5f
+            1f,
+            1f
         ));  
     }
 
@@ -102,8 +102,8 @@ public class Boss1_LeftHand : MonoBehaviour
             gameObject,
             transform.position,
             targetPos,
-            0.5f,
-            0.5f,
+            1f,
+            1f,
             GraspDone
         ));
 
@@ -130,6 +130,7 @@ public class Boss1_LeftHand : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.GetComponent<HitBox>() != null) return;
         if ((bossManage.attackLayer.value & (1 << other.gameObject.layer)) > 0)
         {
             bossManage.TakeDamage(Boss1_Part.LHand, 1);

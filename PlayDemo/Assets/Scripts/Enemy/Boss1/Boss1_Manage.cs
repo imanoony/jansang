@@ -51,6 +51,17 @@ public class Boss1_Manage : MonoBehaviour
     [Header("UI")]
     public Boss1_UI bossUI;
 
+    [Header("Hit FX")]
+    [SerializeField] private float hitShakeDuration = 0.08f;
+    [SerializeField] private float hitShakeAmplitude = 0.2f;
+    [SerializeField] private float hitShakeFrequency = 25f;
+    [SerializeField] private float hitZoomAmount = 0.5f;
+    [SerializeField] private float hitZoomInDuration = 0.04f;
+    [SerializeField] private float hitZoomHoldDuration = 0.05f;
+    [SerializeField] private float hitZoomOutDuration = 0.08f;
+    [Header("Hit Slow")]
+    [SerializeField] private float hitSlowScale = 0.2f;
+    [SerializeField] private float hitSlowDuration = 0.06f;
 
     [Header("Movement")]
     [SerializeField] private Rigidbody2D bossRB;
@@ -70,6 +81,8 @@ public class Boss1_Manage : MonoBehaviour
     private SpriteRenderer leftHandSprite;
     private SpriteRenderer rightHandSprite;
     private SpriteRenderer bodySprite;
+    private CameraShake camShake;
+    private CameraZoom camZoom;
 
 
     [Header("Player References")]
@@ -152,6 +165,7 @@ public class Boss1_Manage : MonoBehaviour
         playerMeleeController = playerObject.GetComponent<MeleeController2D>();
     
         bossUI = GameObject.Find("Boss UI").GetComponent<Boss1_UI>();
+        CacheCameraFx();
     }
 
     private void Start()
@@ -338,10 +352,12 @@ public class Boss1_Manage : MonoBehaviour
 #region Damage and Death
     public void TakeDamage(Boss1_Part part, int damage)
     {
+        bool didDamage = false;
         switch(part){
             case Boss1_Part.Body:
                 if(lHandHealth > 0 || rHandHealth > 0) return;
                 bodyHealth -= damage;
+                didDamage = true;
                 if(bodyHealth <= 0){
                     foreach(GameObject enemy in spawnedEnemies)
                     {
@@ -358,6 +374,7 @@ public class Boss1_Manage : MonoBehaviour
                 break;
             case Boss1_Part.LHand:
                 lHandHealth -= damage;
+                didDamage = true;
                 if(lHandHealth <= 0){
                     StartCoroutine(bossLeftHand.Boss1_LHandDestroyed());
                 }
@@ -368,6 +385,7 @@ public class Boss1_Manage : MonoBehaviour
                 break;
             case Boss1_Part.RHand:
                 rHandHealth -= damage;
+                didDamage = true;
                 if(rHandHealth <= 0){
                     StartCoroutine(bossRightHand.Boss1_RHandDestroyed());
                 }
@@ -377,6 +395,8 @@ public class Boss1_Manage : MonoBehaviour
                 }
                 break;
         }
+
+        if (didDamage) ApplyHitFx();
     }
 #endregion
 
@@ -546,7 +566,7 @@ public class Boss1_Manage : MonoBehaviour
                 // bossRightHand.Boss1_Smite();
                 break;
             case Boss1_RHandPattern.Haunt:
-                bossRightHand.Boss1_Haunt(3);
+                bossRightHand.Boss1_Haunt(5);
                 break;
 
         }
@@ -554,6 +574,60 @@ public class Boss1_Manage : MonoBehaviour
 
 #endregion
 
+#region Hit FX
+    public void ApplyHitFx()
+    {
+        ApplyHitSlow();
+        ApplyHitFx(
+            hitShakeDuration,
+            hitShakeAmplitude,
+            hitShakeFrequency,
+            hitZoomAmount,
+            hitZoomInDuration,
+            hitZoomHoldDuration,
+            hitZoomOutDuration
+        );
+    }
+
+    private void ApplyHitFx(
+        float shakeDuration,
+        float shakeAmplitude,
+        float shakeFrequency,
+        float zoomAmount,
+        float zoomInDuration,
+        float zoomHoldDuration,
+        float zoomOutDuration
+    )
+    {
+        if (cameraFollow != null)
+        {
+            cameraFollow.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
+            cameraFollow.ZoomInHoldOut(zoomAmount, zoomInDuration, zoomHoldDuration, zoomOutDuration);
+            return;
+        }
+
+        if (camShake != null) camShake.Shake(shakeDuration, shakeAmplitude, shakeFrequency);
+        if (camZoom != null) camZoom.ZoomInHoldOut(zoomAmount, zoomInDuration, zoomHoldDuration, zoomOutDuration);
+    }
+
+    private void ApplyHitSlow()
+    {
+        var timeManager = GameManager.Instance != null ? GameManager.Instance.TimeManager : null;
+        if (timeManager == null) return;
+
+        if (hitSlowDuration > 0f) timeManager.EnterBulletTime(hitSlowScale, hitSlowDuration);
+        else timeManager.EnterBulletTime(hitSlowScale);
+    }
+
+    private void CacheCameraFx()
+    {
+        var cam = Camera.main;
+        if (cam == null) return;
+        if (cameraFollow == null) cameraFollow = cam.GetComponent<CameraFollow2D>();
+        camShake = cam.GetComponent<CameraShake>();
+        camZoom = cam.GetComponent<CameraZoom>();
+    }
+#endregion
 
 #region Smooth Move
 
