@@ -72,6 +72,14 @@ public class TutorialManager : MonoBehaviour
         {
             if (tc.worldObjectHighlight) spotlightHighlighter.HighlightWorld(tutorialTransforms[tc.highlightTransformId], tc.highlightPixel);
             else  spotlightHighlighter.HighlightUI(tutorialUiElements[tc.highlightTransformId], tc.highlightPixel);
+
+            if (tc.highlightTransformId == 4)
+            {
+                GameObject tf = new GameObject("TMaP");
+                tf.transform.position = tutorialTransforms[4].position;
+                tutorialTransforms[swappedMonsterDieHighlightIndex] = tf.transform;
+                tutorialCamera.SetTargetRoot(tf.transform);
+            }
         }
         
         tutorialText.gameObject.SetActive(true);

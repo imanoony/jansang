@@ -47,6 +47,7 @@ public class AudioManager : MonoBehaviour
     public void PlayBgm(AudioClip clip, float volume = 1f, bool loop = true, float fadeIn = 0f)
     {
         if (clip == null || bgmSource == null) return;
+        if (bgmSource.clip == clip && bgmSource.isPlaying) return;
 
         bgmSource.clip = clip;
         bgmSource.loop = loop;
