@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,6 +9,36 @@ public class MySceneManager : MonoBehaviour
     public Image fadePanel;
     public float fadeTime = 2f;
     public Image loadingBar;
+
+    private void Start()
+    {
+        StartCoroutine(FadeIn());
+    }
+
+    IEnumerator FadeIn()
+    {
+        fadePanel.gameObject.SetActive(true);
+
+        Color c = Color.black;
+        c.a = 1;
+
+        float elapsed = 0f;
+        while (true)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+
+            c.a = 1 - elapsed / fadeTime;
+            fadePanel.color = c;
+
+            if (elapsed >= fadeTime)
+            {
+                break;
+            }
+        }
+        
+        fadePanel.gameObject.SetActive(false);
+    }
     public void LoadScene(string name)
     {
         StartCoroutine(SceneLoadRoutine(name));
@@ -38,5 +69,7 @@ public class MySceneManager : MonoBehaviour
             yield return null;
             loadingBar.fillAmount = asyncload.progress;
         }
+        
+        StartCoroutine(FadeIn());
     }
 }

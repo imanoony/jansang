@@ -907,6 +907,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b814f8ec1f7683e4295f82fa492b4890, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TilemapPlatformIndex
+  tilemaps:
+  - {fileID: 515221867}
+  - {fileID: 167351382}
+  - {fileID: 1393251348}
   tilemap: {fileID: 515221867}
   groundMask:
     serializedVersion: 2
@@ -1285,6 +1289,10 @@ PrefabInstance:
     - target: {fileID: 6581568070373216191, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7406031739283923202, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: fadeTime
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
