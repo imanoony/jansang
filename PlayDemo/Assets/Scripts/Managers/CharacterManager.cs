@@ -221,6 +221,7 @@ public class CharacterManager : MonoBehaviour
             if (elapsed >= fadeTime) break;
         }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        InitHP();
         fadePanel.gameObject.SetActive(false);
         deathText.gameObject.SetActive(false);
         InputSystem.actions.FindActionMap("Player").Enable();

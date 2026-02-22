@@ -15,6 +15,11 @@ public class Boss1_Body : MonoBehaviour
 
     [Header("Judgement")]
     [SerializeField] private float judgementWait = 0.75f;
+    [SerializeField] private float judgementMoveDuration = 0.6f;
+    [SerializeField] private float judgementMoveHold = 4f;
+    [SerializeField] private float judgementPreLaserShakeDuration = 0.35f;
+    [SerializeField] private float judgementPreLaserShakeAmplitude = 0.35f;
+    [SerializeField] private float judgementPreLaserShakeFrequency = 25f;
     [SerializeField] private GameObject judgementLazer;
     private Transform judgementTransform;
 
@@ -82,14 +87,15 @@ public class Boss1_Body : MonoBehaviour
             bossManage.gameObject,
             startPosition,
             targetAltar.transform.position,
-            1f,
-            6f
+            judgementMoveDuration,
+            judgementMoveHold
         ));
         
         if(bossManage.isInCutScene) yield break;
 
         float timer = 0f;
 
+       
         yield return new WaitForSeconds(judgementWait);
 
         if(targetAltar.GetComponent<Boss1_Altar>().active == false)
@@ -102,6 +108,16 @@ public class Boss1_Body : MonoBehaviour
             }
             yield break;
         }
+        
+        if (judgementPreLaserShakeDuration > 0f)
+        {
+            bossManage.cameraFollow.Shake(
+                judgementPreLaserShakeDuration,
+                judgementPreLaserShakeAmplitude,
+                judgementPreLaserShakeFrequency
+            );
+        }
+
 
         Vector2 direction = (bossManage.playerTransform.position - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
