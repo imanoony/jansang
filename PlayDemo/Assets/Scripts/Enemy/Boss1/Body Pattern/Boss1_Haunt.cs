@@ -5,12 +5,18 @@ public class Boss1_Haunt : MonoBehaviour
     [Header("Movement Settings")]
     public float maxSpeed = 3f;
     public float acceleration = 0.05f;
+    [SerializeField] private float speedRampDuration = 1.5f;
+    [SerializeField] private float maxSpeedMultiplier = 1.5f;
+    [SerializeField] private float accelerationMultiplier = 1.5f;
 
     [Header("Health Settings")]
     [SerializeField] int health = 2;
 
     private Transform spiritTransform;
     private Rigidbody2D spiritRigidbody;
+    private float baseMaxSpeed;
+    private float baseAcceleration;
+    private float spawnTime;
 
     private Boss1_Manage bossManage;
 
@@ -28,6 +34,9 @@ public class Boss1_Haunt : MonoBehaviour
     private void Start()
     {
         health = 2;
+        baseMaxSpeed = maxSpeed;
+        baseAcceleration = acceleration;
+        spawnTime = Time.time;
         Destroy(gameObject, lifeTime);
     }
 
@@ -35,13 +44,21 @@ public class Boss1_Haunt : MonoBehaviour
     private Vector2 playerDirection;
     private void FixedUpdate()
     {
+        float rampT = speedRampDuration > 0f
+            ? Mathf.Clamp01((Time.time - spawnTime) / speedRampDuration)
+            : 1f;
+        float speedMul = Mathf.Lerp(1f, maxSpeedMultiplier, rampT);
+        float accelMul = Mathf.Lerp(1f, accelerationMultiplier, rampT);
+        float currentMaxSpeed = baseMaxSpeed * speedMul;
+        float currentAcceleration = baseAcceleration * accelMul;
+
         Vector2 dir = (bossManage.playerTransform.position - spiritTransform.position).normalized;
-        spiritRigidbody.AddForce(dir * acceleration, ForceMode2D.Force);
+        spiritRigidbody.AddForce(dir * currentAcceleration, ForceMode2D.Force);
 
         Vector2 v = spiritRigidbody.linearVelocity;
-        if (v.sqrMagnitude > maxSpeed * maxSpeed)
+        if (v.sqrMagnitude > currentMaxSpeed * currentMaxSpeed)
         {
-            spiritRigidbody.linearVelocity = v.normalized * maxSpeed;
+            spiritRigidbody.linearVelocity = v.normalized * currentMaxSpeed;
         }
 
         float angle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;

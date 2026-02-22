@@ -7,6 +7,7 @@ public class BulletTimeController : MonoBehaviour
 
     private CharacterManager manager;
     private int requestId;
+    private AudioManager audioManager;
 
     void Start()
     {
@@ -15,6 +16,7 @@ public class BulletTimeController : MonoBehaviour
             timeManager = GameManager.Instance.TimeManager;
         if (timeManager == null)
             timeManager = FindObjectOfType<TimeManager>();
+        audioManager = GameManager.Instance != null ? GameManager.Instance.Audio : null;
     }
 
     public bool Use()
@@ -26,6 +28,7 @@ public class BulletTimeController : MonoBehaviour
     {
         if (timeManager == null || requestId != 0) return;
         requestId = timeManager.EnterBulletTime(slowScale);
+        ApplySwapLowPass(true);
     }
 
     public void ExitBulletTime()
@@ -33,10 +36,17 @@ public class BulletTimeController : MonoBehaviour
         if (timeManager == null || requestId == 0) return;
         timeManager.ExitBulletTime(requestId);
         requestId = 0;
+        ApplySwapLowPass(false);
     }
 
     private void OnDisable()
     {
         ExitBulletTime();
+    }
+
+    private void ApplySwapLowPass(bool enabled)
+    {
+        if (audioManager == null) return;
+        audioManager.SetLowPass(enabled);
     }
 }

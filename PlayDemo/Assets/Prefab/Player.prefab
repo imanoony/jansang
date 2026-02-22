@@ -229,8 +229,6 @@ GameObject:
   - component: {fileID: 7796931820783239575}
   - component: {fileID: 8144941878329839698}
   - component: {fileID: 5865790102697253617}
-  - component: {fileID: 7153793870612742348}
-  - component: {fileID: 253913667999482567}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -457,6 +455,14 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: c9815139-aec3-4648-95bd-b6bbc5781140
     m_ActionName: 'Player/Dash[/Keyboard/leftShift]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 633d82f3-b72d-40a5-9f45-b7ad48c947c7
+    m_ActionName: 'Player/AnyKey[/Keyboard/anyKey]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: a9523852-9ecc-45e3-bd2c-fbc8a98b3272
+    m_ActionName: 'Player/Restart[/Keyboard/r]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
@@ -476,7 +482,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetLayer:
     serializedVersion: 2
-    m_Bits: 1536
+    m_Bits: 9728
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -496,7 +502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5d371fcece34be4e909ce5cfe359fd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slowScale: 0.05
+  slowScale: 0.02
   useRate: 30
   timeManager: {fileID: 0}
 --- !u!114 &7937889744083868383
@@ -529,9 +535,12 @@ MonoBehaviour:
   dashing: 0
   silenced: 0
   stunned: 0
+  jumpSfx: {fileID: 8300000, guid: a5bbc11f0e0ddcd40baad229241d4bc9, type: 3}
+  jumpSfxVolume: 1
   moveSpeedAccel: 50
   moveSpeedDeaccel: 50
   actualSpeed: 0
+  disable: 0
 --- !u!114 &2123598759482721288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -581,6 +590,12 @@ MonoBehaviour:
   anim: {fileID: 7682376173339313760}
   shootPos: {fileID: 7218432460646019001}
   hitBox: {fileID: 5798332138023723292}
+  chargeSfx: {fileID: 8300000, guid: 879be7dce4f72044fbcabda81952b6d3, type: 3}
+  chargeSfxVolume: 1
+  weakAttackSfx: {fileID: 8300000, guid: f016f0ee897dc61409346755722b88c5, type: 3}
+  middleAttackSfx: {fileID: 8300000, guid: a48fc57e481518e4d8826015cce99df1, type: 3}
+  strongAttackSfx: {fileID: 8300000, guid: 314103e1e20148f42ad4950b19b14641, type: 3}
+  attackSfxVolume: 1
   attackSilenced: 0
   chargingTime:
   - 0.3
@@ -612,8 +627,11 @@ MonoBehaviour:
   hitZoomOutDuration: 0.08
   hitSlowScale: 0.2
   hitSlowDuration: 0.5
+  hitSfx: {fileID: 8300000, guid: 493c39e1de5f97946bf4e8e3771ddcb3, type: 3}
+  hitSfxVolume: 1
   invincibleTime: 1
   playerHeight: 1
+  death: 0
 --- !u!61 &8144941878329839698
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -683,7 +701,7 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -855,7 +873,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 5
   m_Sprite: {fileID: 1649148736485151496, guid: 94d7d6f9bd6950b40859eec60f22ce6a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

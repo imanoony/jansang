@@ -20,6 +20,9 @@ public class ShieldManEnemy : EnemyBase
     [SerializeField] private float thrustRadius = 1.3f;
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private LayerMask enemyHittableLayer;
+    [Header("SFX")]
+    [SerializeField] private AudioClip blockSfx;
+    [SerializeField, Range(0f, 1f)] private float blockSfxVolume = 1f;
     public bool isWandering = true;
     #endregion
     #region components
@@ -227,7 +230,11 @@ public class ShieldManEnemy : EnemyBase
         else if (Player.transform.position.x > transform.position.x && transform.localScale.x < 0) 
             base.Hit(damage);
         else 
-            FlashColorAsync(Color.yellow, 0.5f, this.GetCancellationTokenOnDestroy()).Forget();
+        {
+            int reducedDamage = Mathf.Max(1, Mathf.CeilToInt(damage * 0.5f));
+            if (audioManager != null) audioManager.PlaySfx(blockSfx, blockSfxVolume);
+            base.Hit(reducedDamage);
+        }
     }
     
     public override void Hit(int damage, Vector3 pos)
@@ -242,7 +249,11 @@ public class ShieldManEnemy : EnemyBase
         else if (pos.x > transform.position.x && transform.localScale.x < 0) 
             base.Hit(damage);
         else 
-            FlashColorAsync(Color.yellow, 0.5f, this.GetCancellationTokenOnDestroy()).Forget();
+        {
+            int reducedDamage = Mathf.Max(1, Mathf.CeilToInt(damage * 0.5f));
+            if (audioManager != null) audioManager.PlaySfx(blockSfx, blockSfxVolume);
+            base.Hit(reducedDamage, pos);
+        }
     }
 
     private void ApplyDamageAreaHits()

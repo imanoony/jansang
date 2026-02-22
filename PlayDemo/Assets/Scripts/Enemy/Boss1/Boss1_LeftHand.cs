@@ -18,6 +18,16 @@ public class Boss1_LeftHand : MonoBehaviour
     private MeleeController2D playerMeleeController;
 
 
+    [Header("Movement")]
+    [SerializeField] private float graspMoveDuration = 0.7f;
+    [SerializeField] private float graspHoldDuration = 0.7f;
+    [SerializeField] private float returnMoveDuration = 0.7f;
+    [SerializeField] private float returnHoldDuration = 0.7f;
+    [Header("Grasp Reach")]
+    [SerializeField] private float minReach = 3f;
+    [SerializeField] private float maxReach = 7f;
+    [SerializeField] private float reachPadding = 0.5f;
+
     private Boss1_Manage bossManage;
     private SpriteRenderer spriteRenderer;
     private Collider2D handCollider;
@@ -48,8 +58,8 @@ public class Boss1_LeftHand : MonoBehaviour
             gameObject,
             transform.localPosition,
             bossManage.lHandOrigin,
-            1f,
-            1f
+            returnMoveDuration,
+            returnHoldDuration
         ));  
     }
 
@@ -95,15 +105,16 @@ public class Boss1_LeftHand : MonoBehaviour
     {
         float playerDistance = Vector2.Distance(gameObject.transform.position, playerObject.transform.position);
         Vector2 playerDirection = (playerObject.transform.position - transform.position).normalized;
-        Vector2 targetPos = (Vector2)transform.position + playerDirection * Math.Max(Math.Min(playerDistance, 5f), 3f);
+        float reach = Mathf.Clamp(playerDistance + reachPadding, minReach, maxReach);
+        Vector2 targetPos = (Vector2)transform.position + playerDirection * reach;
         
 
         graspCoroutine = StartCoroutine(bossManage.ObjectMoveControl(
             gameObject,
             transform.position,
             targetPos,
-            1f,
-            1f,
+            graspMoveDuration,
+            graspHoldDuration,
             GraspDone
         ));
 
