@@ -351,7 +351,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 103e1284781624b4886c2aab8cc00dcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArcherEnemy
-  MaxHP: 10
+  MaxHP: 6
   groundLayer:
     serializedVersion: 2
     m_Bits: 4160
@@ -368,6 +368,10 @@ MonoBehaviour:
   hitZoomOutDuration: 0.08
   hitSlowScale: 0.2
   hitSlowDuration: 0.06
+  hitSfx: {fileID: 8300000, guid: ca78dfef11631464297243c90b7a1e3d, type: 3}
+  deathSfx: {fileID: 8300000, guid: 493c39e1de5f97946bf4e8e3771ddcb3, type: 3}
+  hitSfxVolume: 1
+  deathSfxVolume: 1
   detectionStatusRenderer: {fileID: 3735485871206210956}
   detectionStatusSprites:
   - {fileID: 21300000, guid: 9d511afaed0da4ed9a79aa0ce649a61f, type: 3}
@@ -388,6 +392,8 @@ MonoBehaviour:
   bowTransform: {fileID: 1387220777739172569}
   bulletPrefab: {fileID: 3883931819640486854, guid: a0dc7386a2d81114ea889829e8c431c8, type: 3}
   bulletSpeed: 25
+  shootSfx: {fileID: 8300000, guid: f016f0ee897dc61409346755722b88c5, type: 3}
+  shootSfxVolume: 1
   platformLayer:
     serializedVersion: 2
     m_Bits: 4096

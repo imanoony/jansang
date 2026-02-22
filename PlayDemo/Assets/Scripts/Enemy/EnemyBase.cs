@@ -33,6 +33,11 @@ public class EnemyBase : MonoBehaviour
     [Header("Hit Slow")]
     [SerializeField] private float hitSlowScale = 0.2f;
     [SerializeField] private float hitSlowDuration = 0.06f;
+    [Header("SFX")]
+    [SerializeField] private AudioClip hitSfx;
+    [SerializeField] private AudioClip deathSfx;
+    [SerializeField, Range(0f, 1f)] private float hitSfxVolume = 1f;
+    [SerializeField, Range(0f, 1f)] private float deathSfxVolume = 1f;
     #endregion
     #region components
     protected Animator animator;
@@ -44,6 +49,7 @@ public class EnemyBase : MonoBehaviour
     private CameraFollow2D camFollow;
     private CameraShake camShake;
     private CameraZoom camZoom;
+    protected AudioManager audioManager;
     #endregion
     #region status
     private float currentSpeedRate;
@@ -93,6 +99,7 @@ public class EnemyBase : MonoBehaviour
         }
         ApplyLayerTint();
         CacheCameraFx();
+        audioManager = GameManager.Instance != null ? GameManager.Instance.Audio : null;
         Player = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (commander != null) commander.Register(OnAlerted);
         HP = MaxHP;
@@ -209,6 +216,7 @@ public class EnemyBase : MonoBehaviour
             Quaternion.identity).GetComponent<DamageUI>();
         
         go.Init(damage);
+        if (audioManager != null) audioManager.PlaySfx(hitSfx, hitSfxVolume);
         ApplyHitFx(damage);
         ApplyDamageAsync(damage).Forget();
     }
@@ -342,6 +350,7 @@ public class EnemyBase : MonoBehaviour
         this.HP -= damage;
         if (HP <= 0)
         {
+            if (audioManager != null) audioManager.PlaySfx(deathSfx, deathSfxVolume);
             onDeath.Invoke();
             Destroy(this.gameObject);
             return;
@@ -375,7 +384,7 @@ public class EnemyBase : MonoBehaviour
         }
     }
 
-    private void ApplyHitFx()
+    protected void ApplyHitFx()
     {
         ApplyHitSlow(3);
         ApplyHitFx(
@@ -390,7 +399,7 @@ public class EnemyBase : MonoBehaviour
     }
     public int damageZoomFxThreshold = 3;
     public int damageShakeFxFactor = 3;
-    private void ApplyHitFx(int damage)
+    protected void ApplyHitFx(int damage)
     {
         float damageShakeRate = Mathf.Clamp((float)damage / damageShakeFxFactor, 0.5f, 1.5f);
         ApplyHitSlow(damage);

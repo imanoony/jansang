@@ -65,6 +65,10 @@ public class PlayerMovement2D : MonoBehaviour
     Collider2D col;
     MeleeController2D attack;
     private PlayerGFXController playerGFX; 
+    [Header("SFX")]
+    [SerializeField] private AudioClip jumpSfx;
+    [SerializeField, Range(0f, 1f)] private float jumpSfxVolume = 1f;
+    private AudioManager audioManager;
 
     private float gravity = 1;
     float moveInput;
@@ -84,6 +88,7 @@ public class PlayerMovement2D : MonoBehaviour
         attack = GetComponent<MeleeController2D>();
         playerGFX = GetComponent<PlayerGFXController>();
         gravity = -Physics.gravity.y * rb.gravityScale;
+        audioManager = GameManager.Instance != null ? GameManager.Instance.Audio : null;
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -208,6 +213,7 @@ public class PlayerMovement2D : MonoBehaviour
         float jumpForce = Mathf.Sqrt(2*(targetY - transform.position.y/tileHeight)*gravity);
         playerGFX.Stretch();
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        if (audioManager != null) audioManager.PlaySfx(jumpSfx, jumpSfxVolume);
     }
 
     void TryDash(Vector2 dir)

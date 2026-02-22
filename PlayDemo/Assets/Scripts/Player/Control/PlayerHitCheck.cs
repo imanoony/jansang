@@ -19,10 +19,15 @@ public class PlayerHitCheck : MonoBehaviour
     private CameraFollow2D camFollow;
     private CameraShake camShake;
     private CameraZoom camZoom;
+    [Header("SFX")]
+    [SerializeField] private AudioClip hitSfx;
+    [SerializeField, Range(0f, 1f)] private float hitSfxVolume = 1f;
+    private AudioManager audioManager;
     void Start()
     {
         manager = GameManager.Instance.Char;
         CacheCameraFx();
+        audioManager = GameManager.Instance != null ? GameManager.Instance.Audio : null;
     }
 
     [Header("Invincibility")]
@@ -60,6 +65,7 @@ public class PlayerHitCheck : MonoBehaviour
             Quaternion.identity).GetComponent<DamageUI>();
         
         go.Init(damage);
+        if (audioManager != null) audioManager.PlaySfx(hitSfx, hitSfxVolume);
 
         if (manager.HP <= 0 && !death)
         {

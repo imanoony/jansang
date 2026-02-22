@@ -20,6 +20,10 @@ public class SpearManEnemy : EnemyBase
     [SerializeField] private float thrustRadius = 1.3f;
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private LayerMask enemyHittableLayer;
+    [Header("SFX")]
+    [SerializeField] private AudioClip attackSfx;
+    [SerializeField, Range(0f, 1f)] private float attackSfxVolume = 1f;
+    private AudioManager audioManager;
     public bool isWandering = true;
     #endregion
     #region components
@@ -45,6 +49,7 @@ public class SpearManEnemy : EnemyBase
         base.Start();
 
         lineRenderer = GetComponent<LineRenderer>();
+        audioManager = GameManager.Instance != null ? GameManager.Instance.Audio : null;
         localSpeedRate = 1f;
         preRushSpeedRate = 1f;
         enemyHittableFilter = new ContactFilter2D
@@ -202,6 +207,7 @@ public class SpearManEnemy : EnemyBase
         lineRenderer.enabled = false;
         SetSpeedRate(1);
         SetRushStart(true);
+        if (audioManager != null) audioManager.PlaySfx(attackSfx, attackSfxVolume);
         
         canThrust = false;
         damageArea.enabled = true;

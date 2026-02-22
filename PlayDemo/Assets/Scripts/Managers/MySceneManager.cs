@@ -69,6 +69,7 @@ public class MySceneManager : MonoBehaviour
             yield return null;
             loadingBar.fillAmount = asyncload.progress;
         }
+        loadingBar.gameObject.SetActive(false);
         
         StartCoroutine(FadeIn());
     }
