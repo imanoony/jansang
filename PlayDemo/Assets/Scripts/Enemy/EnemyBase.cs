@@ -66,6 +66,11 @@ public class EnemyBase : MonoBehaviour
     private CancellationTokenSource hitFlashCts;
     private int flashVersion;
     private Color baseColor = Color.white;
+    private Color normalColor = Color.white;
+    private bool isFlashing;
+    private const string EnemyHittableLayerName = "enemyHittable";
+    private static readonly Color EnemyHittableColor = new Color(0.4f, 0.4f, 0.4f, 1f);
+    private int enemyHittableLayer = -1;
     public void TryTalk()
     {
         if (canTalkTime > Time.time) return;
@@ -80,7 +85,13 @@ public class EnemyBase : MonoBehaviour
         col = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>(true);
-        if (spriteRenderer != null) baseColor = spriteRenderer.color;
+        enemyHittableLayer = LayerMask.NameToLayer(EnemyHittableLayerName);
+        if (spriteRenderer != null)
+        {
+            normalColor = spriteRenderer.color;
+            baseColor = normalColor;
+        }
+        ApplyLayerTint();
         CacheCameraFx();
         Player = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (commander != null) commander.Register(OnAlerted);
@@ -97,10 +108,23 @@ public class EnemyBase : MonoBehaviour
     protected virtual void Update()
     {
         detectionStatusRenderer.flipX = transform.localScale.x < 0;
+        ApplyLayerTint();
     }
     protected virtual UniTask RunAIAsync(CancellationToken token)
     {
         return UniTask.CompletedTask;
+    }
+    private void ApplyLayerTint()
+    {
+        if (spriteRenderer == null) return;
+        if (enemyHittableLayer == -1) return;
+
+        Color targetColor = gameObject.layer == enemyHittableLayer ? EnemyHittableColor : normalColor;
+        if (baseColor != targetColor)
+        {
+            baseColor = targetColor;
+            if (!isFlashing) spriteRenderer.color = baseColor;
+        }
     }
     private void OnAlerted()
     {
@@ -332,6 +356,7 @@ public class EnemyBase : MonoBehaviour
         hitFlashCts = CancellationTokenSource.CreateLinkedTokenSource(token);
         var linkedToken = hitFlashCts.Token;
         int version = ++flashVersion;
+        isFlashing = true;
         spriteRenderer.color = flashColor;
         try
         {
@@ -344,6 +369,7 @@ public class EnemyBase : MonoBehaviour
         {
             if (flashVersion == version)
             {
+                isFlashing = false;
                 if (spriteRenderer != null) spriteRenderer.color = baseColor;
             }
         }
