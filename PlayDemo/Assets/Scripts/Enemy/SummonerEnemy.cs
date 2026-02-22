@@ -73,7 +73,6 @@ public class SummonerEnemy : EnemyBase
     {
         await UniTask.WaitUntil(() => alerted, cancellationToken: token);
         ChangeDirection(0);
-        SetBaseColor(new Color(0f, 1f, 0f, 1f));
         alertEmitter?.Emit();
         currentState = State.Alert;
         CurrentTarget = Player;
@@ -90,7 +89,6 @@ public class SummonerEnemy : EnemyBase
     private async UniTask SummonRoutineAsync(CancellationToken token)
     {
         if (CurrentTarget == null) return;
-        SetBaseColor(new Color(0f, 1f, 1f, 1f));
         float prob = Random.Range(0f, 1f);
         int cur = summonProbabilities.Length / 2;
         while (true)
@@ -107,7 +105,6 @@ public class SummonerEnemy : EnemyBase
             }
         }
         await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: token);
-        SetBaseColor(new Color(1f, 0f, 0f, 1f));
         Summon(cur);
         await UniTask.Delay(TimeSpan.FromSeconds(5f), cancellationToken: token);
     }

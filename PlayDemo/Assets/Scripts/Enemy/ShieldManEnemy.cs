@@ -117,7 +117,6 @@ public class ShieldManEnemy : EnemyBase
     {
         await UniTask.WaitUntil(() => alerted, cancellationToken: token);
         ChangeDirection(0);
-        SetBaseColor(new Color(0f, 1f, 0f, 1f));
         currentState = State.Alert;
         automaticFlip = true;
         await AlertedActionAsync(token);
@@ -141,7 +140,6 @@ public class ShieldManEnemy : EnemyBase
     }
     private async UniTask WanderAsync(CancellationToken token)
     {
-        SetBaseColor(new Color(0f, 1f, 0f, 1f));
         int dir = Random.Range(-1, 2);
         ChangeDirection(dir);
         await UniTask.Delay(TimeSpan.FromSeconds(2f), cancellationToken: token);
@@ -153,7 +151,6 @@ public class ShieldManEnemy : EnemyBase
     private async UniTask AttackRoutineAsync(CancellationToken token)
     {
         if (CurrentTarget == null) return;
-        SetBaseColor(new Color(1f, 0f, 0f, 1f));
         int dir;
         if (CurrentTarget.transform.position.x < transform.position.x) dir = -1;
         else dir = 1;
@@ -214,7 +211,6 @@ public class ShieldManEnemy : EnemyBase
         ChangeDirection(0);
         ChangeMoveSpeed(1f);
         GetComponent<Rigidbody2D>().linearVelocityY = 3; 
-        SetBaseColor(new Color(0.4f, 0.4f, 0.4f, 1f));
         await UniTask.Delay(TimeSpan.FromSeconds(2f), cancellationToken: token);
         
         automaticFlip = true;

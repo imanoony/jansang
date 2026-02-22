@@ -6,7 +6,8 @@ public class TilemapPlatformIndex : MonoBehaviour
 {
     public static TilemapPlatformIndex Instance;
     [Header("Tilemap")]
-    public Tilemap tilemap;
+    public List<Tilemap> tilemaps = new();
+    [SerializeField] private Tilemap tilemap;
 
     [Header("Raycast")]
     public LayerMask groundMask;          // TilemapCollider2D가 있는 레이어
@@ -14,7 +15,7 @@ public class TilemapPlatformIndex : MonoBehaviour
     public Vector2 rayOffset = Vector2.zero; // 발 위치 보정(필요시)
 
     // cell -> platformId
-    private readonly Dictionary<Vector3Int, int> cellToPlatform = new();
+    private readonly Dictionary<Tilemap, Dictionary<Vector3Int, int>> tilemapToPlatform = new();
 
     static readonly Vector3Int[] Dirs =
     {
@@ -36,43 +37,55 @@ public class TilemapPlatformIndex : MonoBehaviour
     [ContextMenu("Rebuild Platform Index")]
     public void BuildIndex()
     {
-        cellToPlatform.Clear();
-        int platformId = 0;
+        tilemapToPlatform.Clear();
 
-        foreach (var pos in tilemap.cellBounds.allPositionsWithin)
+        if (tilemaps.Count == 0 && tilemap != null)
         {
-            if (!tilemap.HasTile(pos)) continue;
-            if (cellToPlatform.ContainsKey(pos)) continue;
-
-            // BFS 라벨링
-            var q = new Queue<Vector3Int>();
-            q.Enqueue(pos);
-            cellToPlatform[pos] = platformId;
-
-            while (q.Count > 0)
-            {
-                var cur = q.Dequeue();
-                foreach (var d in Dirs)
-                {
-                    var next = cur + d;
-                    if (!tilemap.HasTile(next)) continue;
-                    if (cellToPlatform.ContainsKey(next)) continue;
-
-                    cellToPlatform[next] = platformId;
-                    q.Enqueue(next);
-                }
-            }
-
-            platformId++;
+            tilemaps.Add(tilemap);
         }
 
-        Debug.Log($"[TilemapPlatformIndex] Platform count = {platformId}");
+        foreach (var tm in tilemaps)
+        {
+            if (tm == null) continue;
+            var cellToPlatform = new Dictionary<Vector3Int, int>();
+            int platformId = 0;
+
+            foreach (var pos in tm.cellBounds.allPositionsWithin)
+            {
+                if (!tm.HasTile(pos)) continue;
+                if (cellToPlatform.ContainsKey(pos)) continue;
+
+                // BFS 라벨링
+                var q = new Queue<Vector3Int>();
+                q.Enqueue(pos);
+                cellToPlatform[pos] = platformId;
+
+                while (q.Count > 0)
+                {
+                    var cur = q.Dequeue();
+                    foreach (var d in Dirs)
+                    {
+                        var next = cur + d;
+                        if (!tm.HasTile(next)) continue;
+                        if (cellToPlatform.ContainsKey(next)) continue;
+
+                        cellToPlatform[next] = platformId;
+                        q.Enqueue(next);
+                    }
+                }
+
+                platformId++;
+            }
+
+            tilemapToPlatform[tm] = cellToPlatform;
+            Debug.Log($"[TilemapPlatformIndex] {tm.name} platform count = {platformId}");
+        }
     }
 
     /// <summary>
     /// 발 위치에서 아래로 Raycast 해서 밟고 있는 플랫폼 ID를 얻는다.
     /// </summary>
-    public bool TryGetStandingPlatformIdByRay(Transform foot, out int platformId, out RaycastHit2D hit)
+    public bool TryGetStandingPlatformIdByRay(Transform foot, out int platformId, out Tilemap hitTilemap, out RaycastHit2D hit)
     {
         Vector2 origin = (Vector2)foot.position + rayOffset;
 
@@ -81,15 +94,29 @@ public class TilemapPlatformIndex : MonoBehaviour
         if (!hit.collider)
         {
             platformId = -1;
+            hitTilemap = null;
+            return false;
+        }
+
+        hitTilemap = hit.collider.GetComponentInParent<Tilemap>();
+        if (hitTilemap == null)
+        {
+            platformId = -1;
+            return false;
+        }
+
+        if (!tilemapToPlatform.TryGetValue(hitTilemap, out var cellToPlatform))
+        {
+            platformId = -1;
             return false;
         }
 
         // hit 지점을 타일 셀로 변환
-        Vector3Int cell = tilemap.WorldToCell(hit.point);
+        Vector3Int cell = hitTilemap.WorldToCell(hit.point);
 
         // 가끔 hit.point가 타일 경계/콜라이더 경계라 한 칸 옆으로 찍히는 경우가 있어서,
         // 아래로 아주 살짝 더 내린 점으로 보정하면 안정적임
-        Vector3Int cell2 = tilemap.WorldToCell(hit.point + Vector2.down * 0.01f);
+        Vector3Int cell2 = hitTilemap.WorldToCell(hit.point + Vector2.down * 0.01f);
 
         if (cellToPlatform.TryGetValue(cell2, out platformId)) return true;
         if (cellToPlatform.TryGetValue(cell, out platformId)) return true;
@@ -100,8 +127,8 @@ public class TilemapPlatformIndex : MonoBehaviour
 
     public bool AreOnSamePlatformByRay(Transform footA, Transform footB)
     {
-        if (!TryGetStandingPlatformIdByRay(footA, out int aId, out _)) return false;
-        if (!TryGetStandingPlatformIdByRay(footB, out int bId, out _)) return false;
-        return aId == bId;
+        if (!TryGetStandingPlatformIdByRay(footA, out int aId, out Tilemap aMap, out _)) return false;
+        if (!TryGetStandingPlatformIdByRay(footB, out int bId, out Tilemap bMap, out _)) return false;
+        return aMap == bMap && aId == bId;
     }
 }

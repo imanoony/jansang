@@ -16,6 +16,7 @@ public class ArcherEnemy : EnemyBase
     [SerializeField] private LayerMask sightMask;   
     [Header("Aiming!")]
     [SerializeField] private float aimingTime = 2f;
+    [SerializeField] private Transform bowTransform;
     [Header("Attack!")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed = 5f;
@@ -104,7 +105,6 @@ public class ArcherEnemy : EnemyBase
     protected override async UniTask RunAIAsync(CancellationToken token)
     {
         await UniTask.WaitUntil(() => alerted, cancellationToken: token);
-        SetBaseColor(new Color(0f, 1f, 0f, 1f));
         currentState = State.Alert;
         await AlertedActionAsync(token);
     }
@@ -154,10 +154,8 @@ public class ArcherEnemy : EnemyBase
             if (canJump && TilemapPlatformIndex.Instance.AreOnSamePlatformByRay(Player, transform))
             {
                 CurrentTarget = null;
-                SetBaseColor(new Color(0f, 1f, 0f, 1f));
                 await ChangePlatformAsync(token);
                 canJump = false;
-                SetBaseColor(new Color(0f, 1f, 1f, 1f));
             }
             else if (found)
             {
@@ -172,7 +170,6 @@ public class ArcherEnemy : EnemyBase
                         UniTask.WaitUntil(AreMySoldiersReady, cancellationToken: token);
                         onSergeantCommand?.Invoke();
                     }
-                    SetBaseColor(new Color(1f, 0f, 0f, 1f));
                     if (mySergeant != null)
                     {
                         mySergeant.onSergeantCommand.RemoveListener(CommandFromSergeant);
@@ -202,7 +199,6 @@ public class ArcherEnemy : EnemyBase
     private async UniTask ChangePlatformAsync(CancellationToken token)
     {
         Vector3 nextPos = FindNextPlatform() ?? transform.position;
-        SetBaseColor(new Color(0f, 0f, 1f, 1f));
         if ((nextPos - transform.position).sqrMagnitude < 0.1f) return;
 
         float targetspeed = 0f;
@@ -292,11 +288,13 @@ public class ArcherEnemy : EnemyBase
             lineRenderer.startWidth = 0.1f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
             lineRenderer.endWidth = 0.1f * Mathf.Sin((elapsed / aimingTime) * (Mathf.PI / 2f));
             lineRenderer.SetPosition(0, transform.position);
-            
+
+            Vector3 aimTarget;
             if (elapsed < aimingTime / 2)
             {
                 finalTarget = CurrentTarget?.position ?? transform.position;
-                lineRenderer.SetPosition(1, finalTarget);
+                aimTarget = finalTarget;
+                lineRenderer.SetPosition(1, aimTarget);
             }
             else 
             {
@@ -305,8 +303,19 @@ public class ArcherEnemy : EnemyBase
                 c.a = 0;
                 lineRenderer.endColor = c;
                 
-                Vector3 dirgo = (finalTarget - transform.position).normalized;
+                aimTarget = finalTarget;
+                Vector3 dirgo = (aimTarget - transform.position).normalized;
                 lineRenderer.SetPosition(1, transform.position + dirgo * 20);
+            }
+
+            if (bowTransform != null)
+            {
+                Vector3 bowDir = aimTarget - bowTransform.position;
+                if (bowDir.sqrMagnitude > 0.0001f)
+                {
+                    float bowAngle = Mathf.Atan2(bowDir.y, bowDir.x) * Mathf.Rad2Deg;
+                    bowTransform.rotation = Quaternion.Euler(0f, 0f, bowAngle);
+                }
             }
             
             

@@ -81,6 +81,7 @@ public class Boss1_RightHand : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.GetComponent<HitBox>() != null) return;
         if ((bossManage.attackLayer.value & (1 << other.gameObject.layer)) > 0)
         {
             bossManage.TakeDamage(Boss1_Part.RHand, 1);

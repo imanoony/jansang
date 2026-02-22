@@ -66,7 +66,11 @@ public class EnemyBase : MonoBehaviour
     private CancellationTokenSource hitFlashCts;
     private int flashVersion;
     private Color baseColor = Color.white;
+    private Color normalColor = Color.white;
     private bool isFlashing;
+    private const string EnemyHittableLayerName = "enemyHittable";
+    private static readonly Color EnemyHittableColor = new Color(0.4f, 0.4f, 0.4f, 1f);
+    private int enemyHittableLayer = -1;
     public void TryTalk()
     {
         if (canTalkTime > Time.time) return;
@@ -80,9 +84,14 @@ public class EnemyBase : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         col = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        if (spriteRenderer != null) baseColor = spriteRenderer.color;
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>(true);
+        enemyHittableLayer = LayerMask.NameToLayer(EnemyHittableLayerName);
+        if (spriteRenderer != null)
+        {
+            normalColor = spriteRenderer.color;
+            baseColor = normalColor;
+        }
+        ApplyLayerTint();
         CacheCameraFx();
         Player = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (commander != null) commander.Register(OnAlerted);
@@ -99,10 +108,23 @@ public class EnemyBase : MonoBehaviour
     protected virtual void Update()
     {
         detectionStatusRenderer.flipX = transform.localScale.x < 0;
+        ApplyLayerTint();
     }
     protected virtual UniTask RunAIAsync(CancellationToken token)
     {
         return UniTask.CompletedTask;
+    }
+    private void ApplyLayerTint()
+    {
+        if (spriteRenderer == null) return;
+        if (enemyHittableLayer == -1) return;
+
+        Color targetColor = gameObject.layer == enemyHittableLayer ? EnemyHittableColor : normalColor;
+        if (baseColor != targetColor)
+        {
+            baseColor = targetColor;
+            if (!isFlashing) spriteRenderer.color = baseColor;
+        }
     }
     private void OnAlerted()
     {
@@ -223,29 +245,16 @@ public class EnemyBase : MonoBehaviour
     }
 
     private int _detectionSeq = 0;
-    private async UniTask UpdateDetectionStatusRenderer(CancellationToken token, Color color, Sprite status)
+    private async UniTask UpdateDetectionStatusRenderer(CancellationToken token, Sprite status)
     {
         int myid = _detectionSeq++;
         
         detectionStatusRenderer.gameObject.SetActive(true);
-        detectionStatusRenderer.color = color;
-
         detectionStatusRenderer.sprite = status;
 
         try
         {
             await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
-        
-            float a = 1f;
-            Color c = detectionStatusRenderer.color;
-            while (!token.IsCancellationRequested && a > 0)
-            {
-                a -= Time.deltaTime;
-                c.a = a;
-                detectionStatusRenderer.color = c;
-                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken: token);
-            }
-        
         }
         finally
         {
@@ -255,7 +264,7 @@ public class EnemyBase : MonoBehaviour
 
     private CancellationTokenSource _detectionStatusCTS;
     
-    private async UniTaskVoid RunDetectionStatusAsync(Color color, Sprite status, CancellationTokenSource localCts)
+    private async UniTaskVoid RunDetectionStatusAsync(Sprite status, CancellationTokenSource localCts)
     {
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(
             localCts.Token,
@@ -263,7 +272,7 @@ public class EnemyBase : MonoBehaviour
 
         try
         {
-            await UpdateDetectionStatusRenderer(linked.Token, color, status);
+            await UpdateDetectionStatusRenderer(linked.Token, status);
         }
         catch (OperationCanceledException)
         {
@@ -294,7 +303,7 @@ public class EnemyBase : MonoBehaviour
         _detectionStatusCTS?.Dispose();
         
         _detectionStatusCTS = new CancellationTokenSource();
-        RunDetectionStatusAsync(Color.yellow, detectionStatusSprites[0], _detectionStatusCTS).Forget();
+        RunDetectionStatusAsync(detectionStatusSprites[0], _detectionStatusCTS).Forget();
     }
     
     protected void FoundTarget()
@@ -303,7 +312,7 @@ public class EnemyBase : MonoBehaviour
         _detectionStatusCTS?.Dispose();
         
         _detectionStatusCTS = new CancellationTokenSource();
-        RunDetectionStatusAsync(Color.red, detectionStatusSprites[1], _detectionStatusCTS).Forget();
+        RunDetectionStatusAsync(detectionStatusSprites[1], _detectionStatusCTS).Forget();
     }
     protected bool DetectCliff()
     {
@@ -327,12 +336,6 @@ public class EnemyBase : MonoBehaviour
 
         return false;
     }
-    protected void SetBaseColor(Color color)
-    {
-        baseColor = color;
-        if (!isFlashing && spriteRenderer != null) spriteRenderer.color = baseColor;
-    }
-
     public UnityEvent onDeath = new UnityEvent();
     protected async UniTask ApplyDamageAsync(float damage)
     {

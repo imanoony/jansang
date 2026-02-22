@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 21073661}
   - component: {fileID: 21073662}
   - component: {fileID: 21073663}
-  m_Layer: 0
+  m_Layer: 16
   m_Name: LeftHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -443,6 +443,9 @@ MonoBehaviour:
   - {fileID: -3863843003468414831, guid: a55cb684bb8c1c14a821783f55db3207, type: 3}
   health: 2
   active: 1
+  hitFlashDuration: 0.08
+  hitFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  inactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   bossManage: {fileID: 1155958604}
 --- !u!60 &21768359
 PolygonCollider2D:
@@ -11504,6 +11507,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b814f8ec1f7683e4295f82fa492b4890, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TilemapPlatformIndex
+  tilemaps: []
   tilemap: {fileID: 505569676}
   groundMask:
     serializedVersion: 2
@@ -11785,6 +11789,9 @@ MonoBehaviour:
   - {fileID: -3863843003468414831, guid: a55cb684bb8c1c14a821783f55db3207, type: 3}
   health: 2
   active: 1
+  hitFlashDuration: 0.08
+  hitFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  inactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   bossManage: {fileID: 1155958604}
 --- !u!60 &739467660
 PolygonCollider2D:
@@ -12223,45 +12230,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1180717625}
     m_Modifications:
-    - target: {fileID: 1356419120706315528, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Layer
-      value: 10
+    - target: {fileID: 3059729719328141882, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_ActionEvents.Array.size
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 3059729719328141882, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Camera
-      value: 
+      propertyPath: m_ActionEvents.Array.data[23].m_ActionId
+      value: 633d82f3-b72d-40a5-9f45-b7ad48c947c7
       objectReference: {fileID: 0}
     - target: {fileID: 3059729719328141882, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_UIInputModule
-      value: 
-      objectReference: {fileID: 1949675856}
-    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Size.x
-      value: 1.42
+      propertyPath: m_ActionEvents.Array.data[24].m_ActionId
+      value: a9523852-9ecc-45e3-bd2c-fbc8a98b3272
       objectReference: {fileID: 0}
-    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Size.y
-      value: 2.77
+    - target: {fileID: 3059729719328141882, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_ActionEvents.Array.data[23].m_ActionName
+      value: 'Player/AnyKey[/Keyboard/anyKey]'
       objectReference: {fileID: 0}
-    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 1649148736485151496, guid: 94d7d6f9bd6950b40859eec60f22ce6a, type: 3}
-    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Color.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Color.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4437547419695001231, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_WasSpriteAssigned
-      value: 1
+    - target: {fileID: 3059729719328141882, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
+      propertyPath: m_ActionEvents.Array.data[24].m_ActionName
+      value: 'Player/Restart[/Keyboard/r]'
       objectReference: {fileID: 0}
     - target: {fileID: 5043352431804775299, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
       propertyPath: m_Name
@@ -12307,94 +12294,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Size.x
-      value: 1.42
-      objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Size.y
-      value: 2.77
-      objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_Offset.y
-      value: 1.385
-      objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_SpriteTilingProperty.pivot.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_SpriteTilingProperty.border.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_SpriteTilingProperty.border.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_SpriteTilingProperty.border.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_SpriteTilingProperty.border.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_SpriteTilingProperty.newSize.x
-      value: 1.42
-      objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_SpriteTilingProperty.newSize.y
-      value: 2.77
-      objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_SpriteTilingProperty.oldSize.x
-      value: 1.42
-      objectReference: {fileID: 0}
-    - target: {fileID: 8144941878329839698, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      propertyPath: m_SpriteTilingProperty.oldSize.y
-      value: 2.77
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5043352431804775299, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 923959553}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
 --- !u!4 &923959551 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7279371306044431877, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
   m_PrefabInstance: {fileID: 923959550}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &923959552 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5043352431804775299, guid: 7370d7525a0742541a12e26319a28a63, type: 3}
-  m_PrefabInstance: {fileID: 923959550}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &923959553
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 923959552}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 326e19a142ff8714eb620ea6a20dcdd2, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &968543219
 GameObject:
   m_ObjectHideFlags: 0
@@ -17625,6 +17534,16 @@ MonoBehaviour:
   rewardParticle: {fileID: 0}
   destroyParticle: {fileID: 0}
   bodyMask: {fileID: 0}
+  bossUI: {fileID: 0}
+  hitShakeDuration: 0.2
+  hitShakeAmplitude: 0.2
+  hitShakeFrequency: 25
+  hitZoomAmount: 0.5
+  hitZoomInDuration: 0.04
+  hitZoomHoldDuration: 0.2
+  hitZoomOutDuration: 0.08
+  hitSlowScale: 0.2
+  hitSlowDuration: 0.2
   bossRB: {fileID: 0}
   moveSpeed: 1.5
   breakSpeed: 0.4
@@ -17645,7 +17564,6 @@ MonoBehaviour:
     m_Bits: 1024
   altarObjects: []
   spawnPoints: []
-  bossUI: {fileID: 0}
   enemyRoot: {fileID: 0}
   spawnCooldown: 6
   spawnTimer: 0
@@ -17655,21 +17573,19 @@ MonoBehaviour:
   - {fileID: 2824361930925301053, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
   - {fileID: 2937699623890234527, guid: a6514df26cbd4d4449ca11a4dd857f06, type: 3}
   - {fileID: 2737640904995590904, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
-  - {fileID: 8480676413817879325, guid: 93df4286ad0e84a43befbf3b5d71bd15, type: 3}
-  - {fileID: 4044428486906286431, guid: 99af213a0fb043b4b999c2a5a311b962, type: 3}
   spawnedEnemies: []
   destinationPoint: {x: 0, y: 0}
   currentBodyPattern: 0
   currentLeftHandPattern: 0
   currentRightHandPattern: 0
   bodyPatternTimer: 5
-  lHandPatternTimer: 2
-  rHandPatternTimer: 4
+  lHandPatternTimer: 1
+  rHandPatternTimer: 1
   maxHealth: 40
   totalHealth: 40
-  lHandHealth: 2
-  rHandHealth: 2
-  bodyHealth: 3
+  lHandHealth: 15
+  rHandHealth: 15
+  bodyHealth: 15
 --- !u!50 &1155958605
 Rigidbody2D:
   serializedVersion: 5
@@ -18723,7 +18639,7 @@ GameObject:
   - component: {fileID: 1873270329}
   - component: {fileID: 1873270330}
   - component: {fileID: 1873270331}
-  m_Layer: 0
+  m_Layer: 16
   m_Name: RightHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18816,12 +18732,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Boss1RightHand
   idleSprite: {fileID: 21300000, guid: d327473a23d33504a9dad990dfac0508, type: 3}
-  smiteSprite: {fileID: 0}
+  smiteSprite: {fileID: 1112644003648197173, guid: 94345b0173248bb468bb4927e818fc38, type: 3}
   hauntSprite: {fileID: 21300000, guid: ecc1f2f33e3a5a64a91cbda629164d80, type: 3}
   playerObject: {fileID: 0}
   spiritPrefab: {fileID: 1973558826850276187, guid: 89bc5ab76623b2243a6497e92c4eaadb, type: 3}
-  spiritMinSpeed: 1
-  spiritMaxSpeed: 3
+  spiritMinSpeed: 2
+  spiritMaxSpeed: 5
 --- !u!60 &1873270331
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -19034,6 +18950,9 @@ MonoBehaviour:
   - {fileID: -3863843003468414831, guid: a55cb684bb8c1c14a821783f55db3207, type: 3}
   health: 2
   active: 1
+  hitFlashDuration: 0.08
+  hitFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  inactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   bossManage: {fileID: 1155958604}
 --- !u!60 &1875935151
 PolygonCollider2D:
@@ -19542,7 +19461,7 @@ GameObject:
   - component: {fileID: 2128093669}
   - component: {fileID: 2128093670}
   - component: {fileID: 2128093672}
-  m_Layer: 0
+  m_Layer: 16
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}

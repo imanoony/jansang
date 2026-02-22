@@ -115,7 +115,6 @@ public class SpearManEnemy : EnemyBase
     {
         await UniTask.WaitUntil(() => alerted, cancellationToken: token);
         ChangeDirection(0);
-        SetBaseColor(new Color(0f, 1f, 0f, 1f));
         currentState = State.Alert;
         await AlertedActionAsync(token);
     }
@@ -138,7 +137,6 @@ public class SpearManEnemy : EnemyBase
     }
     private async UniTask WanderAsync(CancellationToken token)
     {
-        SetBaseColor(new Color(0f, 1f, 0f, 1f));
         int dir = Random.Range(-1, 2);
         ChangeDirection(dir);
         await UniTask.Delay(TimeSpan.FromSeconds(2f), cancellationToken: token);
@@ -149,8 +147,6 @@ public class SpearManEnemy : EnemyBase
     private async UniTask AttackRoutineAsync(CancellationToken token)
     {
         if (CurrentTarget == null) return;
-        SetBaseColor(new Color(1f, 0f, 0f, 1f));
-        
         int dir;
         if (CurrentTarget.transform.position.x < transform.position.x) dir = -1;
         else dir = 1;
@@ -215,13 +211,11 @@ public class SpearManEnemy : EnemyBase
         
         // 3: 돌진 끝
         SetRushStart(false);
-        SetBaseColor(new Color(1f, 1f, 0f, 1f));
         automaticFlip = true;
         damageArea.enabled = false;
         await UniTask.Delay(TimeSpan.FromSeconds(0.3f), cancellationToken: token);
         
         // 4: 돌진 끝 뒷걸음질 
-        SetBaseColor(new Color(0.5f, 0.5f, 1f, 1f));
         ChangeDirection(-dir);
         SetSpeedRate(0.2f);
         await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: token);

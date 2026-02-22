@@ -24,7 +24,7 @@ public class Boss1_UI : MonoBehaviour
     [Header("TextMeshPro")]
     public TextMeshProUGUI nameTMP;
 
-    void Start()
+    void Awake()
     {
         nameObject = transform.Find("Name").gameObject;
         healthUI = transform.Find("Health UI").gameObject;

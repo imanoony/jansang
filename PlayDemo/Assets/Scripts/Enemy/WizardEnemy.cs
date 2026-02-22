@@ -53,7 +53,6 @@ public class WizardEnemy : EnemyBase
     {
         await UniTask.WaitUntil(() => alerted, cancellationToken: token);
         ChangeDirection(0);
-        SetBaseColor(new Color(0f, 1f, 0f, 1f));
         currentState = State.Alert;
         automaticFlip = true;
         await AlertedActionAsync(token);
@@ -79,7 +78,6 @@ public class WizardEnemy : EnemyBase
     {
         await UniTask.WaitUntil(() => attackCooldownElapsed <= 0, cancellationToken: token);
         if (CurrentTarget == null || Player == null) return;
-        SetBaseColor(new Color(1f, 0f, 0f, 1f));
         int dir;
         if (CurrentTarget.transform.position.x < transform.position.x) dir = -1;
         else dir = 1;

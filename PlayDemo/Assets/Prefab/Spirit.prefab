@@ -109,9 +109,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Boss1Haunt
   maxSpeed: 3
   acceleration: 3
-  attackLayer:
-    serializedVersion: 2
-    m_Bits: 1024
   health: 2
 --- !u!114 &574109604249743899
 MonoBehaviour:

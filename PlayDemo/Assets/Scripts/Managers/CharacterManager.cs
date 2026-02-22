@@ -1,5 +1,10 @@
 using System;
+using System.Collections;
+using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class CharacterManager : MonoBehaviour
 {
@@ -162,5 +167,70 @@ public class CharacterManager : MonoBehaviour
         }
         // Gauge recovery logic end
         // Add more stat update logic here if needed
+    }
+
+    public Image fadePanel;
+    public TMP_Text deathText;
+    public TMP_Text restartGuideText;
+    public float fadeTime;
+    public bool hitRestart;
+    public IEnumerator Death()
+    {
+        InputSystem.actions.FindActionMap("Player").Disable();
+        int bulletTimeid = GameManager.Instance.TimeManager.EnterBulletTime(0.2f);
+        
+        fadePanel.gameObject.SetActive(true);
+        Color c = Color.black;
+        c.a = 0;
+        float elapsed = 0;
+        while (true)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+            
+            c.a = elapsed / fadeTime;
+            fadePanel.color = c;
+
+            if (elapsed >= fadeTime / 2)
+            {
+                if (!deathText.gameObject.activeSelf) deathText.gameObject.SetActive(true);
+                deathText.alpha = (elapsed - fadeTime/2) / (fadeTime / 2);
+            }
+            if (elapsed >= fadeTime) break;
+        }
+
+        restartGuideText.gameObject.SetActive(true);
+        var action = InputSystem.actions.FindActionMap("Player").FindAction("Restart");
+        
+        action.Enable();
+        action.started += HitRestart;
+        
+        
+        yield return new WaitUntil(() => hitRestart);
+        restartGuideText.gameObject.SetActive(false);
+        action.started -= HitRestart;
+
+        elapsed = 0;
+        while (true)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+            
+            deathText.alpha = 1 - elapsed / fadeTime;
+            
+            if (elapsed >= fadeTime) break;
+        }
+        
+        fadePanel.gameObject.SetActive(false);
+        deathText.gameObject.SetActive(false);
+        InputSystem.actions.FindActionMap("Player").Enable();
+        
+        GameManager.Instance.TimeManager.ExitBulletTime(bulletTimeid);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void HitRestart(InputAction.CallbackContext ctx)
+    {
+        hitRestart = true;
     }
 }
