@@ -3741,15 +3741,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3692877433733137566, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3692877433733137566, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3692877433733137566, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3692877433733137566, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3787,6 +3787,50 @@ PrefabInstance:
       propertyPath: Background
       value: 
       objectReference: {fileID: 1384203897}
+    - target: {fileID: 5577372650166851992, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5577372650166851992, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5577372650166851992, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5577372650166851992, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5577372650166851992, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6505570284587540324, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6581568070373216191, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6581568070373216191, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6581568070373216191, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6581568070373216191, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6581568070373216191, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6602807900092744083, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
       propertyPath: initialMaxHP
       value: 50
@@ -6576,11 +6620,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow2D
   targetRoot: {fileID: 914012525}
+  target: {fileID: 0}
   followLerpSpeed: 3
   mouseInfluence: 1
   baseZoom: 5
   extraZoom: 1
   zoomLerpSpeed: 5
+  useBounds: 0
+  boundsCollider: {fileID: 0}
+  minBound: {x: 0, y: 0}
+  maxBound: {x: 0, y: 0}
+  desiredZoom: 3
   shakeDefaultDuration: 0.08
   shakeDefaultAmplitude: 0.2
   shakeDefaultFrequency: 25
@@ -8735,11 +8785,11 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 848963642}
+  - {fileID: 465470662}
   - {fileID: 310803280}
   - {fileID: 1773701165}
   - {fileID: 914012525}
   - {fileID: 159788844}
-  - {fileID: 465470662}
   - {fileID: 1965513476}
   - {fileID: 937472958}
   - {fileID: 1873770355}

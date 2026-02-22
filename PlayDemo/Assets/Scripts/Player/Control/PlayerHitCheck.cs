@@ -46,10 +46,13 @@ public class PlayerHitCheck : MonoBehaviour
     }
 
     public float playerHeight;
+    public bool death;
     public void TakeDamage(int damage)
     {
         if (isInvincible)
             return;
+
+        damage = 1;
         manager.SubHP(damage);
         
         var go = Instantiate(GameManager.Instance.UI.damageUI, 
@@ -58,7 +61,7 @@ public class PlayerHitCheck : MonoBehaviour
         
         go.Init(damage);
 
-        if (manager.HP <= 0)
+        if (manager.HP <= 0 && !death)
         {
             Die();
             return;
@@ -82,7 +85,9 @@ public class PlayerHitCheck : MonoBehaviour
 
     void Die()
     {
-        Debug.Log("Player Dead");
+        death = true;
+        GetComponent<PlayerMovement2D>().disable = true;
+        StartCoroutine(GameManager.Instance.Char.Death());
     }
 
     private void ApplyHitFx()
