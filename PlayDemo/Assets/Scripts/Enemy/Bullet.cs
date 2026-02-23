@@ -8,8 +8,16 @@ public class Bullet : MonoBehaviour
     Collider2D bulletCol;
     Collider2D ownerCol;
     [SerializeField] private int attackDamage = 3;
+    [SerializeField] private bool detachParticlesOnDestroy = true;
+    private ParticleSystem[] childParticles;
+    private bool destroyed;
 
     public float lifeTime = 7f;
+
+    private void Awake()
+    {
+        CacheChildParticles();
+    }
 
     private void Start()
     {
@@ -20,14 +28,14 @@ public class Bullet : MonoBehaviour
     {
         yield return new WaitForSeconds(lifeTime);
         
-        Destroy(gameObject);
+        DestroySelf();
     }
     
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))
         {
-            Destroy(gameObject);
+            DestroySelf();
             return;
         }
 
@@ -38,7 +46,7 @@ public class Bullet : MonoBehaviour
             {
                 enemy.Hit(attackDamage, transform.position);
             }
-            Destroy(gameObject);
+            DestroySelf();
             return;
         }
         
@@ -49,7 +57,43 @@ public class Bullet : MonoBehaviour
             {
                 enemy.TakeDamage(attackDamage);
             }
-            Destroy(gameObject);
+            DestroySelf();
         }
+    }
+
+    private void DestroySelf()
+    {
+        if (destroyed) return;
+        destroyed = true;
+        if (detachParticlesOnDestroy) DetachChildParticles();
+        Destroy(gameObject);
+    }
+
+    private void CacheChildParticles()
+    {
+        childParticles = GetComponentsInChildren<ParticleSystem>(true);
+    }
+
+    private void DetachChildParticles()
+    {
+        if (childParticles == null || childParticles.Length == 0) return;
+        foreach (var ps in childParticles)
+        {
+            if (ps == null) continue;
+            if (ps.transform == transform) continue;
+
+            ps.transform.SetParent(null, true);
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+
+            float delay = GetParticleTotalDuration(ps);
+            Destroy(ps.gameObject, Mathf.Max(0.05f, delay));
+        }
+    }
+
+    private static float GetParticleTotalDuration(ParticleSystem ps)
+    {
+        var main = ps.main;
+        float lifetime = main.startLifetime.constantMax;
+        return main.duration + lifetime;
     }
 }
