@@ -7,8 +7,10 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioSource sfxSource;
 
     [Header("Volumes")]
+    [SerializeField, Range(0f, 1f)] private float masterVolume = 1f;
     [SerializeField, Range(0f, 1f)] private float bgmVolume = 1f;
     [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
+    private float bgmCurrentBaseVolume = 0f;
 
     [Header("Low Pass")]
     [SerializeField] private float lowPassCutoff = 800f;
@@ -22,6 +24,10 @@ public class AudioManager : MonoBehaviour
     private Coroutine bgmFadeRoutine;
 
     public AudioClip[] bgmClips;
+
+    public float MasterVolume => masterVolume;
+    public float BgmVolume => bgmVolume;
+    public float SfxVolume => sfxVolume;
 
     private void Awake()
     {
@@ -40,7 +46,7 @@ public class AudioManager : MonoBehaviour
         if (clip == null || sfxSource == null) return;
         float prevPitch = sfxSource.pitch;
         sfxSource.pitch = pitch;
-        sfxSource.PlayOneShot(clip, Mathf.Clamp01(volume) * sfxVolume);
+        sfxSource.PlayOneShot(clip, Mathf.Clamp01(volume) * sfxVolume * masterVolume);
         sfxSource.pitch = prevPitch;
     }
 
@@ -51,18 +57,18 @@ public class AudioManager : MonoBehaviour
 
         bgmSource.clip = clip;
         bgmSource.loop = loop;
-        bgmSource.volume = 0f;
+        SetBgmBaseVolume(0f);
         bgmSource.Play();
 
-        float target = Mathf.Clamp01(volume) * bgmVolume;
+        float targetBase = Mathf.Clamp01(volume);
         if (fadeIn > 0f)
         {
-            StartBgmFade(target, fadeIn, false);
+            StartBgmFade(targetBase, fadeIn, false);
         }
         else
         {
             StopBgmFade();
-            bgmSource.volume = target;
+            SetBgmBaseVolume(targetBase);
         }
     }
 
@@ -76,6 +82,7 @@ public class AudioManager : MonoBehaviour
         else
         {
             StopBgmFade();
+            SetBgmBaseVolume(0f);
             bgmSource.Stop();
         }
     }
@@ -83,13 +90,19 @@ public class AudioManager : MonoBehaviour
     public void FadeBgm(float targetVolume, float duration)
     {
         if (bgmSource == null) return;
-        StartBgmFade(Mathf.Clamp01(targetVolume) * bgmVolume, duration, false);
+        StartBgmFade(Mathf.Clamp01(targetVolume), duration, false);
+    }
+
+    public void SetMasterVolume(float volume)
+    {
+        masterVolume = Mathf.Clamp01(volume);
+        ApplyBgmMultiplier();
     }
 
     public void SetBgmVolume(float volume)
     {
         bgmVolume = Mathf.Clamp01(volume);
-        if (bgmSource != null) bgmSource.volume = Mathf.Clamp01(bgmSource.volume);
+        ApplyBgmMultiplier();
     }
 
     public void SetSfxVolume(float volume)
@@ -215,7 +228,7 @@ public class AudioManager : MonoBehaviour
         if (duration <= 0f)
         {
             StopBgmFade();
-            if (bgmSource != null) bgmSource.volume = target;
+            SetBgmBaseVolume(target);
             if (stopAfter && bgmSource != null) bgmSource.Stop();
             return;
         }
@@ -234,17 +247,34 @@ public class AudioManager : MonoBehaviour
     private System.Collections.IEnumerator FadeBgmRoutine(float target, float duration, bool stopAfter)
     {
         if (bgmSource == null) yield break;
-        float start = bgmSource.volume;
+        float start = bgmCurrentBaseVolume;
         float t = 0f;
         while (t < duration)
         {
             t += Time.unscaledDeltaTime;
             float lerp = duration > 0f ? t / duration : 1f;
-            bgmSource.volume = Mathf.Lerp(start, target, lerp);
+            SetBgmBaseVolume(Mathf.Lerp(start, target, lerp));
             yield return null;
         }
-        bgmSource.volume = target;
+        SetBgmBaseVolume(target);
         if (stopAfter) bgmSource.Stop();
         bgmFadeRoutine = null;
+    }
+
+    private float GetEffectiveBgmVolume()
+    {
+        return masterVolume * bgmVolume;
+    }
+
+    private void SetBgmBaseVolume(float baseVolume)
+    {
+        bgmCurrentBaseVolume = Mathf.Clamp01(baseVolume);
+        ApplyBgmMultiplier();
+    }
+
+    private void ApplyBgmMultiplier()
+    {
+        if (bgmSource == null) return;
+        bgmSource.volume = bgmCurrentBaseVolume * GetEffectiveBgmVolume();
     }
 }

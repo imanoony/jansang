@@ -44,6 +44,13 @@ public class MySceneManager : MonoBehaviour
         StartCoroutine(SceneLoadRoutine(name));
     }
 
+    public void ReloadCurrentScene()
+    {
+        var scene = SceneManager.GetActiveScene();
+        if (!scene.IsValid()) return;
+        LoadScene(scene.name);
+    }
+
     IEnumerator SceneLoadRoutine(string scenename)
     {
         fadePanel.gameObject.SetActive(true);

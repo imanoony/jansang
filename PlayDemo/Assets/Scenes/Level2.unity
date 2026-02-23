@@ -6657,6 +6657,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Next Stage Trigger (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 814845825473979611, guid: eb90b9fd6947aec4cbf33db793731f5b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1868747641840705127, guid: eb90b9fd6947aec4cbf33db793731f5b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.5
@@ -7163,6 +7167,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 964599211317380333, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569633004218256560, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569633004218256560, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569633004218256560, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1798851943}
+    - target: {fileID: 1569633004218256560, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569633004218256560, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: RestartScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569633004218256560, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: SettingManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569633004218256560, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 2464659344240176211, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
       propertyPath: m_Name
       value: Managers
@@ -12174,6 +12210,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1798851943 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6763923696998433973, guid: 9b4662cd82c477a4c87d8f405b3cc06a, type: 3}
+  m_PrefabInstance: {fileID: 465470662}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1762a7c7ee8ea09459476e07215694e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SettingManager
 --- !u!1001 &1800150397
 PrefabInstance:
   m_ObjectHideFlags: 0
