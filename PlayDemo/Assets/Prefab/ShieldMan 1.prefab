@@ -283,6 +283,11 @@ MonoBehaviour:
     m_Bits: 262144
   blockSfx: {fileID: 8300000, guid: c917d5f6dc89a7441abce837398ed85b, type: 3}
   blockSfxVolume: 1
+  blockVfxPrefab: {fileID: 8342553524883152834, guid: 5fb4a9a0b01dc2f45af6c5747c734282, type: 3}
+  blockVfxSpawn: {fileID: 8348660630101437246}
+  blockVfxLocalOffset: {x: 0.6, y: 0.2}
+  blockVfxUseHitPosition: 1
+  blockVfxLifetime: 1.2
   isWandering: 1
   attackArea: {fileID: 3231353124348335431}
   rushSpeedRate: 4

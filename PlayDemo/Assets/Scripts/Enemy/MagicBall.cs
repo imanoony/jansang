@@ -20,17 +20,29 @@ public class MagicBall : MonoBehaviour
     [SerializeField] private float knockbackStunDuration = 0.2f;
     [SerializeField] private LayerMask playerLayer;
     [SerializeField] private LayerMask enemyHittableLayer;
+    [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private Collider2D ball;
     [SerializeField] private Collider2D detectBoundary;
     [SerializeField] [CanBeNull] private BallCollisionDetection ballCollision;
     [SerializeField] [CanBeNull] private BallCollisionDetection boundaryCollision;
     [SerializeField] private bool detachParticlesOnDestroy = true;
+    [Header("Explosion VFX")]
+    [SerializeField] private GameObject explosionVfxPrefab;
+    [SerializeField] private Vector2 explosionVfxOffset;
+    [SerializeField] private float explosionVfxLifetime = 1.2f;
+    [Header("Explosion Shake")]
+    [SerializeField] private float explosionShakeDuration = 0.08f;
+    [SerializeField] private float explosionShakeAmplitude = 0.2f;
+    [SerializeField] private float explosionShakeFrequency = 25f;
     private ParticleSystem[] childParticles;
     private bool destroyed;
+    private CameraFollow2D camFollow;
+    private CameraShake camShake;
 
     private void Awake()
     {
         CacheChildParticles();
+        CacheCameraFx();
     }
     public void Init(GameObject player, float speed)
     {
@@ -79,6 +91,8 @@ public class MagicBall : MonoBehaviour
     }
     private void Explosion(Collision2D collision)
     {
+        SpawnExplosionVfx();
+        ApplyExplosionShake();
         TryApplyExplosionDamage(collision);
         DestroySelf();
     }
@@ -89,6 +103,14 @@ public class MagicBall : MonoBehaviour
 
         bool hitPlayer = collision.collider != null &&
             (collision.collider.CompareTag("Player") || IsInLayerMask(collision.gameObject.layer, playerLayer));
+        bool hitEnemyHittable = collision.collider != null &&
+            IsInLayerMask(collision.gameObject.layer, enemyHittableLayer);
+
+        if (hitEnemyHittable)
+        {
+            ApplyEnemyDamage(GetEnemyDamageMask());
+            return;
+        }
 
         if (!hitPlayer) return;
 
@@ -96,7 +118,6 @@ public class MagicBall : MonoBehaviour
         if (playerHit != null) playerHit.TakeDamage(attackDamage);
 
         ApplyPlayerKnockback(collision.collider);
-        ApplyEnemyHittableDamage();
     }
 
     private void ApplyPlayerKnockback(Collider2D playerCol)
@@ -118,12 +139,12 @@ public class MagicBall : MonoBehaviour
         playerRb.linearVelocity = dir * knockbackForce;
     }
 
-    private void ApplyEnemyHittableDamage()
+    private void ApplyEnemyDamage(LayerMask mask)
     {
-        if (enemyHittableLayer.value == 0) return;
+        if (mask.value == 0) return;
 
         float radius = GetExplosionRadius();
-        var hits = Physics2D.OverlapCircleAll(transform.position, radius, enemyHittableLayer);
+        var hits = Physics2D.OverlapCircleAll(transform.position, radius, mask);
         if (hits == null || hits.Length == 0) return;
 
         HashSet<EnemyBase> damaged = new HashSet<EnemyBase>();
@@ -133,6 +154,13 @@ public class MagicBall : MonoBehaviour
             if (enemy == null || !damaged.Add(enemy)) continue;
             enemy.Hit(attackDamage, transform.position);
         }
+    }
+
+    private LayerMask GetEnemyDamageMask()
+    {
+        LayerMask mask = enemyHittableLayer;
+        if (enemyLayer.value != 0) mask |= enemyLayer;
+        return mask;
     }
 
     private float GetExplosionRadius()
@@ -181,6 +209,33 @@ public class MagicBall : MonoBehaviour
         var main = ps.main;
         float lifetime = main.startLifetime.constantMax;
         return main.duration + lifetime;
+    }
+
+    private void SpawnExplosionVfx()
+    {
+        if (explosionVfxPrefab == null) return;
+        Vector3 pos = transform.position + (Vector3)explosionVfxOffset;
+        var vfx = Instantiate(explosionVfxPrefab, pos, Quaternion.identity);
+        if (explosionVfxLifetime > 0f) Destroy(vfx, explosionVfxLifetime);
+    }
+
+    private void ApplyExplosionShake()
+    {
+        if (explosionShakeDuration <= 0f || explosionShakeAmplitude <= 0f) return;
+        if (camFollow != null)
+        {
+            camFollow.Shake(explosionShakeDuration, explosionShakeAmplitude, explosionShakeFrequency);
+            return;
+        }
+        if (camShake != null) camShake.Shake(explosionShakeDuration, explosionShakeAmplitude, explosionShakeFrequency);
+    }
+
+    private void CacheCameraFx()
+    {
+        var cam = Camera.main;
+        if (cam == null) return;
+        camFollow = cam.GetComponent<CameraFollow2D>();
+        camShake = cam.GetComponent<CameraShake>();
     }
 }
 

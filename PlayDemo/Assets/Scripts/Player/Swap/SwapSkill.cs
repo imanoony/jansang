@@ -52,6 +52,12 @@ public class SwapSkill : MonoBehaviour
     {
         if (silenced) return;
 
+        if (skillActive && player != null && !player.CanMove())
+        {
+            DeactivateSkill();
+            return;
+        }
+
         if (skillActive)
         {
             UpdateTargets();

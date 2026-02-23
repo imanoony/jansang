@@ -34,6 +34,7 @@ public enum Boss1_RHandPattern
 
 public class Boss1_Manage : MonoBehaviour
 {
+    private bool difficultyApplied;
     [Header("Cut Scene Settings")]
     public float appearTime = 3f;
     public float handAppearTime = 3f;
@@ -166,6 +167,8 @@ public class Boss1_Manage : MonoBehaviour
     
         bossUI = GameObject.Find("Boss UI").GetComponent<Boss1_UI>();
         CacheCameraFx();
+
+        ApplyDifficulty();
     }
 
     private void Start()
@@ -208,6 +211,19 @@ public class Boss1_Manage : MonoBehaviour
         maxHealth = bodyHealth + lHandHealth + rHandHealth;
         totalHealth = maxHealth;
         StartCoroutine(Boss1_AppearScene());
+    }
+
+    private void ApplyDifficulty()
+    {
+        if (difficultyApplied) return;
+        float multiplier = 1f;
+        if (GameManager.Instance != null) multiplier = GameManager.Instance.EnemyHpMultiplier;
+        if (multiplier <= 0f) multiplier = 1f;
+
+        bodyHealth = Mathf.Max(1, Mathf.CeilToInt(bodyHealth * multiplier));
+        lHandHealth = Mathf.Max(1, Mathf.CeilToInt(lHandHealth * multiplier));
+        rHandHealth = Mathf.Max(1, Mathf.CeilToInt(rHandHealth * multiplier));
+        difficultyApplied = true;
     }
 
 #region Cut Scene
@@ -396,10 +412,35 @@ public class Boss1_Manage : MonoBehaviour
                 break;
         }
 
-        if (didDamage) ApplyHitFx();
+        if (didDamage)
+        {
+            ApplyHitFx();
+            SpawnHitEffect(part);
+        }
     }
 #endregion
 
+    private void SpawnHitEffect(Boss1_Part part)
+    {
+        var gm = GameManager.Instance;
+        if (gm == null) return;
+
+        Vector3 pos = transform.position;
+        switch (part)
+        {
+            case Boss1_Part.Body:
+                if (bodyObject != null) pos = bodyObject.transform.position;
+                break;
+            case Boss1_Part.LHand:
+                if (leftHandObject != null) pos = leftHandObject.transform.position;
+                break;
+            case Boss1_Part.RHand:
+                if (rightHandObject != null) pos = rightHandObject.transform.position;
+                break;
+        }
+
+        gm.SpawnHitEffect(pos);
+    }
 
 #region Pattern Manage
 

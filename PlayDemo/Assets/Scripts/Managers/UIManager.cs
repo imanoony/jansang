@@ -1,3 +1,5 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -162,6 +164,51 @@ public class UIManager : MonoBehaviour
     
     #region Damage
     public GameObject damageUI;
+    #endregion
+
+    #region Guide
+    [Header("Guide UI")]
+    [SerializeField] private GameObject guideRoot;
+    [SerializeField] private TMP_Text guideText;
+    [SerializeField] private CanvasGroup guideCanvasGroup;
+    [SerializeField] private float guideFadeDelay = 0f;
+    [SerializeField] private float guideFadeDuration = 1.2f;
+    private Coroutine guideRoutine;
+
+    public void ShowGuideText(string text)
+    {
+        if (guideText == null || guideCanvasGroup == null) return;
+
+        guideText.text = text;
+        if (guideRoot != null) guideRoot.SetActive(true);
+
+        if (guideRoutine != null) StopCoroutine(guideRoutine);
+        guideRoutine = StartCoroutine(GuideFadeRoutine());
+    }
+
+    private IEnumerator GuideFadeRoutine()
+    {
+        guideCanvasGroup.alpha = 1f;
+        guideCanvasGroup.interactable = false;
+        guideCanvasGroup.blocksRaycasts = false;
+
+        if (guideFadeDelay > 0f)
+            yield return new WaitForSecondsRealtime(guideFadeDelay);
+
+        float duration = Mathf.Max(0.01f, guideFadeDuration);
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            float lerp = Mathf.Clamp01(t / duration);
+            guideCanvasGroup.alpha = Mathf.Lerp(1f, 0f, lerp);
+            yield return null;
+        }
+
+        guideCanvasGroup.alpha = 0f;
+        if (guideRoot != null) guideRoot.SetActive(false);
+        guideRoutine = null;
+    }
     #endregion
     
     #region Observers

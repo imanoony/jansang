@@ -8,6 +8,18 @@ using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 public class EnemyBase : MonoBehaviour
 {
+    public static float DetectionRadiusMultiplier { get; private set; } = 1f;
+    public static float HealthMultiplier { get; private set; } = 1f;
+
+    public static void SetDetectionRadiusMultiplier(float value)
+    {
+        DetectionRadiusMultiplier = Mathf.Max(0f, value);
+    }
+
+    public static void SetHealthMultiplier(float value)
+    {
+        HealthMultiplier = Mathf.Max(0f, value);
+    }
     #region HP
     [Header("HP Stats")]
     public float HP { get; protected set; }
@@ -102,6 +114,8 @@ public class EnemyBase : MonoBehaviour
         audioManager = GameManager.Instance != null ? GameManager.Instance.Audio : null;
         Player = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (commander != null) commander.Register(OnAlerted);
+        int scaledMax = Mathf.Max(1, Mathf.CeilToInt(MaxHP * HealthMultiplier));
+        MaxHP = scaledMax;
         HP = MaxHP;
         currentSpeedRate = 1;
         RunAIAsync(this.GetCancellationTokenOnDestroy()).Forget();
@@ -211,19 +225,38 @@ public class EnemyBase : MonoBehaviour
     
     public virtual void Hit(int damage)
     {
-        var go = Instantiate(GameManager.Instance.UI.damageUI, 
-            transform.position + Vector3.up * col.bounds.size.y, 
-            Quaternion.identity).GetComponent<DamageUI>();
-        
-        go.Init(damage);
-        if (audioManager != null) audioManager.PlaySfx(hitSfx, hitSfxVolume);
-        ApplyHitFx(damage);
-        ApplyDamageAsync(damage).Forget();
+        Vector3 effectPos = col != null ? col.bounds.center : transform.position;
+        ApplyHitInternal(damage, effectPos);
     }
     
     public virtual void Hit(int damage, Vector3 pos)
     {
-        Hit(damage);
+        ApplyHitInternal(damage, pos);
+    }
+
+    private void ApplyHitInternal(int damage, Vector3 effectPos)
+    {
+        var ui = GameManager.Instance != null ? GameManager.Instance.UI : null;
+        if (ui != null && ui.damageUI != null)
+        {
+            Vector3 uiPos = transform.position;
+            if (col != null) uiPos += Vector3.up * col.bounds.size.y;
+            var go = Instantiate(ui.damageUI, uiPos, Quaternion.identity).GetComponent<DamageUI>();
+            go.Init(damage);
+        }
+
+        if (audioManager != null) audioManager.PlaySfx(hitSfx, hitSfxVolume);
+        Vector3 hitPos = col != null ? col.bounds.center : transform.position;
+        SpawnHitEffect(hitPos);
+        ApplyHitFx(damage);
+        ApplyDamageAsync(damage).Forget();
+    }
+
+    private void SpawnHitEffect(Vector3 pos)
+    {
+        var gm = GameManager.Instance;
+        if (gm == null) return;
+        gm.SpawnHitEffect(pos);
     }
     
     private void OnTriggerEnter2D(Collider2D other)
@@ -243,8 +276,9 @@ public class EnemyBase : MonoBehaviour
     protected bool DetectPlayer(float range, LayerMask sightMask)
     {
         if (Player == null) return false;
+        float effectiveRange = range * DetectionRadiusMultiplier;
         float dist = Vector2.Distance(transform.position, Player.position);
-        if (dist > range) return false;
+        if (dist > effectiveRange) return false;
         Vector2 dir = (Player.position - transform.position).normalized;
         RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, dist, sightMask);
         if (hit.collider != null && hit.collider.CompareTag("Player"))

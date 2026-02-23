@@ -23,6 +23,12 @@ public class ShieldManEnemy : EnemyBase
     [Header("SFX")]
     [SerializeField] private AudioClip blockSfx;
     [SerializeField, Range(0f, 1f)] private float blockSfxVolume = 1f;
+    [Header("VFX")]
+    [SerializeField] private GameObject blockVfxPrefab;
+    [SerializeField] private Transform blockVfxSpawn;
+    [SerializeField] private Vector2 blockVfxLocalOffset = new Vector2(0.6f, 0.2f);
+    [SerializeField] private bool blockVfxUseHitPosition = true;
+    [SerializeField] private float blockVfxLifetime = 1.2f;
     public bool isWandering = true;
     #endregion
     #region components
@@ -233,6 +239,7 @@ public class ShieldManEnemy : EnemyBase
         {
             int reducedDamage = Mathf.Max(1, Mathf.CeilToInt(damage * 0.5f));
             if (audioManager != null) audioManager.PlaySfx(blockSfx, blockSfxVolume);
+            SpawnBlockVfx(Player != null ? Player.position : transform.position);
             base.Hit(reducedDamage);
         }
     }
@@ -252,8 +259,38 @@ public class ShieldManEnemy : EnemyBase
         {
             int reducedDamage = Mathf.Max(1, Mathf.CeilToInt(damage * 0.5f));
             if (audioManager != null) audioManager.PlaySfx(blockSfx, blockSfxVolume);
+            SpawnBlockVfx(pos);
             base.Hit(reducedDamage, pos);
         }
+    }
+
+    private void SpawnBlockVfx(Vector3 hitPos)
+    {
+        if (blockVfxPrefab == null) return;
+
+        Vector3 spawnPos = GetBlockVfxPosition(hitPos);
+        var vfx = Instantiate(blockVfxPrefab, spawnPos, Quaternion.identity);
+        ApplyBlockVfxFacing(vfx);
+        if (blockVfxLifetime > 0f) Destroy(vfx, blockVfxLifetime);
+    }
+
+    private Vector3 GetBlockVfxPosition(Vector3 hitPos)
+    {
+        if (blockVfxSpawn != null) return blockVfxSpawn.position;
+        if (blockVfxUseHitPosition) return hitPos;
+
+        float dir = transform.localScale.x >= 0f ? 1f : -1f;
+        Vector3 offset = new Vector3(blockVfxLocalOffset.x * dir, blockVfxLocalOffset.y, 0f);
+        return transform.position + offset;
+    }
+
+    private void ApplyBlockVfxFacing(GameObject vfx)
+    {
+        if (vfx == null) return;
+        float dir = transform.localScale.x >= 0f ? 1f : -1f;
+        Vector3 scale = vfx.transform.localScale;
+        scale.x = Mathf.Abs(scale.x) * dir;
+        vfx.transform.localScale = scale;
     }
 
     private void ApplyDamageAreaHits()

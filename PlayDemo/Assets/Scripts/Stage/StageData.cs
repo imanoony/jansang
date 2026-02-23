@@ -146,17 +146,7 @@ public static class StageSerializer
         decoTM.ClearAllTiles();
 
         if (player.childCount > 0)
-#if UNITY_EDITOR
-            Undo.DestroyObjectImmediate(player.GetChild(0).gameObject);
-#else
-            Destroy(player.GetChild(0).gameObject);
-#endif
-        for (i = enemy.childCount - 1; i >= 0; i--)
-#if UNITY_EDITOR
-            Undo.DestroyObjectImmediate(enemy.GetChild(i).gameObject);
-#else
-            Destroy(enemy.GetChild(i).gameObject);
-#endif
+
 
         // 땅 타일 배치하기
         foreach (Int2 pos in stage.grounds)
@@ -173,26 +163,7 @@ public static class StageSerializer
         foreach (Int2 pos in stage.decos)
             decoTM.SetTile(new Vector3Int(pos.x, pos.y), decoTiles[0]);
 
-        // 적들 스폰하기
-        foreach (Int2 pos in stage.enemies)
-        {
-#if UNITY_EDITOR
-            entity = (GameObject)PrefabUtility.InstantiatePrefab(enemyPrefab);
-#else
-            entity = Instantiate(enemyPrefab);
-#endif
-            entity.transform.position = GetEnemyPos(grid, pos);
-            entity.transform.SetParent(enemy);
-        }
-
-        // 플레이어 스폰하기
-#if UNITY_EDITOR
-        entity = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
-#else   
-        entity = Instantiate(playerPrefab);
-#endif
-        entity.transform.position = GetPlayerPos(grid, stage.player);
-        entity.transform.SetParent(player);
+        
     }
 
     // TODO: 화면 clear 함수 만들기

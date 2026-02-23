@@ -18441,6 +18441,7 @@ MonoBehaviour:
   - {fileID: 2824361930925301053, guid: a3c6e0c3faa1a474c9b7d2912f70fc5d, type: 3}
   - {fileID: 2937699623890234527, guid: a6514df26cbd4d4449ca11a4dd857f06, type: 3}
   - {fileID: 2737640904995590904, guid: 71d8a53708256ff488b379cd2e0afe97, type: 3}
+  - {fileID: 4044428486906286431, guid: 99af213a0fb043b4b999c2a5a311b962, type: 3}
   spawnedEnemies: []
   destinationPoint: {x: 0, y: 0}
   currentBodyPattern: 0
@@ -20798,6 +20799,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 70315955554233825, guid: f1455fcc2bf0a0744bec02b20cd77441, type: 3}
+      propertyPath: tutorial
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1751506176548827490, guid: f1455fcc2bf0a0744bec02b20cd77441, type: 3}
       propertyPath: m_Name
       value: AudioPlayer

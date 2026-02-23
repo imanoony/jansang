@@ -16,6 +16,7 @@ public enum Boss2_Pattern
 
 public class Boss2_Manage : MonoBehaviour
 {
+    private bool difficultyApplied;
     [Header("Cut Scene Settings")]
     public float appearDashTime = 2f;
     public float appearDashDistance = 4f;
@@ -127,6 +128,8 @@ public class Boss2_Manage : MonoBehaviour
         bodySR = spriteParent.transform.Find("Body").GetComponent<SpriteRenderer>();
 
         bossUI = GameObject.Find("Boss UI").GetComponent<Boss2_UI>();
+
+        ApplyDifficulty();
     }
 #endregion
 
@@ -140,6 +143,16 @@ public class Boss2_Manage : MonoBehaviour
     {
         health = maxHealth;
         StartCoroutine(Boss2_AppearScene());
+    }
+
+    private void ApplyDifficulty()
+    {
+        if (difficultyApplied) return;
+        float multiplier = 1f;
+        if (GameManager.Instance != null) multiplier = GameManager.Instance.EnemyHpMultiplier;
+        if (multiplier <= 0f) multiplier = 1f;
+        maxHealth = Mathf.Max(1, Mathf.CeilToInt(maxHealth * multiplier));
+        difficultyApplied = true;
     }
 
     private void Update()
@@ -193,6 +206,7 @@ public class Boss2_Manage : MonoBehaviour
         if (isInvincible){ return; }
 
         health -= damage;
+        SpawnHitEffect();
 
         if(health <= 0)
         {
@@ -202,6 +216,14 @@ public class Boss2_Manage : MonoBehaviour
         }
 
         StartCoroutine(DamageEffect());
+    }
+
+    private void SpawnHitEffect()
+    {
+        var gm = GameManager.Instance;
+        if (gm == null) return;
+        Vector3 pos = bossCol != null ? bossCol.bounds.center : transform.position;
+        gm.SpawnHitEffect(pos);
     }
 
     IEnumerator DamageEffect()

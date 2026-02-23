@@ -66,6 +66,7 @@ public class PlayerHitCheck : MonoBehaviour
         
         go.Init(damage);
         if (audioManager != null) audioManager.PlaySfx(hitSfx, hitSfxVolume);
+        SpawnHitEffect();
 
         if (manager.HP <= 0 && !death)
         {
@@ -75,6 +76,17 @@ public class PlayerHitCheck : MonoBehaviour
         ApplyHitSlow();
         ApplyHitFx();
         StartCoroutine(NoDamage());
+    }
+
+    private void SpawnHitEffect()
+    {
+        var gm = GameManager.Instance;
+        if (gm == null) return;
+
+        Vector3 pos = transform.position;
+        var col = GetComponent<Collider2D>();
+        if (col != null) pos = col.bounds.center;
+        gm.SpawnHitEffect(pos);
     }
 
     IEnumerator NoDamage()

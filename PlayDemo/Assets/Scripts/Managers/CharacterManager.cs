@@ -137,6 +137,21 @@ public class CharacterManager : MonoBehaviour
     }
     #endregion
     private bool initialized = false;
+
+    public void ApplyDifficultyStats(int maxHp, float maxGauge)
+    {
+        if (maxHp > 0) initialMaxHP = maxHp;
+        if (maxGauge > 0f) initialMaxGauge = maxGauge;
+
+        if (!initialized) return;
+
+        MaxHP = initialMaxHP;
+        MaxGauge = initialMaxGauge;
+        HP = Mathf.Min(HP, MaxHP);
+        Gauge = Mathf.Min(Gauge, MaxGauge);
+        OnHPChanged?.Invoke(HP);
+        OnGaugeChanged?.Invoke(Gauge);
+    }
     public void Init()
     {
         // Max Gauge가 게임 진행에 따라 변할 수 있다는 점을 고려

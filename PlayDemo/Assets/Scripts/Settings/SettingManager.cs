@@ -121,6 +121,7 @@ public class SettingManager : MonoBehaviour
 
     public void RestartScene()
     {
+        Time.timeScale = 1f;
         if (timestopid != -1)
         {
             GameManager.Instance.TimeManager.ExitBulletTime(timestopid);
@@ -139,13 +140,13 @@ public class SettingManager : MonoBehaviour
         float fadeOut = sceneManager != null ? Mathf.Max(0f, sceneManager.fadeTime) : 1f;
         if (audio != null) audio.StopBgm(fadeOut);
 
-        if (sceneManager != null)
+        if (gameManager != null)
         {
-            sceneManager.ReloadCurrentScene();
+            gameManager.ReturnToTitle();
         }
         else
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            SceneManager.LoadScene("TitleScene");
         }
     }
 

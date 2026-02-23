@@ -12,6 +12,7 @@ public class TitleSceneManager : MonoBehaviour
     public Image[] backgrounds;
 
     public InputAction anykeyAction;
+    public GameObject difficultyPanel;
 
     
     private bool changeStarted = false;
@@ -22,14 +23,34 @@ public class TitleSceneManager : MonoBehaviour
 
     public Image loadingBar;
     
+    private void Awake()
+    {
+        if (GameManager.Instance != null)
+        {
+            Destroy(GameManager.Instance.gameObject);
+        }
+    }
+
     private void Start()
     {
         anykeyAction = InputSystem.actions.FindActionMap("Player").FindAction("AnyKey");
         anykeyAction.Enable();
-        anykeyAction.started += GoToStage;
+        anykeyAction.started += GoToDifficulty;
     }
 
-    private void GoToStage(InputAction.CallbackContext context)
+    private void GoToDifficulty(InputAction.CallbackContext context)
+    {
+        anykeyAction.started -= GoToDifficulty;
+        difficultyPanel.SetActive(true);
+    }
+
+    public void SetDifficulty(int difficulty)
+    {
+        if (!changeStarted) DifficultyContainer.instance.difficulty = difficulty;
+        GoToStage();
+    }
+
+    private void GoToStage()
     {
         if (!changeStarted)
         {
@@ -40,6 +61,7 @@ public class TitleSceneManager : MonoBehaviour
 
     IEnumerator ChangeScene()
     {
+        fadePanel.gameObject.SetActive(true);
         float elapsed = 0;
         Color c = Color.black;
         c.a = 0;
